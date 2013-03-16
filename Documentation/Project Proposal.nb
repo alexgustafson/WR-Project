@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       157,          7]
-NotebookDataLength[     22053,        568]
-NotebookOptionsPosition[     19343,        470]
-NotebookOutlinePosition[     20054,        498]
-CellTagsIndexPosition[     19956,        492]
+NotebookDataLength[     22156,        571]
+NotebookOptionsPosition[     19392,        471]
+NotebookOutlinePosition[     20157,        501]
+CellTagsIndexPosition[     20059,        495]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -49,13 +49,14 @@ The goal of this project is the implmentation of a C++ cross platform \
 application that will analyse audio files. The application will utilize the \
 MPICH MPI Library in order to effitiently utilize multi-core or \
 multi-computer environments. The primary analysis tool will be a \
-fourier-based frequency anaylsis of audio signal. \
+fourier-based frequency anaylsis of audio data. \
 \>", "Abstract",
  CellChangeTimes->{{3.5724346121436567`*^9, 3.572434613413775*^9}, {
   3.572434758446398*^9, 3.572434824849225*^9}, {3.572434858786503*^9, 
   3.572434878936103*^9}, {3.572434943216941*^9, 3.572434945894856*^9}, {
   3.572434976392343*^9, 3.5724351837702436`*^9}, {3.572435215129629*^9, 
-  3.5724352585520697`*^9}, {3.572435395391981*^9, 3.572435427167623*^9}}],
+  3.5724352585520697`*^9}, {3.572435395391981*^9, 3.572435427167623*^9}, {
+  3.5724429721338453`*^9, 3.572442976890152*^9}}],
 
 Cell["16.03.2013", "Date",
  CellChangeTimes->{{3.572435279235506*^9, 3.572435282327874*^9}}],
@@ -468,8 +469,10 @@ Cell[TextData[{
 }, Open  ]]
 }, Open  ]]
 },
-WindowSize->{716, 732},
-WindowMargins->{{Automatic, 120}, {Automatic, 18}},
+WindowSize->{716, 747},
+WindowMargins->{{Automatic, 123}, {Automatic, 21}},
+PrintingCopies->1,
+PrintingPageRange->{1, Automatic},
 FrontEndVersion->"9.0 for Mac OS X x86 (32-bit, 64-bit Kernel) (January 25, \
 2013)",
 StyleDefinitions->FrontEnd`FileName[{"Article"}, "JournalArticle.nb", 
@@ -481,18 +484,18 @@ PrivateNotebookOptions -> {"NotebookAuthor" -> ""}
 (* Internal cache information *)
 (*CellTagsOutline
 CellTagsIndex->{
- "00002B71"->{
-  Cell[19000, 445, 303, 20, 24, "Reference",
-   CellTags->"00002B71"]},
  "000030FD"->{
-  Cell[18681, 421, 316, 22, 24, "Reference",
-   CellTags->"000030FD"]}
+  Cell[18730, 422, 316, 22, 24, "Reference",
+   CellTags->"000030FD"]},
+ "00002B71"->{
+  Cell[19049, 446, 303, 20, 24, "Reference",
+   CellTags->"00002B71"]}
  }
 *)
 (*CellTagsIndex
 CellTagsIndex->{
- {"00002B71", 19774, 483},
- {"000030FD", 19861, 486}
+ {"000030FD", 19877, 486},
+ {"00002B71", 19964, 489}
  }
 *)
 (*NotebookFileOutline
@@ -506,66 +509,66 @@ Cell[946, 35, 65, 1, 12, "Institution"]
 }, Open  ]],
 Cell[CellGroupData[{
 Cell[1048, 41, 140, 3, 45, "AbstractSection"],
-Cell[1191, 46, 721, 11, 61, "Abstract"],
-Cell[1915, 59, 92, 1, 27, "Date"],
-Cell[2010, 62, 82, 1, 20, "Text"],
-Cell[2095, 65, 82, 1, 20, "Text"],
-Cell[2180, 68, 82, 1, 20, "Text"]
+Cell[1191, 46, 770, 12, 61, "Abstract"],
+Cell[1964, 60, 92, 1, 27, "Date"],
+Cell[2059, 63, 82, 1, 20, "Text"],
+Cell[2144, 66, 82, 1, 20, "Text"],
+Cell[2229, 69, 82, 1, 20, "Text"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[2299, 74, 150, 2, 47, "Section"],
+Cell[2348, 75, 150, 2, 47, "Section"],
 Cell[CellGroupData[{
-Cell[2474, 80, 108, 1, 33, "Subsection"],
-Cell[2585, 83, 1595, 32, 73, "Text"],
-Cell[4183, 117, 854, 13, 50, "Text"]
+Cell[2523, 81, 108, 1, 33, "Subsection"],
+Cell[2634, 84, 1595, 32, 73, "Text"],
+Cell[4232, 118, 854, 13, 50, "Text"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[5074, 135, 156, 2, 33, "Subsection"],
-Cell[5233, 139, 613, 10, 50, "Text"],
-Cell[5849, 151, 404, 7, 20, "Text"]
+Cell[5123, 136, 156, 2, 33, "Subsection"],
+Cell[5282, 140, 613, 10, 50, "Text"],
+Cell[5898, 152, 404, 7, 20, "Text"]
 }, Open  ]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[6302, 164, 202, 3, 47, "Section"],
-Cell[6507, 169, 1142, 18, 80, "Text"]
+Cell[6351, 165, 202, 3, 47, "Section"],
+Cell[6556, 170, 1142, 18, 80, "Text"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[7686, 192, 248, 5, 47, "Section"],
+Cell[7735, 193, 248, 5, 47, "Section"],
 Cell[CellGroupData[{
-Cell[7959, 201, 164, 2, 33, "Subsection"],
-Cell[8126, 205, 1237, 25, 58, "Text"]
+Cell[8008, 202, 164, 2, 33, "Subsection"],
+Cell[8175, 206, 1237, 25, 58, "Text"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[9400, 235, 221, 3, 33, "Subsection"],
-Cell[9624, 240, 1309, 20, 80, "Text"]
+Cell[9449, 236, 221, 3, 33, "Subsection"],
+Cell[9673, 241, 1309, 20, 80, "Text"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[10970, 265, 258, 3, 33, "Subsection"],
-Cell[11231, 270, 965, 15, 35, "Text"]
+Cell[11019, 266, 258, 3, 33, "Subsection"],
+Cell[11280, 271, 965, 15, 35, "Text"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[12233, 290, 307, 4, 33, "Subsection"],
-Cell[12543, 296, 917, 15, 20, "Text"]
+Cell[12282, 291, 307, 4, 33, "Subsection"],
+Cell[12592, 297, 917, 15, 20, "Text"]
 }, Open  ]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[13509, 317, 279, 4, 47, "Section"],
+Cell[13558, 318, 279, 4, 47, "Section"],
 Cell[CellGroupData[{
-Cell[13813, 325, 219, 3, 33, "Subsection"],
-Cell[14035, 330, 756, 13, 20, "Text"],
-Cell[14794, 345, 753, 13, 20, "Text"],
-Cell[15550, 360, 721, 10, 20, "Text"],
-Cell[16274, 372, 820, 13, 20, "Text"],
-Cell[17097, 387, 749, 11, 20, "Text"],
-Cell[17849, 400, 654, 10, 20, "Text"]
+Cell[13862, 326, 219, 3, 33, "Subsection"],
+Cell[14084, 331, 756, 13, 20, "Text"],
+Cell[14843, 346, 753, 13, 20, "Text"],
+Cell[15599, 361, 721, 10, 20, "Text"],
+Cell[16323, 373, 820, 13, 20, "Text"],
+Cell[17146, 388, 749, 11, 20, "Text"],
+Cell[17898, 401, 654, 10, 20, "Text"]
 }, Open  ]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[18552, 416, 104, 1, 47, "ReferenceSection"],
+Cell[18601, 417, 104, 1, 47, "ReferenceSection"],
 Cell[CellGroupData[{
-Cell[18681, 421, 316, 22, 24, "Reference",
+Cell[18730, 422, 316, 22, 24, "Reference",
  CellTags->"000030FD"],
-Cell[19000, 445, 303, 20, 24, "Reference",
+Cell[19049, 446, 303, 20, 24, "Reference",
  CellTags->"00002B71"]
 }, Open  ]]
 }, Open  ]]
