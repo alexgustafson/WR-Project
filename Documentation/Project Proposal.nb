@@ -1,0 +1,462 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 9.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       157,          7]
+NotebookDataLength[     16368,        453]
+NotebookOptionsPosition[     14044,        367]
+NotebookOutlinePosition[     14754,        395]
+CellTagsIndexPosition[     14656,        389]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell["\<\
+Seminar Wissenschaftliches Rechnen\
+\>", "Title",
+ CellChangeTimes->{{3.5724342860810127`*^9, 3.572434295620327*^9}}],
+
+Cell[CellGroupData[{
+
+Cell["Alexander Gustafson", "Author",
+ CellChangeTimes->{{3.572434300717225*^9, 3.5724343044998407`*^9}}],
+
+Cell["ZHAW Zurich", "Institution",
+ CellChangeTimes->{{3.5724343079022303`*^9, 3.5724343110516157`*^9}}],
+
+Cell["", "Institution",
+ CellChangeTimes->{3.572434316539123*^9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["\<\
+Project Proposal : Audio FIle Analysis \
+\>", "AbstractSection",
+ CellChangeTimes->{{3.572434398813312*^9, 3.572434600781542*^9}}],
+
+Cell["\<\
+The goal of this project is the implmentation of a C++ cross platform \
+application that will analyse audio files. The application will utilize the \
+MPICH MPI Library in order to effitiently utilize multi-core or \
+multi-computer environments. The primary analysis tool will be a \
+fourier-based frequency anaylsis of audio signal. \
+\>", "Abstract",
+ CellChangeTimes->{{3.5724346121436567`*^9, 3.572434613413775*^9}, {
+  3.572434758446398*^9, 3.572434824849225*^9}, {3.572434858786503*^9, 
+  3.572434878936103*^9}, {3.572434943216941*^9, 3.572434945894856*^9}, {
+  3.572434976392343*^9, 3.5724351837702436`*^9}, {3.572435215129629*^9, 
+  3.5724352585520697`*^9}, {3.572435395391981*^9, 3.572435427167623*^9}}],
+
+Cell["16.03.2013", "Date",
+ CellChangeTimes->{{3.572435279235506*^9, 3.572435282327874*^9}}],
+
+Cell["", "Text",
+ CellChangeTimes->{{3.572440785870514*^9, 3.572440785872593*^9}}],
+
+Cell["", "Text",
+ CellChangeTimes->{{3.572440785870514*^9, 3.572440786825741*^9}}],
+
+Cell["", "Text",
+ CellChangeTimes->{{3.572440785870514*^9, 3.572440786823023*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Audio Analysis", "Section",
+ CellChangeTimes->{{3.572435451320835*^9, 3.5724354539802732`*^9}, {
+  3.572435636696848*^9, 3.572435673127728*^9}}],
+
+Cell[CellGroupData[{
+
+Cell["Frequency Analysis", "Subsection",
+ CellChangeTimes->{{3.572435460638612*^9, 3.5724354676682377`*^9}}],
+
+Cell[TextData[{
+ "The user should be able to select an audio file, or folder containing audio \
+files. The application will then begin to divide the audio file(s) into \
+smaller overlapping slices. Each slice will be treated with a windowing \
+function that will fade-out the edges. Windowing reduces false spectral \
+artifacts that would result from discontinuities resulting from the slicing. \
+Windowing also helps to \[OpenCurlyDoubleQuote]",
+ ButtonBox["reduce the problem of spectral leakage",
+  BaseStyle->"Hyperlink",
+  ButtonData->{
+    URL["http://www.katjaas.nl/FFTwindow/FFTwindow.html"], None},
+  ButtonNote->"http://www.katjaas.nl/FFTwindow/FFTwindow.html"],
+ "\[CloseCurlyDoubleQuote]",
+ ButtonBox[Cell[TextData[StyleBox[ButtonBox["1"],
+  FontVariations->{"CompatibilityType"->"Superscript"}]], "Citation",
+  Editable->False,
+  TaggingRules->{NoteData -> RowBox[{
+       RowBox[{"http", ":"}], "//", 
+       RowBox[{
+         RowBox[{
+           RowBox[{"www", ".", "katjaas", ".", "nl"}], "/", "FFTwindow"}], 
+         "/", 
+         RowBox[{"FFTwindow", ".", "html"}]}]}]}],
+  BaseStyle->"Hyperlink",
+  ButtonData->"000030FD"],
+ ", but I do not really understand this yet."
+}], "Text",
+ CellChangeTimes->{
+  3.572435508437055*^9, {3.572435553534276*^9, 3.5724355535382032`*^9}, {
+   3.572435681023736*^9, 3.572435711910891*^9}, {3.572435802573392*^9, 
+   3.572436229076724*^9}, {3.572436666869769*^9, 3.5724368036889668`*^9}, {
+   3.5724371234689007`*^9, 3.572437146164057*^9}, {3.5724372856164017`*^9, 
+   3.572437307673482*^9}, {3.5724396722232637`*^9, 3.572439675800331*^9}}],
+
+Cell["\<\
+The result of the Fourier Transform will be presented to the user in graphic \
+form, as a spectrograph showing the magnitude of the frequency components \
+over time. The application should preserve the numeric results of the fourier \
+transformation, including the imaginary component, so that the original \
+signal might be \[OpenCurlyDoubleQuote]reconstructed\[CloseCurlyDoubleQuote]. \
+\>", "Text",
+ CellChangeTimes->{
+  3.572435508437055*^9, {3.572435553534276*^9, 3.5724355535382032`*^9}, {
+   3.572435681023736*^9, 3.572435711910891*^9}, {3.572435802573392*^9, 
+   3.572436229076724*^9}, {3.572436666869769*^9, 3.5724368036889668`*^9}, {
+   3.5724371234689007`*^9, 3.572437146164057*^9}, {3.5724372856164017`*^9, 
+   3.572437307887081*^9}, {3.572437348413867*^9, 3.5724375323462152`*^9}, {
+   3.572437606394443*^9, 3.572437630848119*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Further Analysis", "Subsection",
+ CellChangeTimes->{{3.572435460638612*^9, 3.5724354676682377`*^9}, {
+  3.57243767177976*^9, 3.5724376782150784`*^9}}],
+
+Cell["\<\
+The application will also calculate the enery level or loudness of each slice \
+in order to gain information about the dynamics of the audio signal. By \
+analysing how often and how quickly the amplitude  or energy of a signal \
+changes it should be possible to make estimations about the tempo or the type \
+of content contained in the audio signal. \
+\>", "Text",
+ CellChangeTimes->{
+  3.572435508437055*^9, {3.572435553534276*^9, 3.572435553716465*^9}, {
+   3.572435604241313*^9, 3.572435624408759*^9}, {3.57243845822656*^9, 
+   3.572438459934991*^9}, {3.5724385404153767`*^9, 3.572438799123726*^9}}],
+
+Cell["\<\
+The application will display the results in graphical form to the user.\
+\>", "Text",
+ CellChangeTimes->{
+  3.572435508437055*^9, {3.572435553534276*^9, 3.572435553716465*^9}, {
+   3.572435604241313*^9, 3.572435624408759*^9}, {3.57243845822656*^9, 
+   3.572438459934991*^9}, {3.5724385404153767`*^9, 3.572438876159893*^9}, {
+   3.57244076364762*^9, 3.572440764423297*^9}, 3.572441471873999*^9}]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["The Application", "Section",
+ CellChangeTimes->{{3.572435451320835*^9, 3.5724354539802732`*^9}, {
+  3.572435636696848*^9, 3.572435673127728*^9}, {3.5724389077148037`*^9, 
+  3.572438910925709*^9}}],
+
+Cell["\<\
+The application will developed in C++. It will be cross-platform compilable. \
+It will have a graphical interface that will alow the user to select one or \
+multiple audio files to analyse. It will alow the user to initiate the \
+analysis, diplay the results in a managed and graphical form that make sense \
+in the context of the data to be displayed. It will also record information \
+about the number of threads/cores used and the time needed to finish \
+processing. Results of the analysis should be exportable, at least as a csv, \
+so that the data can be imported into other applications for testing and \
+comparison. \
+\>", "Text",
+ CellChangeTimes->{
+  3.572435508437055*^9, {3.572435553534276*^9, 3.572435553716465*^9}, {
+   3.572435604241313*^9, 3.572435624408759*^9}, {3.57243845822656*^9, 
+   3.572438459934991*^9}, {3.5724385404153767`*^9, 3.572438799123726*^9}, {
+   3.5724389269511347`*^9, 3.5724389269551163`*^9}, {3.572438971916353*^9, 
+   3.5724390124915648`*^9}, {3.5724390559650793`*^9, 3.572439337628853*^9}, {
+   3.572440770303187*^9, 3.5724407727351313`*^9}, {3.572441463065764*^9, 
+   3.572441464451009*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["\<\
+Tools, Libraries, and Frameworks\
+\>", "Section",
+ CellChangeTimes->{{3.572435451320835*^9, 3.5724354539802732`*^9}, {
+   3.572435636696848*^9, 3.572435673127728*^9}, {3.57243938571093*^9, 
+   3.572439394627397*^9}, 3.572441478320939*^9}],
+
+Cell[CellGroupData[{
+
+Cell["Audio File Processing", "Subsection",
+ CellChangeTimes->{{3.572435460638612*^9, 3.5724354676682377`*^9}, {
+  3.5724394129805517`*^9, 3.5724394214593077`*^9}}],
+
+Cell[TextData[{
+ "JUCE ",
+ ButtonBox[Cell[TextData[StyleBox[ButtonBox["2"],
+  FontVariations->{"CompatibilityType"->"Superscript"}]], "Citation",
+  Editable->False,
+  TaggingRules->{NoteData -> RowBox[{
+       RowBox[{"http", ":"}], "//", 
+       RowBox[{
+         RowBox[{"www", ".", "rawmaterialsoftware", ".", "com"}], "/", 
+         RowBox[{"juce", ".", "php"}]}]}]}],
+  BaseStyle->"Hyperlink",
+  ButtonData->"00002B71"],
+ " is a cross platofrm C++ framework that includes many classes for importing \
+and handling of most common audio file formats (",
+ "WAV, AIFF, Flac and Ogg-Vorbis)",
+ ". JUCE is released under the GNU Public License, commercial licenses are \
+also available. "
+}], "Text",
+ CellChangeTimes->{
+  3.572435508437055*^9, {3.572435553534276*^9, 3.5724355535382032`*^9}, {
+   3.572435681023736*^9, 3.572435711910891*^9}, {3.572435802573392*^9, 
+   3.572436229076724*^9}, {3.572436666869769*^9, 3.5724368036889668`*^9}, {
+   3.5724371234689007`*^9, 3.572437146164057*^9}, {3.5724372856164017`*^9, 
+   3.572437307673482*^9}, {3.572439591127931*^9, 3.572439615799407*^9}, {
+   3.57243967220224*^9, 3.572439856490142*^9}, {3.5724401159673557`*^9, 
+   3.572440147209606*^9}, {3.572440453736383*^9, 3.572440455744433*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Application and GUI Framework", "Subsection",
+ CellChangeTimes->{{3.572435460638612*^9, 3.5724354676682377`*^9}, {
+  3.5724394129805517`*^9, 3.5724394214593077`*^9}, {3.572440167040662*^9, 
+  3.572440198141251*^9}}],
+
+Cell["\<\
+I would also like to use JUCE as the application and GUI framework. Juce \
+offers a large set of cross platform components as well as basic image \
+support that will be usefull for displaying the results of the audio \
+analysis. I have been able to compile the JUCE demo applications on both my \
+Mac and Linux computers with little effort. \
+\>", "Text",
+ CellChangeTimes->{
+  3.572435508437055*^9, {3.572435553534276*^9, 3.5724355535382032`*^9}, {
+   3.572435681023736*^9, 3.572435711910891*^9}, {3.572435802573392*^9, 
+   3.572436229076724*^9}, {3.572436666869769*^9, 3.5724368036889668`*^9}, {
+   3.5724371234689007`*^9, 3.572437146164057*^9}, {3.5724372856164017`*^9, 
+   3.572437307673482*^9}, {3.572439591127931*^9, 3.572439615799407*^9}, {
+   3.57243967220224*^9, 3.572439856490142*^9}, {3.5724401159673557`*^9, 
+   3.572440147209606*^9}, {3.572440208371108*^9, 3.572440227162932*^9}, {
+   3.572440266971755*^9, 3.572440423174371*^9}, {3.572440486581461*^9, 
+   3.5724405343804903`*^9}, {3.572440574909411*^9, 3.5724406136588907`*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Project Repository", "Subsection",
+ CellChangeTimes->{{3.572435460638612*^9, 3.5724354676682377`*^9}, {
+  3.5724394129805517`*^9, 3.5724394214593077`*^9}, {3.572440167040662*^9, 
+  3.572440198141251*^9}, {3.5724406556371737`*^9, 3.572440661417802*^9}}],
+
+Cell["\<\
+I have created a github repository for this project. It will be used to host \
+all code and documentation as well as sample files for anaysis. The url is : \
+https://github.com/alexgustafson/WR-Project\
+\>", "Text",
+ CellChangeTimes->{
+  3.572435508437055*^9, {3.572435553534276*^9, 3.5724355535382032`*^9}, {
+   3.572435681023736*^9, 3.572435711910891*^9}, {3.572435802573392*^9, 
+   3.572436229076724*^9}, {3.572436666869769*^9, 3.5724368036889668`*^9}, {
+   3.5724371234689007`*^9, 3.572437146164057*^9}, {3.5724372856164017`*^9, 
+   3.572437307673482*^9}, {3.572439591127931*^9, 3.572439615799407*^9}, {
+   3.57243967220224*^9, 3.572439856490142*^9}, {3.5724401159673557`*^9, 
+   3.572440147209606*^9}, {3.572440208371108*^9, 3.572440227162932*^9}, {
+   3.572440266971755*^9, 3.572440423174371*^9}, {3.572440486581461*^9, 
+   3.5724405343804903`*^9}, {3.572440574909411*^9, 3.5724406136588907`*^9}, {
+   3.5724406648912888`*^9, 3.572440743976317*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Parallel Processing", "Subsection",
+ CellChangeTimes->{{3.572435460638612*^9, 3.5724354676682377`*^9}, {
+  3.5724394129805517`*^9, 3.5724394214593077`*^9}, {3.572440167040662*^9, 
+  3.572440198141251*^9}, {3.5724406556371737`*^9, 3.572440661417802*^9}, {
+  3.57244086602567*^9, 3.572440874845561*^9}}],
+
+Cell["\<\
+The C++ MPI Library MPICH will be used to distribute processing among \
+available cores or processors. \
+\>", "Text",
+ CellChangeTimes->{
+  3.572435508437055*^9, {3.572435553534276*^9, 3.5724355535382032`*^9}, {
+   3.572435681023736*^9, 3.572435711910891*^9}, {3.572435802573392*^9, 
+   3.572436229076724*^9}, {3.572436666869769*^9, 3.5724368036889668`*^9}, {
+   3.5724371234689007`*^9, 3.572437146164057*^9}, {3.5724372856164017`*^9, 
+   3.572437307673482*^9}, {3.572439591127931*^9, 3.572439615799407*^9}, {
+   3.57243967220224*^9, 3.572439856490142*^9}, {3.5724401159673557`*^9, 
+   3.572440147209606*^9}, {3.572440208371108*^9, 3.572440227162932*^9}, {
+   3.572440266971755*^9, 3.572440423174371*^9}, {3.572440486581461*^9, 
+   3.5724405343804903`*^9}, {3.572440574909411*^9, 3.5724406136588907`*^9}, {
+   3.5724406648912888`*^9, 3.572440743976317*^9}, {3.572440963245633*^9, 
+   3.572441051825947*^9}}]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["References", "ReferenceSection",
+ CellChangeTimes->{{3.572437093062976*^9, 3.572437095139106*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[TextData[{
+ "\t",
+ StyleBox["1",
+  FontVariations->{"CompatibilityType"->"Superscript"}],
+ "\t",
+ "http",
+ ":",
+ "//",
+ "www",
+ ".",
+ "katjaas",
+ ".",
+ "nl",
+ "/",
+ "FFTwindow",
+ "/",
+ "FFTwindow",
+ ".",
+ "html"
+}], "Reference",
+ Editable->False,
+ TaggingRules->{ReferenceNoteData -> ""},
+ CellTags->"000030FD"],
+
+Cell[TextData[{
+ "\t",
+ StyleBox["2",
+  FontVariations->{"CompatibilityType"->"Superscript"}],
+ "\t",
+ "http",
+ ":",
+ "//",
+ "www",
+ ".",
+ "rawmaterialsoftware",
+ ".",
+ "com",
+ "/",
+ "juce",
+ ".",
+ "php"
+}], "Reference",
+ Editable->False,
+ TaggingRules->{ReferenceNoteData -> ""},
+ CellTags->"00002B71"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+},
+WindowSize->{716, 732},
+WindowMargins->{{Automatic, 96}, {Automatic, 44}},
+FrontEndVersion->"9.0 for Mac OS X x86 (32-bit, 64-bit Kernel) (January 25, \
+2013)",
+StyleDefinitions->FrontEnd`FileName[{"Article"}, "JournalArticle.nb", 
+  CharacterEncoding -> "UTF-8"],
+PrivateNotebookOptions -> {"NotebookAuthor" -> ""}
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{
+ "00002B71"->{
+  Cell[13701, 342, 303, 20, 24, "Reference",
+   CellTags->"00002B71"]},
+ "000030FD"->{
+  Cell[13382, 318, 316, 22, 24, "Reference",
+   CellTags->"000030FD"]}
+ }
+*)
+(*CellTagsIndex
+CellTagsIndex->{
+ {"00002B71", 14474, 380},
+ {"000030FD", 14561, 383}
+ }
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[579, 22, 127, 3, 72, "Title"],
+Cell[CellGroupData[{
+Cell[731, 29, 105, 1, 41, "Author"],
+Cell[839, 32, 104, 1, 12, "Institution"],
+Cell[946, 35, 65, 1, 12, "Institution"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[1048, 41, 140, 3, 45, "AbstractSection"],
+Cell[1191, 46, 721, 11, 61, "Abstract"],
+Cell[1915, 59, 92, 1, 27, "Date"],
+Cell[2010, 62, 82, 1, 20, "Text"],
+Cell[2095, 65, 82, 1, 20, "Text"],
+Cell[2180, 68, 82, 1, 20, "Text"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[2299, 74, 150, 2, 47, "Section"],
+Cell[CellGroupData[{
+Cell[2474, 80, 108, 1, 33, "Subsection"],
+Cell[2585, 83, 1595, 32, 73, "Text"],
+Cell[4183, 117, 854, 13, 50, "Text"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[5074, 135, 156, 2, 33, "Subsection"],
+Cell[5233, 139, 613, 10, 50, "Text"],
+Cell[5849, 151, 404, 7, 20, "Text"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[6302, 164, 202, 3, 47, "Section"],
+Cell[6507, 169, 1142, 18, 80, "Text"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[7686, 192, 248, 5, 47, "Section"],
+Cell[CellGroupData[{
+Cell[7959, 201, 164, 2, 33, "Subsection"],
+Cell[8126, 205, 1237, 25, 58, "Text"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[9400, 235, 221, 3, 33, "Subsection"],
+Cell[9624, 240, 1053, 16, 50, "Text"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[10714, 261, 258, 3, 33, "Subsection"],
+Cell[10975, 266, 965, 15, 35, "Text"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[11977, 286, 307, 4, 33, "Subsection"],
+Cell[12287, 292, 917, 15, 20, "Text"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[13253, 313, 104, 1, 47, "ReferenceSection"],
+Cell[CellGroupData[{
+Cell[13382, 318, 316, 22, 24, "Reference",
+ CellTags->"000030FD"],
+Cell[13701, 342, 303, 20, 24, "Reference",
+ CellTags->"00002B71"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+}
+]
+*)
+
+(* End of internal cache information *)
