@@ -43,7 +43,7 @@ ifeq ($(CONFIG),Release)
 endif
 
 OBJECTS := \
-  $(OBJDIR)/MainComponent_a6ffb4a5.o \
+  $(OBJDIR)/MainContentComponent_19da5e66.o \
   $(OBJDIR)/Main_90ebc5c2.o \
   $(OBJDIR)/juce_audio_basics_2442e4ea.o \
   $(OBJDIR)/juce_audio_devices_a4c8a728.o \
@@ -78,9 +78,9 @@ strip:
 	@echo Stripping JuceTest
 	-@strip --strip-unneeded $(OUTDIR)/$(TARGET)
 
-$(OBJDIR)/MainComponent_a6ffb4a5.o: ../../Source/MainComponent.cpp
+$(OBJDIR)/MainContentComponent_19da5e66.o: ../../Source/MainContentComponent.cpp
 	-@mkdir -p $(OBJDIR)
-	@echo "Compiling MainComponent.cpp"
+	@echo "Compiling MainContentComponent.cpp"
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
 $(OBJDIR)/Main_90ebc5c2.o: ../../Source/Main.cpp
