@@ -23,7 +23,7 @@
 //[/Headers]
 
 #include "MainContentComponent.h"
-//#include "mpi.hpp"
+#include <mpi.h>
 
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
@@ -99,6 +99,26 @@ void MainContentComponent::buttonClicked (Button* buttonThatWasClicked)
     if (buttonThatWasClicked == startButton)
     {
         //[UserButtonCode_startButton] -- add your button handler code here..
+        
+        int myrank;
+        
+        /* Initialize MPI */
+        
+        MPI_Init(NULL, NULL);
+        
+        /* Find out my identity in the default communicator */
+        
+        MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
+        if (myrank == 0) {
+            //master();
+        } else {
+            //slave();
+        }
+        
+        /* Shut down MPI */
+        
+        MPI_Finalize();
+        
         //[/UserButtonCode_startButton]
     }
 

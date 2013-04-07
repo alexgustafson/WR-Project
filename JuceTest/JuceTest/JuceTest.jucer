@@ -30,9 +30,9 @@
   <EXPORTFORMATS>
     <XCODE_MAC targetFolder="Builds/MacOSX" juceFolder="../../../JUCE/modules">
       <CONFIGURATIONS>
-        <CONFIGURATION name="Debug" osxSDK="default" osxCompatibility="default" osxArchitecture="default"
+        <CONFIGURATION name="Debug" osxSDK="default" osxCompatibility="default" osxArchitecture="64BitIntel"
                        isDebug="1" optimisation="1" targetName="JuceTest" headerPath="/Users/alex_gustafson/Documents/boost/boost"/>
-        <CONFIGURATION name="Release" osxSDK="default" osxCompatibility="default" osxArchitecture="default"
+        <CONFIGURATION name="Release" osxSDK="default" osxCompatibility="default" osxArchitecture="64BitIntel"
                        isDebug="0" optimisation="2" targetName="JuceTest" headerPath="/Users/alex_gustafson/Documents/boost/boost"/>
       </CONFIGURATIONS>
     </XCODE_MAC>
@@ -45,5 +45,5 @@
       </CONFIGURATIONS>
     </LINUX_MAKE>
   </EXPORTFORMATS>
-  <JUCEOPTIONS/>
+  <JUCEOPTIONS JUCE_WEB_BROWSER="disabled"/>
 </JUCERPROJECT>
