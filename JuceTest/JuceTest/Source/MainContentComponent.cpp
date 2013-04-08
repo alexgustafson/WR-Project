@@ -23,7 +23,8 @@
 //[/Headers]
 
 #include "MainContentComponent.h"
-#include <mpi.h>
+#include <boost/mpi/environment.hpp>
+#include <boost/mpi/communicator.hpp>
 
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
@@ -100,24 +101,10 @@ void MainContentComponent::buttonClicked (Button* buttonThatWasClicked)
     {
         //[UserButtonCode_startButton] -- add your button handler code here..
         
-        int myrank;
         
-        /* Initialize MPI */
-        
-        MPI_Init(NULL, NULL);
-        
-        /* Find out my identity in the default communicator */
-        
-        MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
-        if (myrank == 0) {
-            //master();
-        } else {
-            //slave();
-        }
-        
-        /* Shut down MPI */
-        
-        MPI_Finalize();
+        boost::mpi::environment env(true);
+        boost::mpi::communicator world;
+        std::cout << "I am process " << world.rank() << " of " << world.size() << "." << std::endl;
         
         //[/UserButtonCode_startButton]
     }

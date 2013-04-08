@@ -19,6 +19,7 @@
 		3E79E55D3BC62E7B840EC37B /* DiscRecording.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C538FBFCD4C3619BFAB68E4 /* DiscRecording.framework */; };
 		451B582EBE1E953CA87AA7BD /* juce_audio_processors.mm in Sources */ = {isa = PBXBuildFile; fileRef = BC16584EA104861807DB68D9 /* juce_audio_processors.mm */; };
 		5B70F7C6610ECFF8D5F5A997 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7E26642E947BB29ED7E1B182 /* Accelerate.framework */; };
+		6665B7EF1712CB950099D6A2 /* libboost_mpi.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 6665B7EE1712CB940099D6A2 /* libboost_mpi.dylib */; };
 		66CBDCB6171199AA00FDFAC0 /* libmpi_cxx.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 66CBDCB5171199AA00FDFAC0 /* libmpi_cxx.dylib */; };
 		66CBDCB8171199C300FDFAC0 /* libmpi.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 66CBDCB7171199C300FDFAC0 /* libmpi.dylib */; };
 		69F4E691E8AE8033D0F2C227 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7272ACE74D3078D8FCAA9C77 /* OpenGL.framework */; };
@@ -368,6 +369,7 @@
 		65A284B1630EC8B26B6FAA12 /* juce_DrawableRectangle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = juce_DrawableRectangle.h; path = ../../JuceLibraryCode/modules/juce_gui_basics/drawables/juce_DrawableRectangle.h; sourceTree = SOURCE_ROOT; };
 		665967FC28216630240706C8 /* juce_ListBox.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = juce_ListBox.h; path = ../../JuceLibraryCode/modules/juce_gui_basics/widgets/juce_ListBox.h; sourceTree = SOURCE_ROOT; };
 		66649E5A9EC327259A633A7F /* juce_FilenameComponent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = juce_FilenameComponent.h; path = ../../JuceLibraryCode/modules/juce_gui_basics/filebrowser/juce_FilenameComponent.h; sourceTree = SOURCE_ROOT; };
+		6665B7EE1712CB940099D6A2 /* libboost_mpi.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libboost_mpi.dylib; path = ../../../../../../../../usr/local/lib/libboost_mpi.dylib; sourceTree = "<group>"; };
 		66A2C06FD8EDFF80A4EC1C5A /* juce_IIRFilterAudioSource.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = juce_IIRFilterAudioSource.cpp; path = ../../JuceLibraryCode/modules/juce_audio_basics/sources/juce_IIRFilterAudioSource.cpp; sourceTree = SOURCE_ROOT; };
 		66CBDCB5171199AA00FDFAC0 /* libmpi_cxx.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libmpi_cxx.dylib; path = ../../../../../../../../opt/local/lib/libmpi_cxx.dylib; sourceTree = "<group>"; };
 		66CBDCB7171199C300FDFAC0 /* libmpi.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libmpi.dylib; path = ../../../../../../../../opt/local/lib/libmpi.dylib; sourceTree = "<group>"; };
@@ -902,6 +904,7 @@
 				B0549402F17A8A99D3832102 /* WebKit.framework in Frameworks */,
 				66CBDCB8171199C300FDFAC0 /* libmpi.dylib in Frameworks */,
 				66CBDCB6171199AA00FDFAC0 /* libmpi_cxx.dylib in Frameworks */,
+				6665B7EF1712CB950099D6A2 /* libboost_mpi.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2468,6 +2471,7 @@
 			children = (
 				66CBDCB7171199C300FDFAC0 /* libmpi.dylib */,
 				66CBDCB5171199AA00FDFAC0 /* libmpi_cxx.dylib */,
+				6665B7EE1712CB940099D6A2 /* libboost_mpi.dylib */,
 				99DC23DA4CF4992D5694396F /* JuceTest */,
 				ED77CEB903AC8B5453A84D9B /* Juce Modules */,
 				683510F148D2A74FEF4AB0F8 /* Juce Library Code */,
@@ -2665,12 +2669,14 @@
 					../../JuceLibraryCode,
 					"$(inherited)",
 					../../../../../../../../opt/local/include/openmpi,
+					../../../../../boost_1_53_0,
 				);
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					/opt/local/lib,
+					/Users/alex_gustafson/Documents/boost_1_53_0/stage/lib,
 				);
 				MACOSX_DEPLOYMENT_TARGET_ppc = 10.4;
 				SDKROOT_ppc = macosx10.5;
@@ -2718,12 +2724,14 @@
 					../../JuceLibraryCode,
 					"$(inherited)",
 					../../../../../../../../opt/local/include/openmpi,
+					../../../../../boost_1_53_0,
 				);
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					/opt/local/lib,
+					/Users/alex_gustafson/Documents/boost_1_53_0/stage/lib,
 				);
 				MACOSX_DEPLOYMENT_TARGET_ppc = 10.4;
 				SDKROOT_ppc = macosx10.5;
