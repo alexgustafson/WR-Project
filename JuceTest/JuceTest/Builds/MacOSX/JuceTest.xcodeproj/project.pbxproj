@@ -19,9 +19,9 @@
 		3E79E55D3BC62E7B840EC37B /* DiscRecording.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C538FBFCD4C3619BFAB68E4 /* DiscRecording.framework */; };
 		451B582EBE1E953CA87AA7BD /* juce_audio_processors.mm in Sources */ = {isa = PBXBuildFile; fileRef = BC16584EA104861807DB68D9 /* juce_audio_processors.mm */; };
 		5B70F7C6610ECFF8D5F5A997 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7E26642E947BB29ED7E1B182 /* Accelerate.framework */; };
+		662265BC1747B32D0083A4BF /* libmpi_cxx.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 662265BA1747B32D0083A4BF /* libmpi_cxx.dylib */; };
+		662265BD1747B32D0083A4BF /* libmpi.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 662265BB1747B32D0083A4BF /* libmpi.dylib */; };
 		6665B7EF1712CB950099D6A2 /* libboost_mpi.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 6665B7EE1712CB940099D6A2 /* libboost_mpi.dylib */; };
-		66CBDCB6171199AA00FDFAC0 /* libmpi_cxx.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 66CBDCB5171199AA00FDFAC0 /* libmpi_cxx.dylib */; };
-		66CBDCB8171199C300FDFAC0 /* libmpi.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 66CBDCB7171199C300FDFAC0 /* libmpi.dylib */; };
 		69F4E691E8AE8033D0F2C227 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7272ACE74D3078D8FCAA9C77 /* OpenGL.framework */; };
 		6A247E18883622E428493DC3 /* juce_audio_devices.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6360A6324195858EBD63FD0F /* juce_audio_devices.mm */; };
 		6CF4CEEC630701C1D9377D8A /* juce_audio_basics.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0778433A69F0CD610C830299 /* juce_audio_basics.mm */; };
@@ -367,12 +367,12 @@
 		6586B8D2BB411D6E26A7CC4D /* juce_MultiTimer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = juce_MultiTimer.cpp; path = ../../JuceLibraryCode/modules/juce_events/timers/juce_MultiTimer.cpp; sourceTree = SOURCE_ROOT; };
 		65A0DD2119A6767E32EF23C3 /* juce_RelativeRectangle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = juce_RelativeRectangle.h; path = ../../JuceLibraryCode/modules/juce_gui_basics/positioning/juce_RelativeRectangle.h; sourceTree = SOURCE_ROOT; };
 		65A284B1630EC8B26B6FAA12 /* juce_DrawableRectangle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = juce_DrawableRectangle.h; path = ../../JuceLibraryCode/modules/juce_gui_basics/drawables/juce_DrawableRectangle.h; sourceTree = SOURCE_ROOT; };
+		662265BA1747B32D0083A4BF /* libmpi_cxx.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libmpi_cxx.dylib; path = ../../../../../../../../opt/local/lib/libmpi_cxx.dylib; sourceTree = "<group>"; };
+		662265BB1747B32D0083A4BF /* libmpi.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libmpi.dylib; path = ../../../../../../../../opt/local/lib/libmpi.dylib; sourceTree = "<group>"; };
 		665967FC28216630240706C8 /* juce_ListBox.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = juce_ListBox.h; path = ../../JuceLibraryCode/modules/juce_gui_basics/widgets/juce_ListBox.h; sourceTree = SOURCE_ROOT; };
 		66649E5A9EC327259A633A7F /* juce_FilenameComponent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = juce_FilenameComponent.h; path = ../../JuceLibraryCode/modules/juce_gui_basics/filebrowser/juce_FilenameComponent.h; sourceTree = SOURCE_ROOT; };
 		6665B7EE1712CB940099D6A2 /* libboost_mpi.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libboost_mpi.dylib; path = ../../../../../../../../usr/local/lib/libboost_mpi.dylib; sourceTree = "<group>"; };
 		66A2C06FD8EDFF80A4EC1C5A /* juce_IIRFilterAudioSource.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = juce_IIRFilterAudioSource.cpp; path = ../../JuceLibraryCode/modules/juce_audio_basics/sources/juce_IIRFilterAudioSource.cpp; sourceTree = SOURCE_ROOT; };
-		66CBDCB5171199AA00FDFAC0 /* libmpi_cxx.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libmpi_cxx.dylib; path = ../../../../../../../../opt/local/lib/libmpi_cxx.dylib; sourceTree = "<group>"; };
-		66CBDCB7171199C300FDFAC0 /* libmpi.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libmpi.dylib; path = ../../../../../../../../opt/local/lib/libmpi.dylib; sourceTree = "<group>"; };
 		66D1E2744056CCA8421FD152 /* juce_Memory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = juce_Memory.h; path = ../../JuceLibraryCode/modules/juce_core/memory/juce_Memory.h; sourceTree = SOURCE_ROOT; };
 		66E808B6BC4691EEA41BC3B1 /* juce_NamedValueSet.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = juce_NamedValueSet.h; path = ../../JuceLibraryCode/modules/juce_core/containers/juce_NamedValueSet.h; sourceTree = SOURCE_ROOT; };
 		67048D58D8AFBB57D90127AB /* juce_ComponentAnimator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = juce_ComponentAnimator.h; path = ../../JuceLibraryCode/modules/juce_gui_basics/layout/juce_ComponentAnimator.h; sourceTree = SOURCE_ROOT; };
@@ -902,9 +902,9 @@
 				0A95F658B2CD896DC05F1900 /* QuartzCore.framework in Frameworks */,
 				DBFA0267A3D9B0E0DF8726E0 /* QuickTime.framework in Frameworks */,
 				B0549402F17A8A99D3832102 /* WebKit.framework in Frameworks */,
-				66CBDCB8171199C300FDFAC0 /* libmpi.dylib in Frameworks */,
-				66CBDCB6171199AA00FDFAC0 /* libmpi_cxx.dylib in Frameworks */,
 				6665B7EF1712CB950099D6A2 /* libboost_mpi.dylib in Frameworks */,
+				662265BC1747B32D0083A4BF /* libmpi_cxx.dylib in Frameworks */,
+				662265BD1747B32D0083A4BF /* libmpi.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2469,8 +2469,8 @@
 		F59DC624D72134F753A120CA /* Source */ = {
 			isa = PBXGroup;
 			children = (
-				66CBDCB7171199C300FDFAC0 /* libmpi.dylib */,
-				66CBDCB5171199AA00FDFAC0 /* libmpi_cxx.dylib */,
+				662265BA1747B32D0083A4BF /* libmpi_cxx.dylib */,
+				662265BB1747B32D0083A4BF /* libmpi.dylib */,
 				6665B7EE1712CB940099D6A2 /* libboost_mpi.dylib */,
 				99DC23DA4CF4992D5694396F /* JuceTest */,
 				ED77CEB903AC8B5453A84D9B /* Juce Modules */,

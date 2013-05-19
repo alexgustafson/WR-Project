@@ -10,7 +10,8 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "MainContentComponent.h"
-
+#include <boost/mpi/environment.hpp>
+#include <boost/mpi/communicator.hpp>
 
 //==============================================================================
 class JuceTestApplication  : public JUCEApplication
@@ -94,6 +95,34 @@ private:
     ScopedPointer<MainWindow> mainWindow;
 };
 
+#define START_JUCE_APPLICATION_MPI(AppClass) \
+static juce::JUCEApplicationBase* juce_CreateApplication() { return new AppClass(); } \
+extern "C" JUCE_MAIN_FUNCTION \
+{ \
+boost::mpi::environment env(argc, argv, true);\
+boost::mpi::communicator world;\
+std::string value; \
+std::cout << "I am process " << world.rank() << " of " << world.size() << "." << std::endl;\
+\
+if (world.rank() == 0) { \
+juce::JUCEApplication::createInstance = &juce_CreateApplication; \
+return juce::JUCEApplication::main (JUCE_MAIN_FUNCTION_ARGS); \
+}else{ \
+doWorker();\
+}\
+std::cout << "Process #" << world.rank() << " says " << value << std::endl; \
+\
+return 0;\
+\
+}
+
+void doWorker()
+{
+    std::cout << "I'm a worker";
+}
+
+
+
 //==============================================================================
 // This macro generates the main() routine that launches the app.
-START_JUCE_APPLICATION (JuceTestApplication)
+START_JUCE_APPLICATION_MPI (JuceTestApplication)

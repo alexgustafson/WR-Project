@@ -23,8 +23,7 @@
 //[/Headers]
 
 #include "MainContentComponent.h"
-#include <boost/mpi/environment.hpp>
-#include <boost/mpi/communicator.hpp>
+
 
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
@@ -100,11 +99,7 @@ void MainContentComponent::buttonClicked (Button* buttonThatWasClicked)
     if (buttonThatWasClicked == startButton)
     {
         //[UserButtonCode_startButton] -- add your button handler code here..
-        
-        
-        boost::mpi::environment env(true);
-        boost::mpi::communicator world;
-        std::cout << "I am process " << world.rank() << " of " << world.size() << "." << std::endl;
+
         
         //[/UserButtonCode_startButton]
     }
