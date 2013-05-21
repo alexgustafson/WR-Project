@@ -49,6 +49,7 @@ endif
 DEPFLAGS := $(if $(word 2, $(TARGET_ARCH)), , -MMD)
 
 OBJECTS := \
+  $(OBJDIR)/SerializableAudioBuffer_a4c57218.o \
   $(OBJDIR)/AudioWavViewComponent_e38750cf.o \
   $(OBJDIR)/MainViewComponent_716a0cac.o \
   $(OBJDIR)/MPIHandler_5a03e8cd.o \
@@ -87,6 +88,11 @@ clean:
 strip:
 	@echo Stripping JuceTest
 	-@strip --strip-unneeded $(OUTDIR)/$(TARGET)
+
+$(OBJDIR)/SerializableAudioBuffer_a4c57218.o: ../../Source/SerializableAudioBuffer.cpp
+	-@mkdir -p $(OBJDIR)
+	@echo "Compiling SerializableAudioBuffer.cpp"
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
 $(OBJDIR)/AudioWavViewComponent_e38750cf.o: ../../Source/gui/AudioWavViewComponent.cpp
 	-@mkdir -p $(OBJDIR)

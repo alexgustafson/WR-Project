@@ -143,16 +143,38 @@ void MainViewComponent::buttonClicked (Button* buttonThatWasClicked)
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 void MainViewComponent::processAudioFile()
 {
-    for (int64 i = 0; i < sliceSize; i++) {
-        std::cout << "samplenr:" << i << " : " << getNextSampleSlice()->getSampleData(0, i) << std::endl;
+    MPIHandler* mpiHandle = MPIHandler::getInstance();
+    
+    std::string value("hello");
+    int* sampleBuffer = new int[sliceSize];
+    
+    if (audioReader->usesFloatingPointData) {
+        std::cout << "should float";
     }
+    
+    audioReader->read(&sampleBuffer, 1, currentSamplePosition, sliceSize, false);
+
+    
+    for (int64 i = 0; i < sliceSize; i++) {
+        std::cout << "samplenr:" << i << " : " << (float)sampleBuffer[i] << std::endl;
+    }
+    
+    //mpiHandle->send(2, MPIHandler::message_tags::msg_sampledata, getNextSampleSlice());
+    mpiHandle->send(2, MPIHandler::message_tags::msg_sampledata, value);
+    
+
     currentSamplePosition += sliceSize;
 }
 
-AudioSampleBuffer* MainViewComponent::getNextSampleSlice()
+SerializableAudioBuffer* MainViewComponent::getNextSampleSlice()
 {
-    AudioSampleBuffer* nextBuffer = new AudioSampleBuffer(1, sliceSize);
+    SerializableAudioBuffer* nextBuffer = new SerializableAudioBuffer(1, sliceSize);
+    
+    
+    
     audioReader->read(nextBuffer, 0, sliceSize, currentSamplePosition, true, false);
+    
+
     return nextBuffer;
     
 }

@@ -23,6 +23,9 @@
 //[Headers]     -- You can add your own extra header files here --
 #include "JuceHeader.h"
 #include "AudioWavViewComponent.h"
+#include "SerializableAudioBuffer.h"
+#include "MPIHandler.h"
+#include <boost/serialization/vector.hpp>
 //[/Headers]
 
 
@@ -48,7 +51,7 @@ public:
     void showFile (const File& file);
     void loadFileIntoTransport (const File& audioFile);
     void processAudioFile () ;
-    AudioSampleBuffer* getNextSampleSlice();
+    SerializableAudioBuffer* getNextSampleSlice();
 
     //[/UserMethods]
 
@@ -63,8 +66,9 @@ private:
     AudioFormatManager formatManager;
     ScopedPointer<AudioFormatReaderSource> currentAudioFileSource;
     ScopedPointer<AudioFormatReader> audioReader;
+    ScopedPointer<SerializableAudioBuffer> serializeableAudioBuffer;
     File audioFile;
-    int sliceSize = 1024;
+    int sliceSize = 256;
     int64 currentSamplePosition = 0;
     //[/UserVariables]
 

@@ -4,6 +4,10 @@
               bundleIdentifier="com.yourcompany.JuceTest" jucerVersion="3.1.0">
   <MAINGROUP id="XEC9Vj" name="JuceTest">
     <GROUP id="{6CA9CFE0-5D39-191E-E30C-9DC1C58A6F5D}" name="Source">
+      <FILE id="RkErDK" name="SerializableAudioBuffer.cpp" compile="1" resource="0"
+            file="Source/SerializableAudioBuffer.cpp"/>
+      <FILE id="KRKSVd" name="SerializableAudioBuffer.h" compile="0" resource="0"
+            file="Source/SerializableAudioBuffer.h"/>
       <GROUP id="{AC34EA63-042C-B560-D750-0FFB2F107E82}" name="gui">
         <FILE id="jhabiF" name="AudioWavViewComponent.cpp" compile="1" resource="0"
               file="Source/gui/AudioWavViewComponent.cpp"/>

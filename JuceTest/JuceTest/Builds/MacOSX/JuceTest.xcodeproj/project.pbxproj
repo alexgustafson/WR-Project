@@ -24,6 +24,7 @@
 		6CF4CEEC630701C1D9377D8A /* juce_audio_basics.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0778433A69F0CD610C830299 /* juce_audio_basics.mm */; };
 		6EFBE61B21877698A4C336EC /* MainViewComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 467845FB5052A1A2D16DF210 /* MainViewComponent.cpp */; };
 		73B8485516C467621C0F041C /* RecentFilesMenuTemplate.nib in Resources */ = {isa = PBXBuildFile; fileRef = 7AA4DDDA43A12BA72D0EBB6D /* RecentFilesMenuTemplate.nib */; };
+		7E0348E673F61BD30976F7E0 /* SerializableAudioBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EB6A847C7EDD6B662FF341C4 /* SerializableAudioBuffer.cpp */; };
 		808F1C576E4EC55954852A33 /* juce_audio_utils.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1C2DB0F363DCE95457B099E4 /* juce_audio_utils.mm */; };
 		8CB4495060943D5BA59F3557 /* juce_core.mm in Sources */ = {isa = PBXBuildFile; fileRef = 08F598B040986489551DC30D /* juce_core.mm */; };
 		8D3FB75E2C12AFF341E2FE3B /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C3AC7895AAF901F3B21614B /* IOKit.framework */; };
@@ -482,6 +483,7 @@
 		7EED461EDEE78EDBF6638A57 /* juce_WindowsRegistry.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = juce_WindowsRegistry.h; path = ../../JuceLibraryCode/modules/juce_core/misc/juce_WindowsRegistry.h; sourceTree = SOURCE_ROOT; };
 		7F33E15FDF83227A1868A497 /* juce_AudioPluginFormat.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = juce_AudioPluginFormat.h; path = ../../JuceLibraryCode/modules/juce_audio_processors/format/juce_AudioPluginFormat.h; sourceTree = SOURCE_ROOT; };
 		7F3EBE8AF41B2A32969988B0 /* juce_FileOutputStream.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = juce_FileOutputStream.cpp; path = ../../JuceLibraryCode/modules/juce_core/files/juce_FileOutputStream.cpp; sourceTree = SOURCE_ROOT; };
+		80202049706069EB9F13A46D /* SerializableAudioBuffer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SerializableAudioBuffer.h; path = ../../Source/SerializableAudioBuffer.h; sourceTree = SOURCE_ROOT; };
 		805154CBDF2C8E60F5F55548 /* juce_ApplicationBase.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = juce_ApplicationBase.cpp; path = ../../JuceLibraryCode/modules/juce_events/messages/juce_ApplicationBase.cpp; sourceTree = SOURCE_ROOT; };
 		80A4B85365A80817DD28F93C /* juce_ImageFileFormat.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = juce_ImageFileFormat.cpp; path = ../../JuceLibraryCode/modules/juce_graphics/images/juce_ImageFileFormat.cpp; sourceTree = SOURCE_ROOT; };
 		80E11A02ADC1E409CECA7DD4 /* JuceHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JuceHeader.h; path = ../../JuceLibraryCode/JuceHeader.h; sourceTree = SOURCE_ROOT; };
@@ -843,6 +845,7 @@
 		E9555D0FE46736F6A8963A01 /* juce_android_Windowing.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = juce_android_Windowing.cpp; path = ../../JuceLibraryCode/modules/juce_gui_basics/native/juce_android_Windowing.cpp; sourceTree = SOURCE_ROOT; };
 		E9D4A177F52B85089A3914C4 /* juce_File.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = juce_File.cpp; path = ../../JuceLibraryCode/modules/juce_core/files/juce_File.cpp; sourceTree = SOURCE_ROOT; };
 		EA8E650337E2ED544C6F2FC2 /* juce_android_Midi.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = juce_android_Midi.cpp; path = ../../JuceLibraryCode/modules/juce_audio_devices/native/juce_android_Midi.cpp; sourceTree = SOURCE_ROOT; };
+		EB6A847C7EDD6B662FF341C4 /* SerializableAudioBuffer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = SerializableAudioBuffer.cpp; path = ../../Source/SerializableAudioBuffer.cpp; sourceTree = SOURCE_ROOT; };
 		EBA1AF77D03BE5E44965FF68 /* juce_Viewport.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = juce_Viewport.cpp; path = ../../JuceLibraryCode/modules/juce_gui_basics/layout/juce_Viewport.cpp; sourceTree = SOURCE_ROOT; };
 		EBD0175A1F3CD24FE6133529 /* juce_module_info */ = {isa = PBXFileReference; lastKnownFileType = text; name = juce_module_info; path = ../../JuceLibraryCode/modules/juce_gui_basics/juce_module_info; sourceTree = SOURCE_ROOT; };
 		EC3E5D792B50074049BC7EC1 /* juce_GZIPCompressorOutputStream.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = juce_GZIPCompressorOutputStream.cpp; path = ../../JuceLibraryCode/modules/juce_core/zip/juce_GZIPCompressorOutputStream.cpp; sourceTree = SOURCE_ROOT; };
@@ -1613,6 +1616,8 @@
 		7D9D0C1E4F8BB28D55CB09F4 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				EB6A847C7EDD6B662FF341C4 /* SerializableAudioBuffer.cpp */,
+				80202049706069EB9F13A46D /* SerializableAudioBuffer.h */,
 				E88093E15205D56CD2858A4C /* gui */,
 				73C3D6757C3405F636941578 /* MPIHandler.cpp */,
 				9D4CD765278594EAAD8784C3 /* MPIHandler.h */,
@@ -2699,6 +2704,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7E0348E673F61BD30976F7E0 /* SerializableAudioBuffer.cpp in Sources */,
 				BB9BAF0AF9B41F65A76C731D /* AudioWavViewComponent.cpp in Sources */,
 				6EFBE61B21877698A4C336EC /* MainViewComponent.cpp in Sources */,
 				90DDDB60D0B52D1E710EEA46 /* MPIHandler.cpp in Sources */,
@@ -2756,7 +2762,6 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				MACOSX_DEPLOYMENT_TARGET_ppc = 10.4;
-				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"-lboost_mpi",
 					"-lboost_serialization",
@@ -2819,7 +2824,6 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				MACOSX_DEPLOYMENT_TARGET_ppc = 10.4;
-				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"-lboost_mpi",
 					"-lboost_serialization",

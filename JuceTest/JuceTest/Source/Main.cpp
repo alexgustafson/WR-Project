@@ -9,6 +9,7 @@
 */
 
 #include "../JuceLibraryCode/JuceHeader.h"
+#include "SerializableAudioBuffer.h"
 #include "MainContentComponent.h"
 #include "MainViewComponent.h"
 #include "MPIHandler.h"
@@ -108,7 +109,7 @@ void doWorker()
     std::string value;
     std::cout << "I'm a worker";
     
-    while(value != "shutdown")
+    while(true)
     {
         mpiHandle->mpi_synchronous_recieve(value);
         std::cout << "Process #" << mpiHandle->getRank() << " says " << value << std::endl;

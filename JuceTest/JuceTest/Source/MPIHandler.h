@@ -17,6 +17,8 @@ class MPIHandler
 {
     
 public:
+    
+    enum message_tags {msg_sampledata, msg_broadcast_data, msg_finished};
 
     ~MPIHandler()
     {
@@ -55,6 +57,12 @@ public:
     void mpi_broadcast(T & value, int root)
     {
         boost::mpi::broadcast(myWorld, value, root);
+    };
+    
+    template<typename T>
+    void send(int dest, int tag, const T & value)
+    {
+        myWorld.send(dest, tag, value);
     };
     
 private:
