@@ -1,20 +1,18 @@
 /*
   ==============================================================================
 
-  This is an automatically generated file created by the Jucer!
-
-  Creation date:  17 Mar 2013 11:19:33am
+  This is an automatically generated GUI class created by the Introjucer!
 
   Be careful when adding custom code to these files, as only the code within
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Jucer version: 1.12
+  Created with Introjucer version: 3.1.0
 
   ------------------------------------------------------------------------------
 
-  The Jucer is part of the JUCE library - "Jules' Utility Class Extensions"
-  Copyright 2004-6 by Raw Material Software ltd.
+  The Introjucer is part of the JUCE library - "Jules' Utility Class Extensions"
+  Copyright 2004-13 by Raw Material Software Ltd.
 
   ==============================================================================
 */
@@ -25,14 +23,11 @@
 #include "MainContentComponent.h"
 
 
-
 //[MiscUserDefs] You can add your own user definitions and misc code here...
 //[/MiscUserDefs]
 
 //==============================================================================
 MainContentComponent::MainContentComponent ()
-    : startButton (0),
-      textEditor (0)
 {
     addAndMakeVisible (startButton = new TextButton ("new button"));
     startButton->setButtonText ("start process");
@@ -63,8 +58,8 @@ MainContentComponent::~MainContentComponent()
     //[Destructor_pre]. You can add your own custom destruction code here..
     //[/Destructor_pre]
 
-    deleteAndZero (startButton);
-    deleteAndZero (textEditor);
+    startButton = nullptr;
+    textEditor = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -100,7 +95,7 @@ void MainContentComponent::buttonClicked (Button* buttonThatWasClicked)
     {
         //[UserButtonCode_startButton] -- add your button handler code here..
 
-        
+        shutDownWorkers();
         //[/UserButtonCode_startButton]
     }
 
@@ -111,14 +106,22 @@ void MainContentComponent::buttonClicked (Button* buttonThatWasClicked)
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
+void MainContentComponent::shutDownWorkers()
+{
+    std::string value;
+    value = "shutdown";
+    MPIHandler* mpiHandle = MPIHandler::getInstance();
+    mpiHandle->mpi_broadcast(value, 0);
+}
 //[/MiscUserCode]
 
 
 //==============================================================================
 #if 0
-/*  -- Jucer information section --
+/*  -- Introjucer information section --
 
-    This is where the Jucer puts all of its metadata, so don't change anything in here!
+    This is where the Introjucer stores the metadata that describe this GUI layout, so
+    make changes in here at your peril!
 
 BEGIN_JUCER_METADATA
 
@@ -139,7 +142,6 @@ BEGIN_JUCER_METADATA
 END_JUCER_METADATA
 */
 #endif
-
 
 
 //[EndFile] You can add extra defines here...

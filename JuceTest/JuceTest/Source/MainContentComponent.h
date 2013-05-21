@@ -1,29 +1,29 @@
 /*
   ==============================================================================
 
-  This is an automatically generated file created by the Jucer!
-
-  Creation date:  17 Mar 2013 11:19:33am
+  This is an automatically generated GUI class created by the Introjucer!
 
   Be careful when adding custom code to these files, as only the code within
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Jucer version: 1.12
+  Created with Introjucer version: 3.1.0
 
   ------------------------------------------------------------------------------
 
-  The Jucer is part of the JUCE library - "Jules' Utility Class Extensions"
-  Copyright 2004-6 by Raw Material Software ltd.
+  The Introjucer is part of the JUCE library - "Jules' Utility Class Extensions"
+  Copyright 2004-13 by Raw Material Software Ltd.
 
   ==============================================================================
 */
 
-#ifndef __JUCER_HEADER_MAINCONTENTCOMPONENT_MAINCONTENTCOMPONENT_E1EC9DD9__
-#define __JUCER_HEADER_MAINCONTENTCOMPONENT_MAINCONTENTCOMPONENT_E1EC9DD9__
+#ifndef __JUCE_HEADER_92E596E9AF51CD06__
+#define __JUCE_HEADER_92E596E9AF51CD06__
 
 //[Headers]     -- You can add your own extra header files here --
 #include "JuceHeader.h"
+#include "MPIHandler.h"
+
 //[/Headers]
 
 
@@ -46,6 +46,7 @@ public:
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
+    void shutDownWorkers();
     //[/UserMethods]
 
     void paint (Graphics& g);
@@ -59,8 +60,8 @@ private:
     //[/UserVariables]
 
     //==============================================================================
-    TextButton* startButton;
-    TextEditor* textEditor;
+    ScopedPointer<TextButton> startButton;
+    ScopedPointer<TextEditor> textEditor;
 
 
     //==============================================================================
@@ -70,4 +71,4 @@ private:
 //[EndFile] You can add extra defines here...
 //[/EndFile]
 
-#endif   // __JUCER_HEADER_MAINCONTENTCOMPONENT_MAINCONTENTCOMPONENT_E1EC9DD9__
+#endif   // __JUCE_HEADER_92E596E9AF51CD06__

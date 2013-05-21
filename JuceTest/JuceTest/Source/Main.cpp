@@ -10,15 +10,15 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "MainContentComponent.h"
-#include <boost/mpi/environment.hpp>
-#include <boost/mpi/communicator.hpp>
+#include "MainViewComponent.h"
+#include "MPIHandler.h"
 
 //==============================================================================
 class JuceTestApplication  : public JUCEApplication
 {
 public:
     //==============================================================================
-    JuceTestApplication() {}
+    JuceTestApplication() { }
 
     const String getApplicationName()       { return ProjectInfo::projectName; }
     const String getApplicationVersion()    { return ProjectInfo::versionString; }
@@ -30,6 +30,11 @@ public:
         // This method is where you should put your application's initialisation code..
 
         mainWindow = new MainWindow();
+    }
+    
+    void gotThis()
+    {
+        
     }
 
     void shutdown()
@@ -66,8 +71,7 @@ public:
                                         Colours::lightgrey,
                                         DocumentWindow::allButtons)
         {
-            setContentOwned (new MainContentComponent(), true);
-
+            setContentOwned (new MainViewComponent(), true);
             centreWithSize (getWidth(), getHeight());
             setVisible (true);
         }
@@ -89,40 +93,52 @@ public:
 
     private:
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainWindow)
+    
     };
 
 private:
     ScopedPointer<MainWindow> mainWindow;
 };
 
-#define START_JUCE_APPLICATION_MPI(AppClass) \
-static juce::JUCEApplicationBase* juce_CreateApplication() { return new AppClass(); } \
-extern "C" JUCE_MAIN_FUNCTION \
-{ \
-boost::mpi::environment env(argc, argv, true);\
-boost::mpi::communicator world;\
-std::string value; \
-std::cout << "I am process " << world.rank() << " of " << world.size() << "." << std::endl;\
-\
-if (world.rank() == 0) { \
-juce::JUCEApplication::createInstance = &juce_CreateApplication; \
-return juce::JUCEApplication::main (JUCE_MAIN_FUNCTION_ARGS); \
-}else{ \
-doWorker();\
-}\
-std::cout << "Process #" << world.rank() << " says " << value << std::endl; \
-\
-return 0;\
-\
-}
-
 void doWorker()
 {
+    MPIHandler* mpiHandle = MPIHandler::getInstance();
+    std::string value;
     std::cout << "I'm a worker";
+    
+    while(value != "shutdown")
+    {
+        mpiHandle->mpi_synchronous_recieve(value);
+        std::cout << "Process #" << mpiHandle->getRank() << " says " << value << std::endl;
+    }
+
 }
+
+
+static juce::JUCEApplicationBase* juce_CreateApplication()
+{
+    return new JuceTestApplication();
+}
+
+
+extern "C" int main (int argc, char* argv[])
+{
+    boost::mpi::environment env(argc, argv);
+    MPIHandler* mpiHandle = MPIHandler::getInstance();
+    mpiHandle->initializeEnvironment(argc, argv);
+
+    if (mpiHandle->getRank() == 0) {
+        juce::JUCEApplication::createInstance = &juce_CreateApplication;
+        return juce::JUCEApplication::main (JUCE_MAIN_FUNCTION_ARGS);
+    }else{ 
+        doWorker();
+    }
+    
+}
+
 
 
 
 //==============================================================================
 // This macro generates the main() routine that launches the app.
-START_JUCE_APPLICATION_MPI (JuceTestApplication)
+//START_JUCE_APPLICATION_MPI (JuceTestApplication)
