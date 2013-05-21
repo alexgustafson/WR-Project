@@ -22,6 +22,7 @@
 
 //[Headers]     -- You can add your own extra header files here --
 #include "JuceHeader.h"
+#include "AudioWavViewComponent.h"
 //[/Headers]
 
 
@@ -46,6 +47,8 @@ public:
     //[UserMethods]     -- You can add your own custom methods in this section.
     void showFile (const File& file);
     void loadFileIntoTransport (const File& audioFile);
+    void processAudioFile () ;
+    AudioSampleBuffer* getNextSampleSlice();
 
     //[/UserMethods]
 
@@ -57,12 +60,17 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
+    AudioFormatManager formatManager;
+    ScopedPointer<AudioFormatReaderSource> currentAudioFileSource;
+    ScopedPointer<AudioFormatReader> audioReader;
     File audioFile;
+    int sliceSize = 1024;
+    int64 currentSamplePosition = 0;
     //[/UserVariables]
 
     //==============================================================================
-    ScopedPointer<Component> audioWavformViewer;
-    ScopedPointer<Component> AudioSpectraViewer;
+    ScopedPointer<AudioWavViewComponent> audioWavformViewer;
+    ScopedPointer<Component> audioSpectraViewer;
     ScopedPointer<TextButton> audioSelectButton;
     ScopedPointer<TextButton> startProcessButton;
 

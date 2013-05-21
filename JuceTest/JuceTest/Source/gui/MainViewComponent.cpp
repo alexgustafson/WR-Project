@@ -22,19 +22,17 @@
 
 #include "MainViewComponent.h"
 
-
 //[MiscUserDefs] You can add your own user definitions and misc code here...
-
 //[/MiscUserDefs]
 
 //==============================================================================
 MainViewComponent::MainViewComponent ()
 {
-    addAndMakeVisible (audioWavformViewer = new Component());
+    addAndMakeVisible (audioWavformViewer = new AudioWavViewComponent (formatManager));
     audioWavformViewer->setName ("audio waveform viewer");
 
-    addAndMakeVisible (AudioSpectraViewer = new Component());
-    AudioSpectraViewer->setName ("audio spectra viewer");
+    addAndMakeVisible (audioSpectraViewer = new Component());
+    audioSpectraViewer->setName ("audio spectra viewer");
 
     addAndMakeVisible (audioSelectButton = new TextButton ("audio select button"));
     audioSelectButton->setButtonText ("select audio file");
@@ -52,6 +50,7 @@ MainViewComponent::MainViewComponent ()
 
 
     //[Constructor] You can add your own custom stuff here..
+    formatManager.registerBasicFormats();
     //[/Constructor]
 }
 
@@ -61,12 +60,14 @@ MainViewComponent::~MainViewComponent()
     //[/Destructor_pre]
 
     audioWavformViewer = nullptr;
-    AudioSpectraViewer = nullptr;
+    audioSpectraViewer = nullptr;
     audioSelectButton = nullptr;
     startProcessButton = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
+    audioReader = nullptr;
+    currentAudioFileSource = nullptr;
     //[/Destructor]
 }
 
@@ -88,7 +89,7 @@ void MainViewComponent::paint (Graphics& g)
 void MainViewComponent::resized()
 {
     audioWavformViewer->setBounds (8, 40, 584, 112);
-    AudioSpectraViewer->setBounds (8, 160, 584, 232);
+    audioSpectraViewer->setBounds (8, 160, 584, 232);
     audioSelectButton->setBounds (8, 8, 150, 24);
     startProcessButton->setBounds (168, 8, 150, 24);
     //[UserResized] Add your own custom resize handling here..
@@ -108,8 +109,18 @@ void MainViewComponent::buttonClicked (Button* buttonThatWasClicked)
                                String::empty);
         if (myChooser.browseForFileToOpen())
         {
-            audioFile = (myChooser.getResult());
-            std::cout << audioFile.getFileName();
+
+            //audioFile = (myChooser.getResult());
+            currentAudioFileSource = nullptr;
+            audioReader = formatManager.createReaderFor (myChooser.getResult());
+
+            if (audioReader != nullptr)
+            {
+                currentAudioFileSource = new AudioFormatReaderSource (audioReader, true);
+                audioWavformViewer->setFile(myChooser.getResult());
+            }
+
+            //std::cout << audioFile.getFileName();
 
         }
         //[/UserButtonCode_audioSelectButton]
@@ -117,6 +128,9 @@ void MainViewComponent::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == startProcessButton)
     {
         //[UserButtonCode_startProcessButton] -- add your button handler code here..
+        if (currentAudioFileSource != nullptr) {
+            processAudioFile();
+        }
         //[/UserButtonCode_startProcessButton]
     }
 
@@ -127,6 +141,21 @@ void MainViewComponent::buttonClicked (Button* buttonThatWasClicked)
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
+void MainViewComponent::processAudioFile()
+{
+    for (int64 i = 0; i < sliceSize; i++) {
+        std::cout << "samplenr:" << i << " : " << getNextSampleSlice()->getSampleData(0, i) << std::endl;
+    }
+    currentSamplePosition += sliceSize;
+}
+
+AudioSampleBuffer* MainViewComponent::getNextSampleSlice()
+{
+    AudioSampleBuffer* nextBuffer = new AudioSampleBuffer(1, sliceSize);
+    audioReader->read(nextBuffer, 0, sliceSize, currentSamplePosition, true, false);
+    return nextBuffer;
+    
+}
 //[/MiscUserCode]
 
 
@@ -146,10 +175,10 @@ BEGIN_JUCER_METADATA
   <BACKGROUND backgroundColour="ffededed">
     <RECT pos="0 0 600 400" fill="solid: ff808080" hasStroke="0"/>
   </BACKGROUND>
-  <GENERICCOMPONENT name="audio waveform viewer" id="8c88d9e639609ba1" memberName="AudioWavformViewer"
-                    virtualName="" explicitFocusOrder="0" pos="8 40 584 112" class="Component"
-                    params=""/>
-  <GENERICCOMPONENT name="audio spectra viewer" id="2cb179ec12bf0b43" memberName="AudioSpectraViewer"
+  <GENERICCOMPONENT name="audio waveform viewer" id="8c88d9e639609ba1" memberName="audioWavformViewer"
+                    virtualName="" explicitFocusOrder="0" pos="8 40 584 112" class="AudioWavViewComponent"
+                    params="AudioFormatManager&amp; formatManager"/>
+  <GENERICCOMPONENT name="audio spectra viewer" id="2cb179ec12bf0b43" memberName="audioSpectraViewer"
                     virtualName="" explicitFocusOrder="0" pos="8 160 584 232" class="Component"
                     params=""/>
   <TEXTBUTTON name="audio select button" id="22779fde320537b4" memberName="audioSelectButton"

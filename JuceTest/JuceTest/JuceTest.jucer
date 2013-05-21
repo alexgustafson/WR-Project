@@ -5,6 +5,10 @@
   <MAINGROUP id="XEC9Vj" name="JuceTest">
     <GROUP id="{6CA9CFE0-5D39-191E-E30C-9DC1C58A6F5D}" name="Source">
       <GROUP id="{AC34EA63-042C-B560-D750-0FFB2F107E82}" name="gui">
+        <FILE id="jhabiF" name="AudioWavViewComponent.cpp" compile="1" resource="0"
+              file="Source/gui/AudioWavViewComponent.cpp"/>
+        <FILE id="k6CvzP" name="AudioWavViewComponent.h" compile="0" resource="0"
+              file="Source/gui/AudioWavViewComponent.h"/>
         <FILE id="kiel7N" name="MainViewComponent.cpp" compile="1" resource="0"
               file="Source/gui/MainViewComponent.cpp"/>
         <FILE id="ix2qNo" name="MainViewComponent.h" compile="0" resource="0"
@@ -34,6 +38,7 @@
     <MODULE id="juce_audio_devices" showAllCode="1" useLocalCopy="1"/>
     <MODULE id="juce_audio_formats" showAllCode="1" useLocalCopy="1"/>
     <MODULE id="juce_audio_processors" showAllCode="1" useLocalCopy="1"/>
+    <MODULE id="juce_audio_utils" showAllCode="1" useLocalCopy="1"/>
   </MODULES>
   <EXPORTFORMATS>
     <XCODE_MAC targetFolder="Builds/MacOSX" juceFolder="../../../JUCE/modules"
