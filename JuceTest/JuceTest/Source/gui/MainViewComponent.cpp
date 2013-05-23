@@ -22,6 +22,7 @@
 
 #include "MainViewComponent.h"
 
+
 //[MiscUserDefs] You can add your own user definitions and misc code here...
 //[/MiscUserDefs]
 
@@ -144,24 +145,24 @@ void MainViewComponent::buttonClicked (Button* buttonThatWasClicked)
 void MainViewComponent::processAudioFile()
 {
     MPIHandler* mpiHandle = MPIHandler::getInstance();
-    
+
     std::string value("hello");
     int* sampleBuffer = new int[sliceSize];
-    
+
     if (audioReader->usesFloatingPointData) {
         std::cout << "should float";
     }
-    
+
     audioReader->read(&sampleBuffer, 1, currentSamplePosition, sliceSize, false);
 
-    
+
     for (int64 i = 0; i < sliceSize; i++) {
         std::cout << "samplenr:" << i << " : " << (float)sampleBuffer[i] << std::endl;
     }
-    
+
     //mpiHandle->send(2, MPIHandler::message_tags::msg_sampledata, getNextSampleSlice());
-    mpiHandle->send(2, MPIHandler::message_tags::msg_sampledata, value);
-    
+    mpiHandle->send(2, 0, value);
+
 
     currentSamplePosition += sliceSize;
 }
@@ -169,14 +170,14 @@ void MainViewComponent::processAudioFile()
 SerializableAudioBuffer* MainViewComponent::getNextSampleSlice()
 {
     SerializableAudioBuffer* nextBuffer = new SerializableAudioBuffer(1, sliceSize);
-    
-    
-    
+
+
+
     audioReader->read(nextBuffer, 0, sliceSize, currentSamplePosition, true, false);
-    
+
 
     return nextBuffer;
-    
+
 }
 //[/MiscUserCode]
 
@@ -199,7 +200,7 @@ BEGIN_JUCER_METADATA
   </BACKGROUND>
   <GENERICCOMPONENT name="audio waveform viewer" id="8c88d9e639609ba1" memberName="audioWavformViewer"
                     virtualName="" explicitFocusOrder="0" pos="8 40 584 112" class="AudioWavViewComponent"
-                    params="AudioFormatManager&amp; formatManager"/>
+                    params="formatManager"/>
   <GENERICCOMPONENT name="audio spectra viewer" id="2cb179ec12bf0b43" memberName="audioSpectraViewer"
                     virtualName="" explicitFocusOrder="0" pos="8 160 584 232" class="Component"
                     params=""/>

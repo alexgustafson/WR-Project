@@ -11,7 +11,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "SerializableAudioBuffer.h"
 #include "MainContentComponent.h"
-#include "MainViewComponent.h"
+#include "gui/MainViewComponent.h"
 #include "MPIHandler.h"
 
 //==============================================================================
@@ -131,6 +131,7 @@ extern "C" int main (int argc, char* argv[])
     mpiHandle->initializeEnvironment(argc, argv);
 
     if (mpiHandle->getRank() == 0) {
+        std::cout << "my rank " << mpiHandle->getRank() << std::endl;
         juce::JUCEApplication::createInstance = &juce_CreateApplication;
         return juce::JUCEApplication::main (JUCE_MAIN_FUNCTION_ARGS);
     }else{ 
