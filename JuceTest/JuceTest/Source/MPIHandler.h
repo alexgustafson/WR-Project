@@ -51,7 +51,7 @@ public:
     template<typename T>
     void mpi_synchronous_recieve(T & value)
     {
-        myWorld.recv(-1, -1, value);
+        myWorld.recv(0, 0, value);
     };
     
     template<typename T> 
