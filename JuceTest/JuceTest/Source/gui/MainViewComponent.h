@@ -68,7 +68,7 @@ private:
     ScopedPointer<AudioFormatReader> audioReader;
     ScopedPointer<SerializableAudioBuffer> serializeableAudioBuffer;
     File audioFile;
-    int sliceSize = 256;
+    int sliceSize = 2048;
     int64 currentSamplePosition = 0;
     //[/UserVariables]
 
