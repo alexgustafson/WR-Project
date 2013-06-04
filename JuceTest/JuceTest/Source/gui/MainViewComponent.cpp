@@ -145,22 +145,25 @@ void MainViewComponent::buttonClicked (Button* buttonThatWasClicked)
 void MainViewComponent::processAudioFile()
 {
     MPIHandler* mpiHandle = MPIHandler::getInstance();
+    SerializableAudioBuffer *audioBuffer = new SerializableAudioBuffer(1,sliceSize);
     
-    std::string value("hello");
+    //std::string value("hello");
     
     if (audioReader->usesFloatingPointData) {
         std::cout << "should float";
     }
     
-    audioReader->read(serializeableAudioBuffer, 0, 1024, 0, true, true);
+    audioReader->read(audioBuffer, 0, sliceSize,  (44100 * 20), true, true);
 
-    
+    //for testing - make sure float values before sending via mpi are same on the otherside
     for (int64 i = 0; i < sliceSize; i++) {
-        std::cout << "samplenr:" << i << " : " << serializeableAudioBuffer->getSampleData(0,i) << std::endl;
+        std::cout << "samplenr:" << i << " : " << *audioBuffer->getSampleData(0,i ) << std::endl;
     }
     
-    //mpiHandle->send(2, MPIHandler::message_tags::msg_sampledata, getNextSampleSlice());
-    //mpiHandle->send(2, MPIHandler::message_tags::msg_sampledata, value);
+    mpiHandle->sendSampleBuffer(audioBuffer->getSampleData(0), sliceSize, 2);
+    
+    //mpiHandle->send(2, MPIHandler::MESSAGE_TAGS::msg_sampledata, audioBuffer);
+    //mpiHandle->send(2, MPIHandler::MESSAGE_TAGS::msg_sampledata, value);
     
 
     currentSamplePosition += sliceSize;

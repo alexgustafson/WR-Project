@@ -48,11 +48,25 @@ public:
         return myWorld.rank();
     };
     
+    void sendSampleBuffer(float* buffer, int sliceSize, int destination)
+    {
+        //MPI_Bsend(buffer, sliceSize, MPI_FLOAT, destination , MPIHandler::MESSAGE_TAGS::msg_sampledata, myWorld);
+        MPI_Send(buffer, sliceSize, MPI_FLOAT, destination , MPIHandler::MESSAGE_TAGS::msg_sampledata, myWorld);
+    }
+    
     template<typename T>
     void mpi_synchronous_recieve(T & value)
     {
         myWorld.recv(0, 0, value);
     };
+    
+    void mpi_oldschoolRevieveFloatArray(void* sampleBuffer, int &count)
+    {
+        std::cout << " worker got here " << getRank();
+        MPI_Status *status;
+        MPI_Recv(sampleBuffer, count, MPI_FLOAT, 0, MPIHandler::MESSAGE_TAGS::msg_sampledata, myWorld, NULL);
+        std::cout << " and stuff received " << getRank();
+    }
     
     template<typename T> 
     void mpi_broadcast(T & value, int root)

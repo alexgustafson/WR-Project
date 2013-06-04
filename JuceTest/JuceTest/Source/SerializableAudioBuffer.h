@@ -13,6 +13,7 @@
 
 #include "JuceHeader.h"
 #include <boost/serialization/serialization.hpp>
+#include <boost/serialization/vector.hpp>
 
 class SerializableAudioBuffer : public AudioSampleBuffer
 {
@@ -21,6 +22,8 @@ public:
     SerializableAudioBuffer(	int 	numChannels, int 	numSamples )
     : AudioSampleBuffer(numChannels, numSamples) {}
     //~SerializableAudioBuffer();
+    
+
     
 private:
     

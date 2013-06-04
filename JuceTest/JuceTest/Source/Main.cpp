@@ -13,6 +13,7 @@
 #include "MainContentComponent.h"
 #include "gui/MainViewComponent.h"
 #include "MPIHandler.h"
+#include "JuceHeader.h"
 
 //==============================================================================
 class JuceTestApplication  : public JUCEApplication
@@ -106,13 +107,21 @@ private:
 void doWorker()
 {
     MPIHandler* mpiHandle = MPIHandler::getInstance();
-    std::string value;
-    std::cout << "I'm a worker";
+    
+    int count = 1024;
+    float *samples = new float[count];
+    std::cout << "I'm a worker, rank=" << mpiHandle->getRank();
     
     while(true)
     {
-        mpiHandle->mpi_synchronous_recieve(value);
-        std::cout << "Process #" << mpiHandle->getRank() << " says " << value << std::endl;
+        
+        mpiHandle->mpi_oldschoolRevieveFloatArray(samples, count);
+        
+        for(int i = 0; i < count; i++)
+        {
+            //std::cout << "Process #" << mpiHandle->getRank() << " says float: " << samples[i] << std::endl; //workgin!!
+        }
+        
     }
 
 }
