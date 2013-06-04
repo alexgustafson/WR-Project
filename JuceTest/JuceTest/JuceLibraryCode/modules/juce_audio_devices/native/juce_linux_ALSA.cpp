@@ -25,162 +25,110 @@
 
 namespace
 {
-
-#ifndef JUCE_ALSA_LOGGING
- #define JUCE_ALSA_LOGGING 0
-#endif
-
-#if JUCE_ALSA_LOGGING
- #define JUCE_ALSA_LOG(dbgtext)   { juce::String tempDbgBuf ("ALSA: "); tempDbgBuf << dbgtext; Logger::writeToLog (tempDbgBuf); DBG (tempDbgBuf) }
- #define JUCE_CHECKED_RESULT(x)   (logErrorMessage (x, __LINE__))
-
- static int logErrorMessage (int err, int lineNum)
- {
-    if (err < 0)
-        JUCE_ALSA_LOG ("Error: line " << lineNum << ": code " << err << " (" << snd_strerror (err) << ")");
-
-    return err;
- }
-#else
- #define JUCE_ALSA_LOG(x)
- #define JUCE_CHECKED_RESULT(x)   (x)
-#endif
-
-#define JUCE_ALSA_FAILED(x)  failed (x)
-
-void getDeviceSampleRates (snd_pcm_t* handle, Array <int>& rates)
-{
-    const int ratesToTry[] = { 22050, 32000, 44100, 48000, 88200, 96000, 176400, 192000, 0 };
-
-    snd_pcm_hw_params_t* hwParams;
-    snd_pcm_hw_params_alloca (&hwParams);
-
-    for (int i = 0; ratesToTry[i] != 0; ++i)
+    void getDeviceSampleRates (snd_pcm_t* handle, Array <int>& rates)
     {
-        if (snd_pcm_hw_params_any (handle, hwParams) >= 0
-             && snd_pcm_hw_params_test_rate (handle, hwParams, ratesToTry[i], 0) == 0)
+        const int ratesToTry[] = { 22050, 32000, 44100, 48000, 88200, 96000, 176400, 192000, 0 };
+
+        snd_pcm_hw_params_t* hwParams;
+        snd_pcm_hw_params_alloca (&hwParams);
+
+        for (int i = 0; ratesToTry[i] != 0; ++i)
         {
-            rates.addIfNotAlreadyThere (ratesToTry[i]);
-        }
-    }
-}
-
-void getDeviceNumChannels (snd_pcm_t* handle, unsigned int* minChans, unsigned int* maxChans)
-{
-    snd_pcm_hw_params_t *params;
-    snd_pcm_hw_params_alloca (&params);
-
-    if (snd_pcm_hw_params_any (handle, params) >= 0)
-    {
-        snd_pcm_hw_params_get_channels_min (params, minChans);
-        snd_pcm_hw_params_get_channels_max (params, maxChans);
-
-        JUCE_ALSA_LOG ("getDeviceNumChannels: " << (int) *minChans << " " << (int) *maxChans);
-
-        // some virtual devices (dmix for example) report 10000 channels , we have to clamp these values
-        *maxChans = jmin (*maxChans, 32u);
-        *minChans = jmin (*minChans, *maxChans);
-    }
-    else
-    {
-        JUCE_ALSA_LOG ("getDeviceNumChannels failed");
-    }
-}
-
-void getDeviceProperties (const String& deviceID,
-                          unsigned int& minChansOut,
-                          unsigned int& maxChansOut,
-                          unsigned int& minChansIn,
-                          unsigned int& maxChansIn,
-                          Array <int>& rates,
-                          bool testOutput = true,
-                          bool testInput = true)
-{
-    minChansOut = maxChansOut = minChansIn = maxChansIn = 0;
-
-    if (deviceID.isEmpty())
-        return;
-
-    JUCE_ALSA_LOG ("getDeviceProperties(" << deviceID.toUTF8().getAddress() << ")");
-
-    snd_pcm_info_t* info;
-    snd_pcm_info_alloca (&info);
-
-    if (testOutput)
-    {
-        snd_pcm_t* pcmHandle;
-
-        if (JUCE_CHECKED_RESULT (snd_pcm_open (&pcmHandle, deviceID.toUTF8().getAddress(), SND_PCM_STREAM_PLAYBACK, SND_PCM_NONBLOCK)) >= 0)
-        {
-            getDeviceNumChannels (pcmHandle, &minChansOut, &maxChansOut);
-            getDeviceSampleRates (pcmHandle, rates);
-
-            snd_pcm_close (pcmHandle);
+            if (snd_pcm_hw_params_any (handle, hwParams) >= 0
+                 && snd_pcm_hw_params_test_rate (handle, hwParams, ratesToTry[i], 0) == 0)
+            {
+                rates.addIfNotAlreadyThere (ratesToTry[i]);
+            }
         }
     }
 
-    if (testInput)
+    void getDeviceNumChannels (snd_pcm_t* handle, unsigned int* minChans, unsigned int* maxChans)
     {
-        snd_pcm_t* pcmHandle;
+        snd_pcm_hw_params_t *params;
+        snd_pcm_hw_params_alloca (&params);
 
-        if (JUCE_CHECKED_RESULT (snd_pcm_open (&pcmHandle, deviceID.toUTF8(), SND_PCM_STREAM_CAPTURE, SND_PCM_NONBLOCK) >= 0))
+        if (snd_pcm_hw_params_any (handle, params) >= 0)
         {
-            getDeviceNumChannels (pcmHandle, &minChansIn, &maxChansIn);
+            snd_pcm_hw_params_get_channels_min (params, minChans);
+            snd_pcm_hw_params_get_channels_max (params, maxChans);
+        }
+    }
 
-            if (rates.size() == 0)
-                getDeviceSampleRates (pcmHandle, rates);
+    void getDeviceProperties (const String& deviceID,
+                              unsigned int& minChansOut,
+                              unsigned int& maxChansOut,
+                              unsigned int& minChansIn,
+                              unsigned int& maxChansIn,
+                              Array <int>& rates)
+    {
+        if (deviceID.isEmpty())
+            return;
 
-            snd_pcm_close (pcmHandle);
+        snd_ctl_t* handle;
+
+        if (snd_ctl_open (&handle, deviceID.upToLastOccurrenceOf (",", false, false).toUTF8(), SND_CTL_NONBLOCK) >= 0)
+        {
+            snd_pcm_info_t* info;
+            snd_pcm_info_alloca (&info);
+
+            snd_pcm_info_set_stream (info, SND_PCM_STREAM_PLAYBACK);
+            snd_pcm_info_set_device (info, deviceID.fromLastOccurrenceOf (",", false, false).getIntValue());
+            snd_pcm_info_set_subdevice (info, 0);
+
+            if (snd_ctl_pcm_info (handle, info) >= 0)
+            {
+                snd_pcm_t* pcmHandle;
+                if (snd_pcm_open (&pcmHandle, deviceID.toUTF8(), SND_PCM_STREAM_PLAYBACK, SND_PCM_ASYNC | SND_PCM_NONBLOCK) >= 0)
+                {
+                    getDeviceNumChannels (pcmHandle, &minChansOut, &maxChansOut);
+                    getDeviceSampleRates (pcmHandle, rates);
+
+                    snd_pcm_close (pcmHandle);
+                }
+            }
+
+            snd_pcm_info_set_stream (info, SND_PCM_STREAM_CAPTURE);
+
+            if (snd_ctl_pcm_info (handle, info) >= 0)
+            {
+                snd_pcm_t* pcmHandle;
+                if (snd_pcm_open (&pcmHandle, deviceID.toUTF8(), SND_PCM_STREAM_CAPTURE, SND_PCM_ASYNC | SND_PCM_NONBLOCK) >= 0)
+                {
+                    getDeviceNumChannels (pcmHandle, &minChansIn, &maxChansIn);
+
+                    if (rates.size() == 0)
+                        getDeviceSampleRates (pcmHandle, rates);
+
+                    snd_pcm_close (pcmHandle);
+                }
+            }
+
+            snd_ctl_close (handle);
         }
     }
 }
-
-static void silentErrorHandler (const char*, int, const char*, int, const char*,...) {}
 
 //==============================================================================
 class ALSADevice
 {
 public:
-    ALSADevice (const String& devID, bool forInput)
+    ALSADevice (const String& deviceID, bool forInput)
         : handle (0),
           bitDepth (16),
           numChannelsRunning (0),
           latency (0),
-          deviceID (devID),
           isInput (forInput),
           isInterleaved (true)
     {
-        JUCE_ALSA_LOG ("snd_pcm_open (" << deviceID.toUTF8().getAddress() << ", forInput=" << forInput << ")");
-
-        int err = snd_pcm_open (&handle, deviceID.toUTF8(),
-                                forInput ? SND_PCM_STREAM_CAPTURE : SND_PCM_STREAM_PLAYBACK,
-                                SND_PCM_ASYNC);
-        if (err < 0)
-        {
-            if (-err == EBUSY)
-                error << "The device \"" << deviceID << "\" is busy (another application is using it).";
-            else if (-err == ENOENT)
-                error << "The device \"" << deviceID << "\" is not available.";
-            else
-                error << "Could not open " << (forInput ? "input" : "output") << " device \"" << deviceID
-                      << "\": " << snd_strerror(err) << " (" << err << ")";
-
-            JUCE_ALSA_LOG ("snd_pcm_open failed; " << error);
-        }
+        failed (snd_pcm_open (&handle, deviceID.toUTF8(),
+                              forInput ? SND_PCM_STREAM_CAPTURE : SND_PCM_STREAM_PLAYBACK,
+                              SND_PCM_ASYNC));
     }
 
     ~ALSADevice()
     {
-        closeNow();
-    }
-
-    void closeNow()
-    {
         if (handle != 0)
-        {
             snd_pcm_close (handle);
-            handle = 0;
-        }
     }
 
     bool setParameters (unsigned int sampleRate, int numChannels, int bufferSize)
@@ -188,24 +136,16 @@ public:
         if (handle == 0)
             return false;
 
-        JUCE_ALSA_LOG ("ALSADevice::setParameters(" << deviceID << ", "
-                         << (int) sampleRate << ", " << numChannels << ", " << bufferSize << ")");
-
         snd_pcm_hw_params_t* hwParams;
         snd_pcm_hw_params_alloca (&hwParams);
 
-        if (snd_pcm_hw_params_any (handle, hwParams) < 0)
-        {
-            // this is the error message that aplay returns when an error happens here,
-            // it is a bit more explicit that "Invalid parameter"
-            error = "Broken configuration for this PCM: no configurations available";
+        if (failed (snd_pcm_hw_params_any (handle, hwParams)))
             return false;
-        }
 
-        if (snd_pcm_hw_params_set_access (handle, hwParams, SND_PCM_ACCESS_RW_INTERLEAVED) >= 0) // works better for plughw..
-            isInterleaved = true;
-        else if (snd_pcm_hw_params_set_access (handle, hwParams, SND_PCM_ACCESS_RW_NONINTERLEAVED) >= 0)
+        if (snd_pcm_hw_params_set_access (handle, hwParams, SND_PCM_ACCESS_RW_NONINTERLEAVED) >= 0)
             isInterleaved = false;
+        else if (snd_pcm_hw_params_set_access (handle, hwParams, SND_PCM_ACCESS_RW_INTERLEAVED) >= 0)
+            isInterleaved = true;
         else
         {
             jassertfalse;
@@ -232,10 +172,6 @@ public:
                 const bool isFloat = (formatsToTry [i + 1] & isFloatBit) != 0;
                 const bool isLittleEndian = (formatsToTry [i + 1] & isLittleEndianBit) != 0;
                 converter = createConverter (isInput, bitDepth, isFloat, isLittleEndian, numChannels);
-
-                JUCE_ALSA_LOG ("format: bitDepth=" << bitDepth << ", isFloat="
-                                << isFloat << ", isLittleEndian=" << isLittleEndian
-                                << ", numChannels=" << numChannels);
                 break;
             }
         }
@@ -243,7 +179,7 @@ public:
         if (bitDepth == 0)
         {
             error = "device doesn't support a compatible PCM format";
-            JUCE_ALSA_LOG ("Error: " + error);
+            DBG ("ALSA error: " + error + "\n");
             return false;
         }
 
@@ -251,48 +187,45 @@ public:
         unsigned int periods = 4;
         snd_pcm_uframes_t samplesPerPeriod = bufferSize;
 
-        if (JUCE_ALSA_FAILED (snd_pcm_hw_params_set_rate_near (handle, hwParams, &sampleRate, 0))
-            || JUCE_ALSA_FAILED (snd_pcm_hw_params_set_channels (handle, hwParams, numChannels))
-            || JUCE_ALSA_FAILED (snd_pcm_hw_params_set_periods_near (handle, hwParams, &periods, &dir))
-            || JUCE_ALSA_FAILED (snd_pcm_hw_params_set_period_size_near (handle, hwParams, &samplesPerPeriod, &dir))
-            || JUCE_ALSA_FAILED (snd_pcm_hw_params (handle, hwParams)))
+        if (failed (snd_pcm_hw_params_set_rate_near (handle, hwParams, &sampleRate, 0))
+            || failed (snd_pcm_hw_params_set_channels (handle, hwParams, numChannels))
+            || failed (snd_pcm_hw_params_set_periods_near (handle, hwParams, &periods, &dir))
+            || failed (snd_pcm_hw_params_set_period_size_near (handle, hwParams, &samplesPerPeriod, &dir))
+            || failed (snd_pcm_hw_params (handle, hwParams)))
         {
             return false;
         }
 
         snd_pcm_uframes_t frames = 0;
 
-        if (JUCE_ALSA_FAILED (snd_pcm_hw_params_get_period_size (hwParams, &frames, &dir))
-             || JUCE_ALSA_FAILED (snd_pcm_hw_params_get_periods (hwParams, &periods, &dir)))
+        if (failed (snd_pcm_hw_params_get_period_size (hwParams, &frames, &dir))
+             || failed (snd_pcm_hw_params_get_periods (hwParams, &periods, &dir)))
             latency = 0;
         else
             latency = frames * (periods - 1); // (this is the method JACK uses to guess the latency..)
-
-        JUCE_ALSA_LOG ("frames: " << (int) frames << ", periods: " << (int) periods
-                          << ", samplesPerPeriod: " << (int) samplesPerPeriod);
 
         snd_pcm_sw_params_t* swParams;
         snd_pcm_sw_params_alloca (&swParams);
         snd_pcm_uframes_t boundary;
 
-        if (JUCE_ALSA_FAILED (snd_pcm_sw_params_current (handle, swParams))
-            || JUCE_ALSA_FAILED (snd_pcm_sw_params_get_boundary (swParams, &boundary))
-            || JUCE_ALSA_FAILED (snd_pcm_sw_params_set_silence_threshold (handle, swParams, 0))
-            || JUCE_ALSA_FAILED (snd_pcm_sw_params_set_silence_size (handle, swParams, boundary))
-            || JUCE_ALSA_FAILED (snd_pcm_sw_params_set_start_threshold (handle, swParams, samplesPerPeriod))
-            || JUCE_ALSA_FAILED (snd_pcm_sw_params_set_stop_threshold (handle, swParams, boundary))
-            || JUCE_ALSA_FAILED (snd_pcm_sw_params (handle, swParams)))
+        if (failed (snd_pcm_sw_params_current (handle, swParams))
+            || failed (snd_pcm_sw_params_get_boundary (swParams, &boundary))
+            || failed (snd_pcm_sw_params_set_silence_threshold (handle, swParams, 0))
+            || failed (snd_pcm_sw_params_set_silence_size (handle, swParams, boundary))
+            || failed (snd_pcm_sw_params_set_start_threshold (handle, swParams, samplesPerPeriod))
+            || failed (snd_pcm_sw_params_set_stop_threshold (handle, swParams, boundary))
+            || failed (snd_pcm_sw_params (handle, swParams)))
         {
             return false;
         }
 
-       #if JUCE_ALSA_LOGGING
+      #if 0
         // enable this to dump the config of the devices that get opened
         snd_output_t* out;
         snd_output_stdio_attach (&out, stderr, 0);
         snd_pcm_hw_params_dump (hwParams, out);
         snd_pcm_sw_params_dump (swParams, out);
-       #endif
+      #endif
 
         numChannelsRunning = numChannels;
 
@@ -323,11 +256,16 @@ public:
             numDone = snd_pcm_writen (handle, (void**) data, numSamples);
         }
 
-        if (numDone < 0 && JUCE_ALSA_FAILED (snd_pcm_recover (handle, numDone, 1 /* silent */)))
-            return false;
-
-        if (numDone < numSamples)
-            JUCE_ALSA_LOG ("Did not write all samples: numDone: " << numDone << ", numSamples: " << numSamples);
+        if (failed (numDone))
+        {
+            if (numDone == -EPIPE)
+            {
+                if (failed (snd_pcm_prepare (handle)))
+                    return false;
+            }
+            else if (numDone != -ESTRPIPE)
+                return false;
+        }
 
         return true;
     }
@@ -344,11 +282,16 @@ public:
 
             snd_pcm_sframes_t num = snd_pcm_readi (handle, scratch.getData(), numSamples);
 
-            if (num < 0 && JUCE_ALSA_FAILED (snd_pcm_recover (handle, num, 1 /* silent */)))
-                return false;
-
-            if (num < numSamples)
-                JUCE_ALSA_LOG ("Did not read all samples: num: " << num << ", numSamples: " << numSamples);
+            if (failed (num))
+            {
+                if (num == -EPIPE)
+                {
+                    if (failed (snd_pcm_prepare (handle)))
+                        return false;
+                }
+                else if (num != -ESTRPIPE)
+                    return false;
+            }
 
             for (int i = 0; i < numChannelsRunning; ++i)
                 converter->convertSamples (data[i], 0, scratch.getData(), i, numSamples);
@@ -357,11 +300,8 @@ public:
         {
             snd_pcm_sframes_t num = snd_pcm_readn (handle, (void**) data, numSamples);
 
-            if (num < 0 && JUCE_ALSA_FAILED (snd_pcm_recover (handle, num, 1 /* silent */)))
+            if (failed (num) && num != -EPIPE && num != -ESTRPIPE)
                 return false;
-
-            if (num < numSamples)
-                JUCE_ALSA_LOG ("Did not read all samples: num: " << num << ", numSamples: " << numSamples);
 
             for (int i = 0; i < numChannelsRunning; ++i)
                 converter->convertSamples (data[i], data[i], numSamples);
@@ -375,9 +315,8 @@ public:
     String error;
     int bitDepth, numChannelsRunning, latency;
 
-private:
     //==============================================================================
-    String deviceID;
+private:
     const bool isInput;
     bool isInterleaved;
     MemoryBlock scratch;
@@ -395,8 +334,8 @@ private:
 
                 if (isLittleEndian)
                     return new AudioData::ConverterInstance <AudioData::Pointer <SampleType, AudioData::LittleEndian, AudioData::Interleaved, AudioData::Const>, DestType> (numInterleavedChannels, 1);
-
-                return new AudioData::ConverterInstance <AudioData::Pointer <SampleType, AudioData::BigEndian, AudioData::Interleaved, AudioData::Const>, DestType> (numInterleavedChannels, 1);
+                else
+                    return new AudioData::ConverterInstance <AudioData::Pointer <SampleType, AudioData::BigEndian, AudioData::Interleaved, AudioData::Const>, DestType> (numInterleavedChannels, 1);
             }
             else
             {
@@ -404,8 +343,8 @@ private:
 
                 if (isLittleEndian)
                     return new AudioData::ConverterInstance <SourceType, AudioData::Pointer <SampleType, AudioData::LittleEndian, AudioData::Interleaved, AudioData::NonConst> > (1, numInterleavedChannels);
-
-                return new AudioData::ConverterInstance <SourceType, AudioData::Pointer <SampleType, AudioData::BigEndian, AudioData::Interleaved, AudioData::NonConst> > (1, numInterleavedChannels);
+                else
+                    return new AudioData::ConverterInstance <SourceType, AudioData::Pointer <SampleType, AudioData::BigEndian, AudioData::Interleaved, AudioData::NonConst> > (1, numInterleavedChannels);
             }
         }
     };
@@ -431,7 +370,7 @@ private:
             return false;
 
         error = snd_strerror (errorNum);
-        JUCE_ALSA_LOG ("ALSA error: " << error);
+        DBG ("ALSA error: " + error + "\n");
         return true;
     }
 
@@ -453,7 +392,6 @@ public:
           inputId (inputId_),
           outputId (outputId_),
           numCallbacks (0),
-          audioIoInProgress (false),
           inputChannelBuffer (1, 1),
           outputChannelBuffer (1, 1)
     {
@@ -567,12 +505,14 @@ public:
         }
 
         if (outputDevice != nullptr && inputDevice != nullptr)
+        {
             snd_pcm_link (outputDevice->handle, inputDevice->handle);
+        }
 
-        if (inputDevice != nullptr && JUCE_ALSA_FAILED (snd_pcm_prepare (inputDevice->handle)))
+        if (inputDevice != nullptr && failed (snd_pcm_prepare (inputDevice->handle)))
             return;
 
-        if (outputDevice != nullptr && JUCE_ALSA_FAILED (snd_pcm_prepare (outputDevice->handle)))
+        if (outputDevice != nullptr && failed (snd_pcm_prepare (outputDevice->handle)))
             return;
 
         startThread (9);
@@ -593,25 +533,6 @@ public:
 
     void close()
     {
-        if (isThreadRunning())
-        {
-            // problem: when pulseaudio is suspended (with pasuspend) , the ALSAThread::run is just stuck in
-            // snd_pcm_writei -- no error, no nothing it just stays stuck. So the only way I found to exit "nicely"
-            // (that is without the "killing thread by force" of stopThread) , is to just call snd_pcm_close from
-            // here which will cause the thread to resume, and exit
-            signalThreadShouldExit();
-
-            const int callbacksToStop = numCallbacks;
-
-            if ((! waitForThreadToExit (400)) && audioIoInProgress && numCallbacks == callbacksToStop)
-            {
-                JUCE_ALSA_LOG ("Thread is stuck in i/o.. Is pulseaudio suspended?");
-
-                if (outputDevice != nullptr) outputDevice->closeNow();
-                if (inputDevice != nullptr) inputDevice->closeNow();
-            }
-        }
-
         stopThread (6000);
 
         inputDevice = nullptr;
@@ -633,17 +554,13 @@ public:
     {
         while (! threadShouldExit())
         {
-            if (inputDevice != nullptr && inputDevice->handle)
+            if (inputDevice != nullptr)
             {
-                audioIoInProgress = true;
-
                 if (! inputDevice->readFromInputDevice (inputChannelBuffer, bufferSize))
                 {
-                    JUCE_ALSA_LOG ("Read failure");
+                    DBG ("ALSA: read failure");
                     break;
                 }
-
-                audioIoInProgress = false;
             }
 
             if (threadShouldExit())
@@ -668,30 +585,22 @@ public:
                 }
             }
 
-            if (outputDevice != nullptr && outputDevice->handle)
+            if (outputDevice != nullptr)
             {
-                JUCE_ALSA_FAILED (snd_pcm_wait (outputDevice->handle, 2000));
+                failed (snd_pcm_wait (outputDevice->handle, 2000));
 
                 if (threadShouldExit())
                     break;
 
-                snd_pcm_sframes_t avail = snd_pcm_avail_update (outputDevice->handle);
-
-                if (avail < 0)
-                    JUCE_ALSA_FAILED (snd_pcm_recover (outputDevice->handle, avail, 0));
-
-                audioIoInProgress = true;
+                failed (snd_pcm_avail_update (outputDevice->handle));
 
                 if (! outputDevice->writeToOutputDevice (outputChannelBuffer, bufferSize))
                 {
-                    JUCE_ALSA_LOG ("write failure");
+                    DBG ("ALSA: write failure");
                     break;
                 }
-
-                audioIoInProgress = false;
             }
         }
-        audioIoInProgress = false;
     }
 
     int getBitDepth() const noexcept
@@ -720,7 +629,6 @@ private:
     const String inputId, outputId;
     ScopedPointer<ALSADevice> outputDevice, inputDevice;
     int numCallbacks;
-    bool audioIoInProgress;
 
     CriticalSection callbackLock;
 
@@ -736,7 +644,7 @@ private:
             return false;
 
         error = snd_strerror (errorNum);
-        JUCE_ALSA_LOG ("ALSA error: " << error);
+        DBG ("ALSA error: " + error + "\n");
         return true;
     }
 
@@ -751,8 +659,8 @@ private:
         maxChansIn = 0;
         unsigned int dummy = 0;
 
-        getDeviceProperties (inputId, dummy, dummy, minChansIn, maxChansIn, sampleRates, false, true);
-        getDeviceProperties (outputId, minChansOut, maxChansOut, dummy, dummy, sampleRates, true, false);
+        getDeviceProperties (inputId, dummy, dummy, minChansIn, maxChansIn, sampleRates);
+        getDeviceProperties (outputId, minChansOut, maxChansOut, dummy, dummy, sampleRates);
 
         for (unsigned int i = 0; i < maxChansOut; ++i)
             channelNamesOut.add ("channel " + String ((int) i + 1));
@@ -770,10 +678,9 @@ class ALSAAudioIODevice   : public AudioIODevice
 {
 public:
     ALSAAudioIODevice (const String& deviceName,
-                       const String& typeName,
                        const String& inputId_,
                        const String& outputId_)
-        : AudioIODevice (deviceName, typeName),
+        : AudioIODevice (deviceName, "ALSA"),
           inputId (inputId_),
           outputId (outputId_),
           isOpen_ (false),
@@ -875,7 +782,7 @@ public:
     {
         AudioIODeviceCallback* const oldCallback = internal.callback;
 
-        start (nullptr);
+        start (0);
 
         if (oldCallback != nullptr)
             oldCallback->audioDeviceStopped();
@@ -893,23 +800,15 @@ private:
 class ALSAAudioIODeviceType  : public AudioIODeviceType
 {
 public:
-    ALSAAudioIODeviceType (bool onlySoundcards, const String &typeName)
-        : AudioIODeviceType (typeName),
-          hasScanned (false),
-          listOnlySoundcards (onlySoundcards)
+    //==============================================================================
+    ALSAAudioIODeviceType()
+        : AudioIODeviceType ("ALSA"),
+          hasScanned (false)
     {
-       #if ! JUCE_ALSA_LOGGING
-        snd_lib_error_set_handler (&silentErrorHandler);
-       #endif
     }
 
     ~ALSAAudioIODeviceType()
     {
-       #if ! JUCE_ALSA_LOGGING
-        snd_lib_error_set_handler (nullptr);
-       #endif
-
-        snd_config_update_free_global(); // prevent valgrind from screaming about alsa leaks
     }
 
     //==============================================================================
@@ -924,176 +823,82 @@ public:
         outputNames.clear();
         outputIds.clear();
 
-        JUCE_ALSA_LOG ("scanForDevices()");
-
-        if (listOnlySoundcards)
-            enumerateAlsaSoundcards();
-        else
-            enumerateAlsaPCMDevices();
-
-        inputNames.appendNumbersToDuplicates (false, true);
-        outputNames.appendNumbersToDuplicates (false, true);
-    }
-
-    StringArray getDeviceNames (bool wantInputNames) const
-    {
-        jassert (hasScanned); // need to call scanForDevices() before doing this
-
-        return wantInputNames ? inputNames : outputNames;
-    }
-
-    int getDefaultDeviceIndex (bool forInput) const
-    {
-        jassert (hasScanned); // need to call scanForDevices() before doing this
-
-        const int idx = (forInput ? inputIds : outputIds).indexOf ("default");
-        return idx >= 0 ? idx : 0;
-    }
-
-    bool hasSeparateInputsAndOutputs() const    { return true; }
-
-    int getIndexOfDevice (AudioIODevice* device, bool asInput) const
-    {
-        jassert (hasScanned); // need to call scanForDevices() before doing this
-
-        if (ALSAAudioIODevice* d = dynamic_cast <ALSAAudioIODevice*> (device))
-            return asInput ? inputIds.indexOf (d->inputId)
-                           : outputIds.indexOf (d->outputId);
-
-        return -1;
-    }
-
-    AudioIODevice* createDevice (const String& outputDeviceName,
-                                 const String& inputDeviceName)
-    {
-        jassert (hasScanned); // need to call scanForDevices() before doing this
-
-        const int inputIndex = inputNames.indexOf (inputDeviceName);
-        const int outputIndex = outputNames.indexOf (outputDeviceName);
-
-        String deviceName (outputIndex >= 0 ? outputDeviceName
-                                            : inputDeviceName);
-
-        if (inputIndex >= 0 || outputIndex >= 0)
-            return new ALSAAudioIODevice (deviceName, getTypeName(),
-                                          inputIds [inputIndex],
-                                          outputIds [outputIndex]);
-
-        return nullptr;
-    }
-
-private:
-    //==============================================================================
-    StringArray inputNames, outputNames, inputIds, outputIds;
-    bool hasScanned, listOnlySoundcards;
-
-    bool testDevice (const String &id, const String &outputName, const String &inputName)
-    {
-        unsigned int minChansOut = 0, maxChansOut = 0;
-        unsigned int minChansIn = 0, maxChansIn = 0;
-        Array <int> rates;
-
-        bool isInput = inputName.isNotEmpty(), isOutput = outputName.isNotEmpty();
-        getDeviceProperties (id, minChansOut, maxChansOut, minChansIn, maxChansIn, rates, isOutput, isInput);
-
-        isInput  = maxChansIn > 0;
-        isOutput = maxChansOut > 0;
-
-        if ((isInput || isOutput) && rates.size() > 0)
+/*        void** hints = 0;
+        if (snd_device_name_hint (-1, "pcm", &hints) >= 0)
         {
-            JUCE_ALSA_LOG ("testDevice: '" << id.toUTF8().getAddress() << "' -> isInput: "
-                            << isInput << ", isOutput: " << isOutput);
-
-            if (isInput)
+            for (void** hint = hints; *hint != 0; ++hint)
             {
-                inputNames.add (inputName);
-                inputIds.add (id);
+                const String name (getHint (*hint, "NAME"));
+
+                if (name.isNotEmpty())
+                {
+                    const String ioid (getHint (*hint, "IOID"));
+
+                    String desc (getHint (*hint, "DESC"));
+                    if (desc.isEmpty())
+                        desc = name;
+
+                    desc = desc.replaceCharacters ("\n\r", "  ");
+
+                    DBG ("name: " << name << "\ndesc: " << desc << "\nIO: " << ioid);
+
+                    if (ioid.isEmpty() || ioid == "Input")
+                    {
+                        inputNames.add (desc);
+                        inputIds.add (name);
+                    }
+
+                    if (ioid.isEmpty() || ioid == "Output")
+                    {
+                        outputNames.add (desc);
+                        outputIds.add (name);
+                    }
+                }
             }
 
-            if (isOutput)
-            {
-                outputNames.add (outputName);
-                outputIds.add (id);
-            }
-
-            return isInput || isOutput;
+            snd_device_name_free_hint (hints);
         }
-
-        return false;
-    }
-
-    void enumerateAlsaSoundcards()
-    {
+*/
         snd_ctl_t* handle = nullptr;
         snd_ctl_card_info_t* info = nullptr;
         snd_ctl_card_info_alloca (&info);
 
         int cardNum = -1;
 
-        while (outputIds.size() + inputIds.size() <= 64)
+        while (outputIds.size() + inputIds.size() <= 32)
         {
             snd_card_next (&cardNum);
 
             if (cardNum < 0)
                 break;
 
-            if (JUCE_CHECKED_RESULT (snd_ctl_open (&handle, ("hw:" + String (cardNum)).toUTF8(), SND_CTL_NONBLOCK)) >= 0)
+            if (snd_ctl_open (&handle, ("hw:" + String (cardNum)).toUTF8(), SND_CTL_NONBLOCK) >= 0)
             {
-                if (JUCE_CHECKED_RESULT (snd_ctl_card_info (handle, info)) >= 0)
+                if (snd_ctl_card_info (handle, info) >= 0)
                 {
                     String cardId (snd_ctl_card_info_get_id (info));
 
                     if (cardId.removeCharacters ("0123456789").isEmpty())
                         cardId = String (cardNum);
 
-                    String cardName = snd_ctl_card_info_get_name (info);
-
-                    if (cardName.isEmpty())
-                        cardName = cardId;
-
                     int device = -1;
-
-                    snd_pcm_info_t* pcmInfo;
-                    snd_pcm_info_alloca (&pcmInfo);
 
                     for (;;)
                     {
                         if (snd_ctl_pcm_next_device (handle, &device) < 0 || device < 0)
                             break;
 
-                        snd_pcm_info_set_device (pcmInfo, device);
+                        String id, name;
+                        id << "hw:" << cardId << ',' << device;
 
-                        for (int subDevice = 0, nbSubDevice = 1; subDevice < nbSubDevice; ++subDevice)
+                        bool isInput, isOutput;
+
+                        if (testDevice (id, isInput, isOutput))
                         {
-                            snd_pcm_info_set_subdevice (pcmInfo, subDevice);
-                            snd_pcm_info_set_stream (pcmInfo, SND_PCM_STREAM_CAPTURE);
-                            const bool isInput = (snd_ctl_pcm_info (handle, pcmInfo) >= 0);
+                            name << snd_ctl_card_info_get_name (info);
 
-                            snd_pcm_info_set_stream (pcmInfo, SND_PCM_STREAM_PLAYBACK);
-                            const bool isOutput = (snd_ctl_pcm_info (handle, pcmInfo) >= 0);
-
-                            if (! (isInput || isOutput))
-                                continue;
-
-                            if (nbSubDevice == 1)
-                                nbSubDevice = snd_pcm_info_get_subdevices_count (pcmInfo);
-
-                            String id, name;
-
-                            if (nbSubDevice == 1)
-                            {
-                                id << "hw:" << cardId << "," << device;
-                                name << cardName << ", " << snd_pcm_info_get_name (pcmInfo);
-                            }
-                            else
-                            {
-                                id << "hw:" << cardId << "," << device << "," << subDevice;
-                                name << cardName << ", " << snd_pcm_info_get_name (pcmInfo)
-                                     << " {" <<  snd_pcm_info_get_subdevice_name (pcmInfo) << "}";
-                            }
-
-                            JUCE_ALSA_LOG ("Soundcard ID: " << id << ", name: '" << name
-                                            << ", isInput:" << isInput << ", isOutput:" << isOutput << "\n");
+                            if (name.isEmpty())
+                                name = id;
 
                             if (isInput)
                             {
@@ -1110,117 +915,97 @@ private:
                     }
                 }
 
-                JUCE_CHECKED_RESULT (snd_ctl_close (handle));
+                snd_ctl_close (handle);
             }
         }
+
+        inputNames.appendNumbersToDuplicates (false, true);
+        outputNames.appendNumbersToDuplicates (false, true);
     }
 
-    /* Enumerates all ALSA output devices (as output by the command aplay -L)
-       Does not try to open the devices (with "testDevice" for example),
-       so that it also finds devices that are busy and not yet available.
-    */
-    void enumerateAlsaPCMDevices()
+    StringArray getDeviceNames (bool wantInputNames) const
     {
-        void** hints = nullptr;
+        jassert (hasScanned); // need to call scanForDevices() before doing this
 
-        if (JUCE_CHECKED_RESULT (snd_device_name_hint (-1, "pcm", &hints)) == 0)
-        {
-            for (char** h = (char**) hints; *h; ++h)
-            {
-                const String id (hintToString (*h, "NAME"));
-                const String description (hintToString (*h, "DESC"));
-                const String ioid (hintToString (*h, "IOID"));
-
-                JUCE_ALSA_LOG ("ID: " << id << "; desc: " << description << "; ioid: " << ioid);
-
-                String ss = id.fromFirstOccurrenceOf ("=", false, false)
-                              .upToFirstOccurrenceOf (",", false, false);
-
-                if (id.isEmpty()
-                     || id.startsWith ("default:") || id.startsWith ("sysdefault:")
-                     || id.startsWith ("plughw:") || id == "null")
-                    continue;
-
-                String name (description.replace ("\n", "; "));
-
-                if (name.isEmpty())
-                    name = id;
-
-                bool isOutput = (ioid != "Input");
-                bool isInput  = (ioid != "Output");
-
-                // alsa is stupid here, it advertises dmix and dsnoop as input/output devices, but
-                // opening dmix as input, or dsnoop as output will trigger errors..
-                isInput  = isInput  && ! id.startsWith ("dmix");
-                isOutput = isOutput && ! id.startsWith ("dsnoop");
-
-                if (isInput)
-                {
-                    inputNames.add (name);
-                    inputIds.add (id);
-                }
-
-                if (isOutput)
-                {
-                    outputNames.add (name);
-                    outputIds.add (id);
-                }
-            }
-
-            snd_device_name_free_hint (hints);
-        }
-
-        // sometimes the "default" device is not listed, but it is nice to see it explicitely in the list
-        if (! outputIds.contains ("default"))
-            testDevice ("default", "Default ALSA Output", "Default ALSA Input");
-
-        // same for the pulseaudio plugin
-        if (! outputIds.contains ("pulse"))
-            testDevice ("pulse", "Pulseaudio output", "Pulseaudio input");
-
-        // make sure the default device is listed first, and followed by the pulse device (if present)
-        int idx = outputIds.indexOf ("pulse");
-        outputIds.move (idx, 0);
-        outputNames.move (idx, 0);
-
-        idx = inputIds.indexOf ("pulse");
-        inputIds.move (idx, 0);
-        inputNames.move (idx, 0);
-
-        idx = outputIds.indexOf ("default");
-        outputIds.move (idx, 0);
-        outputNames.move (idx, 0);
-
-        idx = inputIds.indexOf ("default");
-        inputIds.move (idx, 0);
-        inputNames.move (idx, 0);
+        return wantInputNames ? inputNames : outputNames;
     }
 
-    static String hintToString (const void* hints, const char* type)
+    int getDefaultDeviceIndex (bool /* forInput */) const
     {
-        char* const hint = snd_device_name_get_hint (hints, type);
-        const String s (hint);
-        ::free (hint);
+        jassert (hasScanned); // need to call scanForDevices() before doing this
+        return 0;
+    }
+
+    bool hasSeparateInputsAndOutputs() const    { return true; }
+
+    int getIndexOfDevice (AudioIODevice* device, bool asInput) const
+    {
+        jassert (hasScanned); // need to call scanForDevices() before doing this
+
+        ALSAAudioIODevice* d = dynamic_cast <ALSAAudioIODevice*> (device);
+        if (d == nullptr)
+            return -1;
+
+        return asInput ? inputIds.indexOf (d->inputId)
+                       : outputIds.indexOf (d->outputId);
+    }
+
+    AudioIODevice* createDevice (const String& outputDeviceName,
+                                 const String& inputDeviceName)
+    {
+        jassert (hasScanned); // need to call scanForDevices() before doing this
+
+        const int inputIndex = inputNames.indexOf (inputDeviceName);
+        const int outputIndex = outputNames.indexOf (outputDeviceName);
+
+        String deviceName (outputIndex >= 0 ? outputDeviceName
+                                            : inputDeviceName);
+
+        if (inputIndex >= 0 || outputIndex >= 0)
+            return new ALSAAudioIODevice (deviceName,
+                                          inputIds [inputIndex],
+                                          outputIds [outputIndex]);
+
+        return nullptr;
+    }
+
+    //==============================================================================
+private:
+    StringArray inputNames, outputNames, inputIds, outputIds;
+    bool hasScanned;
+
+    static bool testDevice (const String& id, bool& isInput, bool& isOutput)
+    {
+        unsigned int minChansOut = 0, maxChansOut = 0;
+        unsigned int minChansIn = 0, maxChansIn = 0;
+        Array <int> rates;
+
+        getDeviceProperties (id, minChansOut, maxChansOut, minChansIn, maxChansIn, rates);
+
+        DBG ("ALSA device: " + id
+              + " outs=" + String ((int) minChansOut) + "-" + String ((int) maxChansOut)
+              + " ins=" + String ((int) minChansIn) + "-" + String ((int) maxChansIn)
+              + " rates=" + String (rates.size()));
+
+        isInput = maxChansIn > 0;
+        isOutput = maxChansOut > 0;
+
+        return (isInput || isOutput) && rates.size() > 0;
+    }
+
+    /*static String getHint (void* hint, const char* type)
+    {
+        char* const n = snd_device_name_get_hint (hint, type);
+        const String s ((const char*) n);
+        free (n);
         return s;
-    }
+    }*/
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ALSAAudioIODeviceType)
 };
 
-}
-
 //==============================================================================
-AudioIODeviceType* createAudioIODeviceType_ALSA_Soundcards()
-{
-    return new ALSAAudioIODeviceType (true, "ALSA HW");
-}
-
-AudioIODeviceType* createAudioIODeviceType_ALSA_PCMDevices()
-{
-    return new ALSAAudioIODeviceType (false, "ALSA");
-}
-
 AudioIODeviceType* AudioIODeviceType::createAudioIODeviceType_ALSA()
 {
-    return createAudioIODeviceType_ALSA_PCMDevices();
+    return new ALSAAudioIODeviceType();
 }

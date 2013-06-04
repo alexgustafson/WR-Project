@@ -4,6 +4,8 @@
               bundleIdentifier="com.yourcompany.JuceTest" jucerVersion="3.1.0">
   <MAINGROUP id="XEC9Vj" name="JuceTest">
     <GROUP id="{6CA9CFE0-5D39-191E-E30C-9DC1C58A6F5D}" name="Source">
+      <FILE id="awdWEM" name="Worker.cpp" compile="1" resource="0" file="Source/Worker.cpp"/>
+      <FILE id="blyvAZ" name="Worker.h" compile="0" resource="0" file="Source/Worker.h"/>
       <FILE id="RkErDK" name="SerializableAudioBuffer.cpp" compile="1" resource="0"
             file="Source/SerializableAudioBuffer.cpp"/>
       <FILE id="KRKSVd" name="SerializableAudioBuffer.h" compile="0" resource="0"

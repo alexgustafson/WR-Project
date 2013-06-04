@@ -60,7 +60,7 @@ void AudioWavViewComponent::paint (Graphics& g)
     //[UserPrePaint] Add your own custom painting code here..
     //[/UserPrePaint]
 
-    g.fillAll (Colour (0xffbf9424));
+    g.fillAll (Colour (0xff2496bf));
 
     //[UserPaint] Add your own custom painting code here..
     if (thumbnail.getTotalLength() > 0)
@@ -112,7 +112,7 @@ BEGIN_JUCER_METADATA
                  variableInitialisers="thumbnailCache (5),&#10;thumbnail (512, formatManager, thumbnailCache)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330000013"
                  fixedSize="0" initialWidth="600" initialHeight="400">
-  <BACKGROUND backgroundColour="ffbf9424"/>
+  <BACKGROUND backgroundColour="ff2496bf"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

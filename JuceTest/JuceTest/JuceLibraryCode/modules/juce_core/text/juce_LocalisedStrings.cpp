@@ -23,14 +23,14 @@
   ==============================================================================
 */
 
-LocalisedStrings::LocalisedStrings (const String& fileContents, bool ignoreCase)
+LocalisedStrings::LocalisedStrings (const String& fileContents)
 {
-    loadFromText (fileContents, ignoreCase);
+    loadFromText (fileContents);
 }
 
-LocalisedStrings::LocalisedStrings (const File& fileToLoad, bool ignoreCase)
+LocalisedStrings::LocalisedStrings (const File& fileToLoad)
 {
-    loadFromText (fileToLoad.loadFileAsString(), ignoreCase);
+    loadFromText (fileToLoad.loadFileAsString());
 }
 
 LocalisedStrings::~LocalisedStrings()
@@ -60,7 +60,7 @@ namespace
     {
         LeakAvoidanceTrick()
         {
-            const ScopedPointer<LocalisedStrings> dummy (new LocalisedStrings (String(), false));
+            const ScopedPointer<LocalisedStrings> dummy (new LocalisedStrings (String()));
         }
     };
 
@@ -99,10 +99,8 @@ namespace
     }
 }
 
-void LocalisedStrings::loadFromText (const String& fileContents, bool ignoreCase)
+void LocalisedStrings::loadFromText (const String& fileContents)
 {
-    translations.setIgnoresCase (ignoreCase);
-
     StringArray lines;
     lines.addLines (fileContents);
 
@@ -138,6 +136,11 @@ void LocalisedStrings::loadFromText (const String& fileContents, bool ignoreCase
             countryCodes.removeEmptyStrings();
         }
     }
+}
+
+void LocalisedStrings::setIgnoresCase (const bool shouldIgnoreCase)
+{
+    translations.setIgnoresCase (shouldIgnoreCase);
 }
 
 //==============================================================================

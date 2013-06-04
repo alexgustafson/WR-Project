@@ -280,9 +280,6 @@ namespace juce
 #ifndef __JUCE_WINDOWSREGISTRY_JUCEHEADER__
  #include "misc/juce_WindowsRegistry.h"
 #endif
-#ifndef __JUCE_IPADDRESS_JUCEHEADER__
- #include "network/juce_IPAddress.h"
-#endif
 #ifndef __JUCE_MACADDRESS_JUCEHEADER__
  #include "network/juce_MACAddress.h"
 #endif

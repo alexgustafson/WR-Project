@@ -19,7 +19,7 @@ class MPIHandler
     
 public:
     
-    enum MESSAGE_TAGS {msg_sampledata, msg_broadcast_data, msg_finished};
+    enum MESSAGE_TAGS {msg_sampledata, msg_statusRequest, msg_bufferSize, msg_workerBusy, msg_workerReady, msg_broadcastData, msg_finished};
 
     ~MPIHandler()
     {
@@ -50,7 +50,6 @@ public:
     
     void sendSampleBuffer(float* buffer, int sliceSize, int destination)
     {
-        //MPI_Bsend(buffer, sliceSize, MPI_FLOAT, destination , MPIHandler::MESSAGE_TAGS::msg_sampledata, myWorld);
         MPI_Send(buffer, sliceSize, MPI_FLOAT, destination , MPIHandler::MESSAGE_TAGS::msg_sampledata, myWorld);
     }
     
@@ -60,10 +59,9 @@ public:
         myWorld.recv(0, 0, value);
     };
     
-    void mpi_oldschoolRevieveFloatArray(void* sampleBuffer, int &count)
+    void mpi_recFloatArray(void* sampleBuffer, int &count)
     {
         std::cout << " worker got here " << getRank();
-        MPI_Status *status;
         MPI_Recv(sampleBuffer, count, MPI_FLOAT, 0, MPIHandler::MESSAGE_TAGS::msg_sampledata, myWorld, NULL);
         std::cout << " and stuff received " << getRank();
     }
@@ -79,6 +77,11 @@ public:
     {
         myWorld.send(dest, tag, value);
     };
+    
+    int getNumberOfProcesses()
+    {
+        return myWorld.size();
+    }
     
 private:
     

@@ -23,8 +23,8 @@
   ==============================================================================
 */
 
-AudioProcessorEditor::AudioProcessorEditor (AudioProcessor* const p)
-    : owner (p)
+AudioProcessorEditor::AudioProcessorEditor (AudioProcessor* const owner_)
+    : owner (owner_)
 {
     // the filter must be valid..
     jassert (owner != nullptr);

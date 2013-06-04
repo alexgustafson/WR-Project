@@ -39,6 +39,7 @@ PluginDirectoryScanner::PluginDirectoryScanner (KnownPluginList& listToAddTo,
     : list (listToAddTo),
       format (formatToLookFor),
       deadMansPedalFile (deadMansPedal),
+      nextIndex (0),
       progress (0)
 {
     directoriesToSearch.removeRedundantPaths();
@@ -59,7 +60,6 @@ PluginDirectoryScanner::PluginDirectoryScanner (KnownPluginList& listToAddTo,
     }
 
     applyBlacklistingsFromDeadMansPedal (listToAddTo, deadMansPedalFile);
-    nextIndex.set (filesOrIdentifiersToScan.size());
 }
 
 PluginDirectoryScanner::~PluginDirectoryScanner()
@@ -69,51 +69,43 @@ PluginDirectoryScanner::~PluginDirectoryScanner()
 //==============================================================================
 String PluginDirectoryScanner::getNextPluginFileThatWillBeScanned() const
 {
-    return format.getNameOfPluginFromIdentifier (filesOrIdentifiersToScan [nextIndex.get() - 1]);
-}
-
-void PluginDirectoryScanner::updateProgress()
-{
-    progress = (1.0f - nextIndex.get() / (float) filesOrIdentifiersToScan.size());
+    return format.getNameOfPluginFromIdentifier (filesOrIdentifiersToScan [nextIndex]);
 }
 
 bool PluginDirectoryScanner::scanNextFile (const bool dontRescanIfAlreadyInList)
 {
-    const int index = --nextIndex;
+    String file (filesOrIdentifiersToScan [nextIndex]);
 
-    if (index >= 0)
+    if (file.isNotEmpty() && ! list.isListingUpToDate (file))
     {
-        String file (filesOrIdentifiersToScan [index]);
+        OwnedArray <PluginDescription> typesFound;
 
-        if (file.isNotEmpty() && ! list.isListingUpToDate (file))
-        {
-            OwnedArray <PluginDescription> typesFound;
+        // Add this plugin to the end of the dead-man's pedal list in case it crashes...
+        StringArray crashedPlugins (readDeadMansPedalFile (deadMansPedalFile));
+        crashedPlugins.removeString (file);
+        crashedPlugins.add (file);
+        setDeadMansPedalFile (crashedPlugins);
 
-            // Add this plugin to the end of the dead-man's pedal list in case it crashes...
-            StringArray crashedPlugins (readDeadMansPedalFile (deadMansPedalFile));
-            crashedPlugins.removeString (file);
-            crashedPlugins.add (file);
-            setDeadMansPedalFile (crashedPlugins);
+        list.scanAndAddFile (file, dontRescanIfAlreadyInList, typesFound, format);
 
-            list.scanAndAddFile (file, dontRescanIfAlreadyInList, typesFound, format);
+        // Managed to load without crashing, so remove it from the dead-man's-pedal..
+        crashedPlugins.removeString (file);
+        setDeadMansPedalFile (crashedPlugins);
 
-            // Managed to load without crashing, so remove it from the dead-man's-pedal..
-            crashedPlugins.removeString (file);
-            setDeadMansPedalFile (crashedPlugins);
-
-            if (typesFound.size() == 0 && ! list.getBlacklistedFiles().contains (file))
-                failedFiles.add (file);
-        }
+        if (typesFound.size() == 0 && ! list.getBlacklistedFiles().contains (file))
+            failedFiles.add (file);
     }
 
-    updateProgress();
-    return index > 0;
+    return skipNextFile();
 }
 
 bool PluginDirectoryScanner::skipNextFile()
 {
-    updateProgress();
-    return --nextIndex > 0;
+    if (nextIndex >= filesOrIdentifiersToScan.size())
+        return false;
+
+    progress = ++nextIndex / (float) filesOrIdentifiersToScan.size();
+    return nextIndex < filesOrIdentifiersToScan.size();
 }
 
 void PluginDirectoryScanner::setDeadMansPedalFile (const StringArray& newContents)

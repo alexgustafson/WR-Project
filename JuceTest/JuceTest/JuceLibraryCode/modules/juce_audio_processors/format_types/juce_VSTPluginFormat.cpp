@@ -780,17 +780,22 @@ public:
 
         if (effect != nullptr && effect->magic == kEffectMagic)
         {
-           #if JUCE_MAC
-            if (module->resFileId != 0)
-                UseResFile (module->resFileId);
-           #endif
+            try
+            {
+               #if JUCE_MAC
+                if (module->resFileId != 0)
+                    UseResFile (module->resFileId);
+               #endif
 
-            // Must delete any editors before deleting the plugin instance!
-            jassert (getActiveEditor() == 0);
+                // Must delete any editors before deleting the plugin instance!
+                jassert (getActiveEditor() == 0);
 
-            _fpreset(); // some dodgy plugs fuck around with this
+                _fpreset(); // some dodgy plugs fuck around with this
 
-            module->closeEffect (effect);
+                module->closeEffect (effect);
+            }
+            catch (...)
+            {}
         }
 
         module = nullptr;
@@ -1047,21 +1052,36 @@ public:
                                                jlimit (0, numSamples - 1, samplePosition));
                 }
 
-                effect->dispatcher (effect, effProcessEvents, 0, 0, midiEventsToSend.events, 0);
+                try
+                {
+                    effect->dispatcher (effect, effProcessEvents, 0, 0, midiEventsToSend.events, 0);
+                }
+                catch (...)
+                {}
             }
 
             _clearfp();
 
             if ((effect->flags & effFlagsCanReplacing) != 0)
             {
-                effect->processReplacing (effect, buffer.getArrayOfChannels(), buffer.getArrayOfChannels(), numSamples);
+                try
+                {
+                    effect->processReplacing (effect, buffer.getArrayOfChannels(), buffer.getArrayOfChannels(), numSamples);
+                }
+                catch (...)
+                {}
             }
             else
             {
                 tempBuffer.setSize (effect->numOutputs, numSamples);
                 tempBuffer.clear();
 
-                effect->process (effect, buffer.getArrayOfChannels(), tempBuffer.getArrayOfChannels(), numSamples);
+                try
+                {
+                    effect->process (effect, buffer.getArrayOfChannels(), tempBuffer.getArrayOfChannels(), numSamples);
+                }
+                catch (...)
+                {}
 
                 for (int i = effect->numOutputs; --i >= 0;)
                     buffer.copyFrom (i, 0, tempBuffer.getSampleData (i), numSamples);
@@ -1149,8 +1169,14 @@ public:
     {
         if (effect != nullptr && isPositiveAndBelow (index, (int) effect->numParams))
         {
-            const ScopedLock sl (lock);
-            return effect->getParameter (effect, index);
+            try
+            {
+                const ScopedLock sl (lock);
+                return effect->getParameter (effect, index);
+            }
+            catch (...)
+            {
+            }
         }
 
         return 0.0f;
@@ -1160,10 +1186,16 @@ public:
     {
         if (effect != nullptr && isPositiveAndBelow (index, (int) effect->numParams))
         {
-            const ScopedLock sl (lock);
+            try
+            {
+                const ScopedLock sl (lock);
 
-            if (effect->getParameter (effect, index) != newValue)
-                effect->setParameter (effect, index, newValue);
+                if (effect->getParameter (effect, index) != newValue)
+                    effect->setParameter (effect, index, newValue);
+            }
+            catch (...)
+            {
+            }
         }
     }
 
@@ -1890,12 +1922,12 @@ class VSTPluginWindow   : public AudioProcessorEditor,
 {
 public:
     //==============================================================================
-    VSTPluginWindow (VSTPluginInstance& plug)
-        : AudioProcessorEditor (&plug),
+    VSTPluginWindow (VSTPluginInstance& plugin_)
+        : AudioProcessorEditor (&plugin_),
          #if ! JUCE_MAC
           ComponentMovementWatcher (this),
          #endif
-          plugin (plug),
+          plugin (plugin_),
           isOpen (false),
           recursiveResize (false),
           pluginWantsKeys (false),
@@ -1971,7 +2003,7 @@ public:
     {
         if (isShowing())
             openPluginWindow();
-        else if (! shouldAvoidDeletingWindow())
+        else
             closePluginWindow();
 
         componentMovedOrResized (true, true);
@@ -2049,16 +2081,17 @@ public:
     //==============================================================================
     void timerCallback()
     {
-        if (isShowing())
+       #if JUCE_WINDOWS
+        if (--sizeCheckCount <= 0)
         {
-           #if JUCE_WINDOWS
-            if (--sizeCheckCount <= 0)
-            {
-                sizeCheckCount = 10;
-                checkPluginWindowSize();
-            }
-           #endif
+            sizeCheckCount = 10;
 
+            checkPluginWindowSize();
+        }
+       #endif
+
+        try
+        {
             static bool reentrant = false;
 
             if (! reentrant)
@@ -2068,13 +2101,13 @@ public:
                 reentrant = false;
             }
         }
+        catch (...)
+        {}
     }
 
     //==============================================================================
     void mouseDown (const MouseEvent& e)
     {
-        (void) e;
-
        #if JUCE_LINUX
         if (pluginWindow == 0)
             return;
@@ -2097,6 +2130,8 @@ public:
         sendEventToChild (&ev);
 
        #elif JUCE_WINDOWS
+        (void) e;
+
         toFront (true);
        #endif
     }
@@ -2125,16 +2160,6 @@ private:
     Window pluginWindow;
     EventProcPtr pluginProc;
    #endif
-
-    // This is a workaround for old Mackie plugins that crash if their
-    // window is deleted more than once.
-    bool shouldAvoidDeletingWindow() const
-    {
-        PluginDescription desc;
-        plugin.fillInPluginDescription (desc);
-
-        return desc.manufacturerName.containsIgnoreCase ("Loud Technologies");
-    }
 
     //==============================================================================
 #if JUCE_MAC
@@ -2373,9 +2398,11 @@ private:
                                  message, wParam, lParam);
                 }
 
-                return CallWindowProc ((WNDPROC) w->originalWndProc,
+                return CallWindowProc ((WNDPROC) (w->originalWndProc),
                                        (HWND) w->pluginHWND,
-                                       message, wParam, lParam);
+                                       message,
+                                       wParam,
+                                       lParam);
             }
         }
 
@@ -2542,10 +2569,9 @@ private:
     class InnerWrapperComponent   : public CarbonViewWrapperComponent
     {
     public:
-        InnerWrapperComponent (VSTPluginWindow& w)
-            : owner (w), alreadyInside (false)
+        InnerWrapperComponent (VSTPluginWindow& owner_)
+            : owner (owner_), alreadyInside (false)
         {
-            keepPluginWindowWhenHidden = w.shouldAvoidDeletingWindow();
         }
 
         ~InnerWrapperComponent()

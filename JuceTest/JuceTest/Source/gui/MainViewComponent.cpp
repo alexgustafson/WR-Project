@@ -22,6 +22,7 @@
 
 #include "MainViewComponent.h"
 
+
 //[MiscUserDefs] You can add your own user definitions and misc code here...
 //[/MiscUserDefs]
 
@@ -146,27 +147,29 @@ void MainViewComponent::processAudioFile()
 {
     MPIHandler* mpiHandle = MPIHandler::getInstance();
     SerializableAudioBuffer *audioBuffer = new SerializableAudioBuffer(1,sliceSize);
+
+    currentSamplePosition = 0;
     
-    //std::string value("hello");
+    int numOfProcessors = mpiHandle->getNumberOfProcesses();
     
-    if (audioReader->usesFloatingPointData) {
-        std::cout << "should float";
+    for (int i = 1; i < numOfProcessors; i++) {
+        
+        
+        audioReader->read(audioBuffer, 0, sliceSize,  currentSamplePosition, true, true);
+        
+        //for testing - make sure float values before sending via mpi are same on the otherside
+        /*
+         for (int64 i = 0; i < sliceSize; i++) {
+         std::cout << "samplenr:" << i << " : " << *audioBuffer->getSampleData(0,i ) << std::endl;
+         }
+         */
+        
+        mpiHandle->sendSampleBuffer(audioBuffer->getSampleData(0), sliceSize, i);
+        currentSamplePosition += sliceSize;
     }
     
-    audioReader->read(audioBuffer, 0, sliceSize,  (44100 * 20), true, true);
-
-    //for testing - make sure float values before sending via mpi are same on the otherside
-    for (int64 i = 0; i < sliceSize; i++) {
-        std::cout << "samplenr:" << i << " : " << *audioBuffer->getSampleData(0,i ) << std::endl;
-    }
+    delete audioBuffer;
     
-    mpiHandle->sendSampleBuffer(audioBuffer->getSampleData(0), sliceSize, 2);
-    
-    //mpiHandle->send(2, MPIHandler::MESSAGE_TAGS::msg_sampledata, audioBuffer);
-    //mpiHandle->send(2, MPIHandler::MESSAGE_TAGS::msg_sampledata, value);
-    
-
-    currentSamplePosition += sliceSize;
 }
 
 SerializableAudioBuffer* MainViewComponent::getNextSampleSlice()
@@ -175,7 +178,7 @@ SerializableAudioBuffer* MainViewComponent::getNextSampleSlice()
     audioReader->read(nextBuffer, 0, sliceSize, currentSamplePosition, true, false);
 
     return nextBuffer;
-    
+
 }
 //[/MiscUserCode]
 

@@ -115,10 +115,9 @@ private:
     StringArray filesOrIdentifiersToScan;
     File deadMansPedalFile;
     StringArray failedFiles;
-    Atomic<int> nextIndex;
+    int nextIndex;
     float progress;
 
-    void updateProgress();
     void setDeadMansPedalFile (const StringArray& newContents);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginDirectoryScanner)

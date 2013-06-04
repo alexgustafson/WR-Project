@@ -217,10 +217,6 @@ namespace AudioUnitFormatHelpers
                             desc.componentType = types[0];
                             desc.componentSubType = types[1];
                             desc.componentManufacturer = types[2];
-
-                            if (AudioComponent comp = AudioComponentFindNext (0, &desc))
-                                getNameAndManufacturer (comp, name, manufacturer);
-
                             break;
                         }
 
@@ -278,23 +274,30 @@ public:
     {
         using namespace AudioUnitFormatHelpers;
 
-        ++insideCallback;
-
-        JUCE_AU_LOG ("Opening AU: " + fileOrIdentifier);
-
-        if (getComponentDescFromIdentifier (fileOrIdentifier, componentDesc, pluginName, version, manufacturer)
-             || getComponentDescFromFile (fileOrIdentifier, componentDesc, pluginName, version, manufacturer))
+        try
         {
-            if (AudioComponent comp = AudioComponentFindNext (0, &componentDesc))
+            ++insideCallback;
+
+            JUCE_AU_LOG ("Opening AU: " + fileOrIdentifier);
+
+            if (getComponentDescFromIdentifier (fileOrIdentifier, componentDesc, pluginName, version, manufacturer)
+                 || getComponentDescFromFile (fileOrIdentifier, componentDesc, pluginName, version, manufacturer))
             {
-                AudioComponentInstanceNew (comp, &audioUnit);
+                if (AudioComponent comp = AudioComponentFindNext (0, &componentDesc))
+                {
+                    AudioComponentInstanceNew (comp, &audioUnit);
 
-                wantsMidiMessages = componentDesc.componentType == kAudioUnitType_MusicDevice
-                                 || componentDesc.componentType == kAudioUnitType_MusicEffect;
+                    wantsMidiMessages = componentDesc.componentType == kAudioUnitType_MusicDevice
+                                     || componentDesc.componentType == kAudioUnitType_MusicEffect;
+                }
             }
-        }
 
-        --insideCallback;
+            --insideCallback;
+        }
+        catch (...)
+        {
+            --insideCallback;
+        }
     }
 
     ~AudioUnitPluginInstance()

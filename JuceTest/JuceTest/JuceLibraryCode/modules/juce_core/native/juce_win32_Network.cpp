@@ -315,39 +315,27 @@ InputStream* URL::createNativeStream (const String& address, bool isPost, const 
 
 
 //==============================================================================
-struct GetAdaptersInfoHelper
-{
-    bool callGetAdaptersInfo()
-    {
-        DynamicLibrary dll ("iphlpapi.dll");
-        JUCE_LOAD_WINAPI_FUNCTION (dll, GetAdaptersInfo, getAdaptersInfo, DWORD, (PIP_ADAPTER_INFO, PULONG))
-
-        if (getAdaptersInfo == nullptr)
-            return false;
-
-        adapterInfo.malloc (1);
-        ULONG len = sizeof (IP_ADAPTER_INFO);
-
-        if (getAdaptersInfo (adapterInfo, &len) == ERROR_BUFFER_OVERFLOW)
-            adapterInfo.malloc (len, 1);
-
-        return getAdaptersInfo (adapterInfo, &len) == NO_ERROR;
-    }
-
-    HeapBlock<IP_ADAPTER_INFO> adapterInfo;
-};
-
 namespace MACAddressHelpers
 {
     void getViaGetAdaptersInfo (Array<MACAddress>& result)
     {
-        GetAdaptersInfoHelper gah;
+        DynamicLibrary dll ("iphlpapi.dll");
+        JUCE_LOAD_WINAPI_FUNCTION (dll, GetAdaptersInfo, getAdaptersInfo, DWORD, (PIP_ADAPTER_INFO, PULONG))
 
-        if (gah.callGetAdaptersInfo())
+        if (getAdaptersInfo != nullptr)
         {
-            for (PIP_ADAPTER_INFO adapter = gah.adapterInfo; adapter != nullptr; adapter = adapter->Next)
-                if (adapter->AddressLength >= 6)
-                    result.addIfNotAlreadyThere (MACAddress (adapter->Address));
+            ULONG len = sizeof (IP_ADAPTER_INFO);
+            HeapBlock<IP_ADAPTER_INFO> adapterInfo (1);
+
+            if (getAdaptersInfo (adapterInfo, &len) == ERROR_BUFFER_OVERFLOW)
+                adapterInfo.malloc (len, 1);
+
+            if (getAdaptersInfo (adapterInfo, &len) == NO_ERROR)
+            {
+                for (PIP_ADAPTER_INFO adapter = adapterInfo; adapter != nullptr; adapter = adapter->Next)
+                    if (adapter->AddressLength >= 6)
+                        result.addIfNotAlreadyThere (MACAddress (adapter->Address));
+            }
         }
     }
 
@@ -404,24 +392,6 @@ void MACAddress::findAllAddresses (Array<MACAddress>& result)
 {
     MACAddressHelpers::getViaGetAdaptersInfo (result);
     MACAddressHelpers::getViaNetBios (result);
-}
-
-void IPAddress::findAllAddresses (Array<IPAddress>& result)
-{
-    result.addIfNotAlreadyThere (IPAddress::local());
-
-    GetAdaptersInfoHelper gah;
-
-    if (gah.callGetAdaptersInfo())
-    {
-        for (PIP_ADAPTER_INFO adapter = gah.adapterInfo; adapter != nullptr; adapter = adapter->Next)
-        {
-            IPAddress ip (adapter->IpAddressList.IpAddress.String);
-
-            if (ip != IPAddress::any())
-                result.addIfNotAlreadyThere (ip);
-        }
-    }
 }
 
 //==============================================================================

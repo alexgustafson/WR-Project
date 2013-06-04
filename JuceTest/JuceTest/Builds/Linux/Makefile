@@ -5,8 +5,6 @@ ifndef CONFIG
   CONFIG=Debug
 endif
 
-CXX := mpic++
-
 ifeq ($(CONFIG),Debug)
   BINDIR := build
   LIBDIR := build
@@ -40,7 +38,7 @@ ifeq ($(CONFIG),Release)
   CPPFLAGS := $(DEPFLAGS) -D "LINUX=1" -D "NDEBUG=1" -D "JUCER_LINUX_MAKE_7346DA2A=1" -I /usr/include -I /usr/include/freetype2 -I ../../JuceLibraryCode -I /usr/include/mpich2/
   CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -Os
   CXXFLAGS += $(CFLAGS) 
-  LDFLAGS += $(TARGET_ARCH) -L$(BINDIR) -L$(LIBDIR) -fvisibility=hidden -L/usr/X11R6/lib/ -L/usr/lib/mpich2/lib/ -lX11 -lXext -lXinerama -lasound -ldl -lfreetype -lpthread -lrt -lboost_mpi -lboost_serialization -lmpichcxx -lmpich 
+  LDFLAGS += $(TARGET_ARCH) -L$(BINDIR) -L$(LIBDIR) -L/usr/X11R6/lib/ -L/usr/lib/mpich2/lib/ -lX11 -lXext -lXinerama -lasound -ldl -lfreetype -lpthread -lrt -lboost_mpi -lboost_serialization -lmpichcxx -lmpich 
   LDDEPS :=
   RESFLAGS :=  -D "LINUX=1" -D "NDEBUG=1" -D "JUCER_LINUX_MAKE_7346DA2A=1" -I /usr/include -I /usr/include/freetype2 -I ../../JuceLibraryCode -I /usr/include/mpich2/
   TARGET := JuceTest
@@ -51,6 +49,7 @@ endif
 DEPFLAGS := $(if $(word 2, $(TARGET_ARCH)), , -MMD)
 
 OBJECTS := \
+  $(OBJDIR)/Worker_12758407.o \
   $(OBJDIR)/SerializableAudioBuffer_a4c57218.o \
   $(OBJDIR)/AudioWavViewComponent_e38750cf.o \
   $(OBJDIR)/MainViewComponent_716a0cac.o \
@@ -87,6 +86,11 @@ clean:
 strip:
 	@echo Stripping JuceTest
 	-@strip --strip-unneeded $(OUTDIR)/$(TARGET)
+
+$(OBJDIR)/Worker_12758407.o: ../../Source/Worker.cpp
+	-@mkdir -p $(OBJDIR)
+	@echo "Compiling Worker.cpp"
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
 $(OBJDIR)/SerializableAudioBuffer_a4c57218.o: ../../Source/SerializableAudioBuffer.cpp
 	-@mkdir -p $(OBJDIR)

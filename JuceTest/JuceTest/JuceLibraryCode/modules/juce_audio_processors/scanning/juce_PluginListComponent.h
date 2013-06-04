@@ -61,10 +61,8 @@ public:
     /** Changes the text in the panel's button. */
     void setOptionsButtonText (const String& newText);
 
-    /** Sets how many threads to simultaneously scan for plugins.
-        If this is 0, then all scanning happens on the message thread (this is the default)
-    */
-    void setNumberOfThreadsForScanning (int numThreads);
+    /** Chooses whether to use the message thread or a background thread for scanning. */
+    void setScansOnMessageThread (bool useMessageThread) noexcept;
 
     //==============================================================================
     /** @internal */
@@ -88,7 +86,7 @@ private:
     ListBox listBox;
     TextButton optionsButton;
     PropertiesFile* propertiesToUse;
-    int numThreads;
+    bool scanOnBackgroundThread;
 
     class Scanner;
     friend class Scanner;

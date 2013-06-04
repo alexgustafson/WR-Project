@@ -62,7 +62,6 @@ namespace zlibNamespace
   #include "zlib/zutil.c"
   #undef Byte
   #undef fdopen
-  #undef local
 
   #if JUCE_CLANG
    #pragma clang diagnostic pop

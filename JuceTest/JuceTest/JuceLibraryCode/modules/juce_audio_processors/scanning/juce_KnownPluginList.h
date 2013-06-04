@@ -201,7 +201,6 @@ private:
     OwnedArray <PluginDescription> types;
     StringArray blacklist;
     ScopedPointer<CustomScanner> scanner;
-    CriticalSection scanLock;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (KnownPluginList)
 };

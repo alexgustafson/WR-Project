@@ -32,7 +32,7 @@ PluginListComponent::PluginListComponent (AudioPluginFormatManager& manager,
       deadMansPedalFile (deadMansPedal),
       optionsButton ("Options..."),
       propertiesToUse (properties),
-      numThreads (0)
+      scanOnBackgroundThread (false)
 {
     listBox.setModel (this);
     addAndMakeVisible (&listBox);
@@ -60,9 +60,9 @@ void PluginListComponent::setOptionsButtonText (const String& newText)
     resized();
 }
 
-void PluginListComponent::setNumberOfThreadsForScanning (int num)
+void PluginListComponent::setScansOnMessageThread (bool useMessageThread) noexcept
 {
-    numThreads = num;
+    scanOnBackgroundThread = ! useMessageThread;
 }
 
 void PluginListComponent::resized()
@@ -244,18 +244,20 @@ void PluginListComponent::filesDropped (const StringArray& files, int, int)
 }
 
 //==============================================================================
-class PluginListComponent::Scanner    : private Timer
+class PluginListComponent::Scanner    : private Timer,
+                                        private Thread
 {
 public:
     Scanner (PluginListComponent& plc,
              AudioPluginFormat& format,
              PropertiesFile* properties,
-             int threads)
-        : owner (plc), formatToScan (format), propertiesToUse (properties),
+             bool useThread)
+        : Thread ("plugin_scan"),
+          owner (plc), formatToScan (format), propertiesToUse (properties),
           pathChooserWindow (TRANS("Select folders to scan..."), String::empty, AlertWindow::NoIcon),
           progressWindow (TRANS("Scanning for plug-ins..."),
                           TRANS("Searching for all possible plug-in files..."), AlertWindow::NoIcon),
-          progress (0.0), numThreads (threads), finished (false)
+          progress (0.0), shouldUseThread (useThread), finished (false)
     {
         FileSearchPath path (formatToScan.getDefaultLocationsToSearch());
 
@@ -283,11 +285,7 @@ public:
 
     ~Scanner()
     {
-        if (pool != nullptr)
-        {
-            pool->removeAllJobs (true, 60000);
-            pool = nullptr;
-        }
+        stopThread (10000);
     }
 
 private:
@@ -319,13 +317,8 @@ private:
         progressWindow.addProgressBarComponent (progress);
         progressWindow.enterModalState();
 
-        if (numThreads > 0)
-        {
-            pool = new ThreadPool (numThreads);
-
-            for (int i = numThreads; --i >= 0;)
-                pool->addJob (new ScanJob (*this), true);
-        }
+        if (shouldUseThread)
+            startThread();
 
         startTimer (20);
     }
@@ -338,7 +331,7 @@ private:
 
     void timerCallback()
     {
-        if (pool == nullptr)
+        if (! isThreadRunning())
         {
             if (doNextScan())
                 startTimer (20);
@@ -353,9 +346,15 @@ private:
             progressWindow.setMessage (progressMessage);
     }
 
+    void run()
+    {
+        while (doNextScan() && ! threadShouldExit())
+        {}
+    }
+
     bool doNextScan()
     {
-        progressMessage = TRANS("Testing") + ":\n\n" + scanner->getNextPluginFileThatWillBeScanned();
+        progressMessage = TRANS("Testing:\n\n") + scanner->getNextPluginFileThatWillBeScanned();
 
         if (scanner->scanNextFile (true))
         {
@@ -375,36 +374,15 @@ private:
     FileSearchPathListComponent pathList;
     String progressMessage;
     double progress;
-    int numThreads;
-    bool finished;
-
-    ScopedPointer<ThreadPool> pool;
-
-    struct ScanJob  : public ThreadPoolJob
-    {
-        ScanJob (Scanner& s)  : ThreadPoolJob ("pluginscan"), scanner (s) {}
-
-        JobStatus runJob()
-        {
-            while (scanner.doNextScan() && ! shouldExit())
-            {}
-
-            return jobHasFinished;
-        }
-
-        Scanner& scanner;
-
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ScanJob)
-    };
+    bool shouldUseThread, finished;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Scanner)
-
 };
 
 void PluginListComponent::scanFor (AudioPluginFormat* format)
 {
     if (format != nullptr)
-        currentScanner = new Scanner (*this, *format, propertiesToUse, numThreads);
+        currentScanner = new Scanner (*this, *format, propertiesToUse, scanOnBackgroundThread);
 }
 
 void PluginListComponent::scanFinished (const StringArray& failedFiles)
@@ -419,7 +397,6 @@ void PluginListComponent::scanFinished (const StringArray& failedFiles)
     if (shortNames.size() > 0)
         AlertWindow::showMessageBoxAsync (AlertWindow::InfoIcon,
                                           TRANS("Scan complete"),
-                                          TRANS("Note that the following files appeared to be plugin files, but failed to load correctly")
-                                            + ":\n\n"
+                                          TRANS("Note that the following files appeared to be plugin files, but failed to load correctly:\n\n")
                                             + shortNames.joinIntoString (", "));
 }
