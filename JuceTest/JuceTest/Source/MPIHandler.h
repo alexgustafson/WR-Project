@@ -12,13 +12,14 @@
 #include <boost/mpi/environment.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <boost/mpi.hpp>
+#include "JuceHeader.h"
 
 class MPIHandler
 {
     
 public:
     
-    enum message_tags {msg_sampledata, msg_broadcast_data, msg_finished};
+    enum MESSAGE_TAGS {msg_sampledata, msg_broadcast_data, msg_finished};
 
     ~MPIHandler()
     {
@@ -50,7 +51,7 @@ public:
     template<typename T>
     void mpi_synchronous_recieve(T & value)
     {
-        myWorld.recv(-1, -1, value);
+        myWorld.recv(0, 0, value);
     };
     
     template<typename T> 
