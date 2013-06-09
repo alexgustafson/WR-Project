@@ -14,12 +14,14 @@
 #include <boost/mpi.hpp>
 #include "JuceHeader.h"
 
+enum MESSAGE_TAG {msg_sampledata, msg_resultdata, msg_bufferSize, msg_dataReady, msg_workerBusy, msg_workerReady, msg_broadcastData, msg_finished};
+
+
 class MPIHandler
 {
     
 public:
     
-    enum MESSAGE_TAGS {msg_sampledata, msg_statusRequest, msg_bufferSize, msg_workerBusy, msg_workerReady, msg_broadcastData, msg_finished};
 
     ~MPIHandler()
     {
@@ -50,7 +52,7 @@ public:
     
     void sendSampleBuffer(float* buffer, int sliceSize, int destination)
     {
-        MPI_Send(buffer, sliceSize, MPI_FLOAT, destination , MPIHandler::MESSAGE_TAGS::msg_sampledata, myWorld);
+        MPI_Send(buffer, sliceSize, MPI_FLOAT, destination , msg_sampledata, myWorld);
     }
     
     template<typename T>
@@ -61,9 +63,7 @@ public:
     
     void mpi_recFloatArray(void* sampleBuffer, int &count)
     {
-        std::cout << " worker got here " << getRank();
-        MPI_Recv(sampleBuffer, count, MPI_FLOAT, 0, MPIHandler::MESSAGE_TAGS::msg_sampledata, myWorld, NULL);
-        std::cout << " and stuff received " << getRank();
+        MPI_Recv(sampleBuffer, count, MPI_FLOAT, 0, msg_sampledata, myWorld, NULL);
     }
     
     template<typename T> 
@@ -82,6 +82,13 @@ public:
     {
         return myWorld.size();
     }
+
+    void getBufferSize(int *buffersize);
+    void sendResultData(void* sampleBuffer, int &count);
+    void isResultReady(int workerNr, std::string &ready);
+    void readyToSendResult();
+    boost::mpi::request igetResultData(void* sampleBuffer, int &count, int fromWorkerNr);
+    void getResultData(void* sampleBuffer, int &count, int fromWorkerNr);
     
 private:
     

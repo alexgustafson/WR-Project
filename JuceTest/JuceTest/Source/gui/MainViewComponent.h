@@ -26,6 +26,7 @@
 #include "SerializableAudioBuffer.h"
 #include "MPIHandler.h"
 #include <boost/serialization/vector.hpp>
+#include "SpectraViewComponent.h"
 //[/Headers]
 
 
@@ -39,6 +40,7 @@
                                                                     //[/Comments]
 */
 class MainViewComponent  : public Component,
+                           public Timer,
                            public ButtonListener
 {
 public:
@@ -51,14 +53,16 @@ public:
     void showFile (const File& file);
     void loadFileIntoTransport (const File& audioFile);
     void processAudioFile () ;
-    SerializableAudioBuffer* getNextSampleSlice();
-
+    void timerCallback();
     //[/UserMethods]
 
     void paint (Graphics& g);
     void resized();
     void buttonClicked (Button* buttonThatWasClicked);
 
+    // Binary resources:
+    static const char* backgrounpanel_png;
+    static const int backgrounpanel_pngSize;
 
 
 private:
@@ -68,16 +72,18 @@ private:
     ScopedPointer<AudioFormatReader> audioReader;
     ScopedPointer<SerializableAudioBuffer> serializeableAudioBuffer;
     File audioFile;
-    int sliceSize = 1024;
-    int64 currentSamplePosition = 0;
+    int sliceSize;
+    int64 currentSamplePosition;
+    MPIHandler* mpiHandle;
+    bool audioLoaded;
     //[/UserVariables]
 
     //==============================================================================
     ScopedPointer<AudioWavViewComponent> audioWavformViewer;
-    ScopedPointer<Component> audioSpectraViewer;
     ScopedPointer<TextButton> audioSelectButton;
     ScopedPointer<TextButton> startProcessButton;
-
+    ScopedPointer<TextButton> testButton;
+    ScopedPointer<SpectraViewComponent> audioWavformViewer2;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainViewComponent)

@@ -37,7 +37,7 @@ private:
             ar & *getSampleData(0, i);
     }
     
-    
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SerializableAudioBuffer)
   
 };
 

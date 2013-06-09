@@ -11,6 +11,10 @@
       <FILE id="KRKSVd" name="SerializableAudioBuffer.h" compile="0" resource="0"
             file="Source/SerializableAudioBuffer.h"/>
       <GROUP id="{AC34EA63-042C-B560-D750-0FFB2F107E82}" name="gui">
+        <FILE id="n73BiZ" name="SpectraViewComponent.cpp" compile="1" resource="0"
+              file="Source/gui/SpectraViewComponent.cpp"/>
+        <FILE id="wfTCcP" name="SpectraViewComponent.h" compile="0" resource="0"
+              file="Source/gui/SpectraViewComponent.h"/>
         <FILE id="jhabiF" name="AudioWavViewComponent.cpp" compile="1" resource="0"
               file="Source/gui/AudioWavViewComponent.cpp"/>
         <FILE id="k6CvzP" name="AudioWavViewComponent.h" compile="0" resource="0"

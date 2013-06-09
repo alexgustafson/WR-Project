@@ -51,6 +51,7 @@ DEPFLAGS := $(if $(word 2, $(TARGET_ARCH)), , -MMD)
 OBJECTS := \
   $(OBJDIR)/Worker_12758407.o \
   $(OBJDIR)/SerializableAudioBuffer_a4c57218.o \
+  $(OBJDIR)/SpectraViewComponent_676e18d.o \
   $(OBJDIR)/AudioWavViewComponent_e38750cf.o \
   $(OBJDIR)/MainViewComponent_716a0cac.o \
   $(OBJDIR)/MPIHandler_5a03e8cd.o \
@@ -95,6 +96,11 @@ $(OBJDIR)/Worker_12758407.o: ../../Source/Worker.cpp
 $(OBJDIR)/SerializableAudioBuffer_a4c57218.o: ../../Source/SerializableAudioBuffer.cpp
 	-@mkdir -p $(OBJDIR)
 	@echo "Compiling SerializableAudioBuffer.cpp"
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+$(OBJDIR)/SpectraViewComponent_676e18d.o: ../../Source/gui/SpectraViewComponent.cpp
+	-@mkdir -p $(OBJDIR)
+	@echo "Compiling SpectraViewComponent.cpp"
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
 $(OBJDIR)/AudioWavViewComponent_e38750cf.o: ../../Source/gui/AudioWavViewComponent.cpp

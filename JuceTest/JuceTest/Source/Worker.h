@@ -21,7 +21,8 @@ public:
     Worker();
     ~Worker();
     
-
+    void performWindowing(float* samples, int size);
+    void performFFT(float* samples, int size);
     
     
 private:
@@ -29,6 +30,7 @@ private:
     int myRank;
     int numOfSamples;
     
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Worker)
     
 };
 
