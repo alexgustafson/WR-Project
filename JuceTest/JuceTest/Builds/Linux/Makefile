@@ -18,7 +18,7 @@ ifeq ($(CONFIG),Debug)
   CPPFLAGS := $(DEPFLAGS) -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -D "JUCER_LINUX_MAKE_7346DA2A=1" -I /usr/include -I /usr/include/freetype2 -I ../../JuceLibraryCode -I /usr/include/mpich2/
   CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -g -ggdb -O0
   CXXFLAGS += $(CFLAGS) 
-  LDFLAGS += $(TARGET_ARCH) -L$(BINDIR) -L$(LIBDIR) -L/usr/X11R6/lib/ -L/usr/lib/mpich2/lib/ -lX11 -lXext -lXinerama -lasound -ldl -lfreetype -lpthread -lrt -lboost_mpi -lboost_serialization -lmpichcxx -lmpich 
+  LDFLAGS += $(TARGET_ARCH) -L$(BINDIR) -L$(LIBDIR) -L/usr/X11R6/lib/ -L/usr/lib/mpich2/lib/ -lX11 -lXext -lXinerama -lasound -ldl -lfreetype -lpthread -lrt boost_mpi boost_serialization mpichxx mpich
   LDDEPS :=
   RESFLAGS :=  -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -D "JUCER_LINUX_MAKE_7346DA2A=1" -I /usr/include -I /usr/include/freetype2 -I ../../JuceLibraryCode -I /usr/include/mpich2/
   TARGET := JuceTest
@@ -38,7 +38,7 @@ ifeq ($(CONFIG),Release)
   CPPFLAGS := $(DEPFLAGS) -D "LINUX=1" -D "NDEBUG=1" -D "JUCER_LINUX_MAKE_7346DA2A=1" -I /usr/include -I /usr/include/freetype2 -I ../../JuceLibraryCode -I /usr/include/mpich2/
   CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -Os
   CXXFLAGS += $(CFLAGS) 
-  LDFLAGS += $(TARGET_ARCH) -L$(BINDIR) -L$(LIBDIR) -L/usr/X11R6/lib/ -L/usr/lib/mpich2/lib/ -lX11 -lXext -lXinerama -lasound -ldl -lfreetype -lpthread -lrt -lboost_mpi -lboost_serialization -lmpichcxx -lmpich 
+  LDFLAGS += $(TARGET_ARCH) -L$(BINDIR) -L$(LIBDIR) -L/usr/X11R6/lib/ -L/usr/lib/mpich2/lib/ -lX11 -lXext -lXinerama -lasound -ldl -lfreetype -lpthread -lrt boost_mpi boost_serialization mpichxx mpich
   LDDEPS :=
   RESFLAGS :=  -D "LINUX=1" -D "NDEBUG=1" -D "JUCER_LINUX_MAKE_7346DA2A=1" -I /usr/include -I /usr/include/freetype2 -I ../../JuceLibraryCode -I /usr/include/mpich2/
   TARGET := JuceTest
@@ -50,12 +50,10 @@ DEPFLAGS := $(if $(word 2, $(TARGET_ARCH)), , -MMD)
 
 OBJECTS := \
   $(OBJDIR)/Worker_12758407.o \
-  $(OBJDIR)/SerializableAudioBuffer_a4c57218.o \
   $(OBJDIR)/SpectraViewComponent_676e18d.o \
   $(OBJDIR)/AudioWavViewComponent_e38750cf.o \
   $(OBJDIR)/MainViewComponent_716a0cac.o \
   $(OBJDIR)/MPIHandler_5a03e8cd.o \
-  $(OBJDIR)/MainContentComponent_19da5e66.o \
   $(OBJDIR)/Main_90ebc5c2.o \
   $(OBJDIR)/juce_audio_basics_2442e4ea.o \
   $(OBJDIR)/juce_audio_devices_a4c8a728.o \
@@ -93,11 +91,6 @@ $(OBJDIR)/Worker_12758407.o: ../../Source/Worker.cpp
 	@echo "Compiling Worker.cpp"
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
-$(OBJDIR)/SerializableAudioBuffer_a4c57218.o: ../../Source/SerializableAudioBuffer.cpp
-	-@mkdir -p $(OBJDIR)
-	@echo "Compiling SerializableAudioBuffer.cpp"
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
 $(OBJDIR)/SpectraViewComponent_676e18d.o: ../../Source/gui/SpectraViewComponent.cpp
 	-@mkdir -p $(OBJDIR)
 	@echo "Compiling SpectraViewComponent.cpp"
@@ -116,11 +109,6 @@ $(OBJDIR)/MainViewComponent_716a0cac.o: ../../Source/gui/MainViewComponent.cpp
 $(OBJDIR)/MPIHandler_5a03e8cd.o: ../../Source/MPIHandler.cpp
 	-@mkdir -p $(OBJDIR)
 	@echo "Compiling MPIHandler.cpp"
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/MainContentComponent_19da5e66.o: ../../Source/MainContentComponent.cpp
-	-@mkdir -p $(OBJDIR)
-	@echo "Compiling MainContentComponent.cpp"
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
 $(OBJDIR)/Main_90ebc5c2.o: ../../Source/Main.cpp

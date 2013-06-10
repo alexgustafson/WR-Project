@@ -6,10 +6,6 @@
     <GROUP id="{6CA9CFE0-5D39-191E-E30C-9DC1C58A6F5D}" name="Source">
       <FILE id="awdWEM" name="Worker.cpp" compile="1" resource="0" file="Source/Worker.cpp"/>
       <FILE id="blyvAZ" name="Worker.h" compile="0" resource="0" file="Source/Worker.h"/>
-      <FILE id="RkErDK" name="SerializableAudioBuffer.cpp" compile="1" resource="0"
-            file="Source/SerializableAudioBuffer.cpp"/>
-      <FILE id="KRKSVd" name="SerializableAudioBuffer.h" compile="0" resource="0"
-            file="Source/SerializableAudioBuffer.h"/>
       <GROUP id="{AC34EA63-042C-B560-D750-0FFB2F107E82}" name="gui">
         <FILE id="n73BiZ" name="SpectraViewComponent.cpp" compile="1" resource="0"
               file="Source/gui/SpectraViewComponent.cpp"/>
@@ -26,10 +22,6 @@
       </GROUP>
       <FILE id="CvwjVW" name="MPIHandler.cpp" compile="1" resource="0" file="Source/MPIHandler.cpp"/>
       <FILE id="q3qCJ0" name="MPIHandler.h" compile="0" resource="0" file="Source/MPIHandler.h"/>
-      <FILE id="ba1vjI" name="MainContentComponent.cpp" compile="1" resource="0"
-            file="Source/MainContentComponent.cpp"/>
-      <FILE id="t2trvG" name="MainContentComponent.h" compile="0" resource="0"
-            file="Source/MainContentComponent.h"/>
       <FILE id="Cmj4LK" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
     </GROUP>
   </MAINGROUP>
@@ -59,9 +51,9 @@
                        libraryPath="/opt/local/lib"/>
       </CONFIGURATIONS>
     </XCODE_MAC>
-    <LINUX_MAKE targetFolder="Builds/Linux" juceFolder="../../../JUCE/modules"
-                externalLibraries="boost_mpi&#10;boost_serialization&#10;mpichcxx&#10;mpich"
-                extraDefs="" extraCompilerFlags="" userNotes="add CXX := mpic++ to top of makefile">
+    <LINUX_MAKE targetFolder="Builds/Linux" juceFolder="../../../../juce/modules"
+                extraLinkerFlags="boost_mpi&#10;boost_serialization&#10;mpichxx&#10;mpich"
+                userNotes="add CXX := mpic++ to top of makefile">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" libraryPath="/usr/X11R6/lib/&#10;/usr/lib/mpich2/lib/"
                        isDebug="1" optimisation="1" targetName="JuceTest" headerPath="/usr/include/mpich2/"/>
