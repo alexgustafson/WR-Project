@@ -50,10 +50,7 @@ public:
         return myWorld.rank();
     };
     
-    void sendSampleBuffer(float* buffer, int sliceSize, int destination)
-    {
-        MPI_Send(buffer, sliceSize, MPI_FLOAT, destination , msg_sampledata, myWorld);
-    }
+    void sendSampleBuffer(void* buffer, int sliceSize, int destination);
     
     template<typename T>
     void mpi_synchronous_recieve(T & value)
@@ -61,10 +58,7 @@ public:
         myWorld.recv(0, 0, value);
     };
     
-    void mpi_recFloatArray(void* sampleBuffer, int &count)
-    {
-        MPI_Recv(sampleBuffer, count, MPI_FLOAT, 0, msg_sampledata, myWorld, NULL);
-    }
+    void mpi_recFloatArray(void* sampleBuffer, int &count);
     
     template<typename T> 
     void mpi_broadcast(T & value, int root)
@@ -87,8 +81,11 @@ public:
     void sendResultData(void* sampleBuffer, int &count);
     void isResultReady(int workerNr, std::string &ready);
     void readyToSendResult();
-    boost::mpi::request igetResultData(void* sampleBuffer, int &count, int fromWorkerNr);
     void getResultData(void* sampleBuffer, int &count, int fromWorkerNr);
+    
+    boost::mpi::communicator myWorld;
+    
+    
     
 private:
     
@@ -99,7 +96,7 @@ private:
         
     }
     
-    boost::mpi::communicator myWorld;
+    
     
 };
 

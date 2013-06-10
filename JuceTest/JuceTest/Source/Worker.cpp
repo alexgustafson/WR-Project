@@ -9,6 +9,8 @@
 */
 
 #include "Worker.h"
+#include <boost/mpi.hpp>
+#include <boost/serialization/string.hpp>
 
 #define PI 3.14159265359
 #define PI_2  6.28318530718
@@ -20,30 +22,41 @@ Worker::Worker()
     
 
     MPIHandler* mpiHandle = MPIHandler::getInstance();
-        
+    int *count = new int;
+    
+    mpiHandle->getBufferSize(count);
+    samples = new float[*count];
+    std::vector<float> buffer(*count);
+    
+    
+    
     while(true)
     {
-        int *count = new int;
         
-        mpiHandle->getBufferSize(count);
+        //mpiHandle->mpi_recFloatArray(samples, *count);
         
-        float *samples = new float[*count];
-                
-        mpiHandle->mpi_recFloatArray(samples, *count);
         
-        performWindowing(samples, *count);
-        
+        //performWindowing(samples, *count);
+        std::cout << "count is " << *count << std::endl;
         std::cout << "worker nr: " << mpiHandle->getRank() << " finished window " << std::endl;
         
         mpiHandle->readyToSendResult();
         
         std::cout << "worker nr: " << mpiHandle->getRank() << " signaled ready " << std::endl;
         
+        if(mpiHandle->getRank() == 1)
+        {
+            for(int i = 0; i < *count;i++)
+            {
+                std::cout << "1 data: " << samples[i] << std::endl;
+            }
+        }
+        
         mpiHandle->sendResultData(samples, *count);
         
         std::cout << "worker nr: " << mpiHandle->getRank() << " result sent " << std::endl;
         
-        delete []samples;
+        //delete []samples;
         
     }
     

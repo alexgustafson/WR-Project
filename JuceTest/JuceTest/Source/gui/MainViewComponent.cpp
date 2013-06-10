@@ -189,34 +189,26 @@ void MainViewComponent::timerCallback()
 {
     //check for data from mpi nodes
     int numOfProcessors = mpiHandle->getNumberOfProcesses();
-    std::vector<boost::mpi::request> reqs(numOfProcessors);
-    
-    std::vector<float*> data(numOfProcessors);
     
     for (int i = 1; i < numOfProcessors; i++) {
         
         float *samples = new float[sliceSize];
-        data[i] = samples;
         
-        reqs[i] = mpiHandle->igetResultData(data[i], sliceSize, i);
+        mpiHandle->getResultData(samples, sliceSize, i);
+        
+        if(i == 1)
+        {
+            for(int x = 0; x < sliceSize; x++)
+            {
+                
+                std::cout << "data:" << samples[x] << std::endl;
+            }
+        }
+
 
     }
     
-    bool finished;
-    while(!allFinished)
-    {
-        
-        for (int i = 1; i < numOfProcessors; i++)
-        {
-            
-            std::cout << reqs[i].test();
-            
-        }
-        allFinished = true;
-        
-        
-    }
-    
+
 
 }
 

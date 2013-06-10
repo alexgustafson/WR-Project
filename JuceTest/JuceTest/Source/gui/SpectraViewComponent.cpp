@@ -68,6 +68,7 @@ void SpectraViewComponent::paint (Graphics& g)
     g.fillRect (0, 0, proportionOfWidth (1.0000f), proportionOfHeight (1.0000f));
 
     //[UserPaint] Add your own custom painting code here..
+    /*
     if (sampleBuffer->getNumSamples() > 100) {
         g.setColour(Colour::fromRGB(255, 1, 1));
         for(int x = 0; x < sampleBuffer->getNumSamples(); x++)
@@ -80,6 +81,7 @@ void SpectraViewComponent::paint (Graphics& g)
         }
 
     }
+     */
 
     //[/UserPaint]
 }
