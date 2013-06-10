@@ -23,7 +23,6 @@
 //[Headers]     -- You can add your own extra header files here --
 #include "JuceHeader.h"
 #include "AudioWavViewComponent.h"
-#include "SerializableAudioBuffer.h"
 #include "MPIHandler.h"
 #include <boost/serialization/vector.hpp>
 #include "SpectraViewComponent.h"
@@ -70,7 +69,7 @@ private:
     AudioFormatManager formatManager;
     ScopedPointer<AudioFormatReaderSource> currentAudioFileSource;
     ScopedPointer<AudioFormatReader> audioReader;
-    ScopedPointer<SerializableAudioBuffer> serializeableAudioBuffer;
+    ScopedPointer<AudioSampleBuffer> serializeableAudioBuffer;
     File audioFile;
     int sliceSize;
     int64 currentSamplePosition;

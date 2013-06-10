@@ -56,7 +56,7 @@ MainViewComponent::MainViewComponent ()
 
     //[Constructor] You can add your own custom stuff here..
     formatManager.registerBasicFormats();
-    serializeableAudioBuffer = new SerializableAudioBuffer(1,sliceSize);
+    serializeableAudioBuffer = new AudioSampleBuffer(1,sliceSize);
     sliceSize = 10;
     currentSamplePosition = 0;
     mpiHandle = MPIHandler::getInstance();
@@ -165,7 +165,7 @@ void MainViewComponent::buttonClicked (Button* buttonThatWasClicked)
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 void MainViewComponent::processAudioFile()
 {
-    SerializableAudioBuffer *audioBuffer = new SerializableAudioBuffer(1,sliceSize);
+    AudioSampleBuffer *audioBuffer = new AudioSampleBuffer(1,sliceSize);
 
     currentSamplePosition = 0;
 
