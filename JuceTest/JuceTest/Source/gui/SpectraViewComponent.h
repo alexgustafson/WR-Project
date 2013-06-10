@@ -43,8 +43,9 @@ public:
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
-    AudioSampleBuffer *sampleBuffer;
+    std::vector< float* > buffers;
     void initSampleBuffer(int numChannels, int numSamples);
+    Image spectraImage;
     //[/UserMethods]
 
     void paint (Graphics& g);

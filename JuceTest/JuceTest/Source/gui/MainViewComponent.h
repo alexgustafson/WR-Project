@@ -75,7 +75,7 @@ private:
     int64 currentSamplePosition;
     MPIHandler* mpiHandle;
     bool audioLoaded;
-    std::vector< std::vector<double> > buffers;
+    std::vector< float* > buffers;
     //[/UserVariables]
 
     //==============================================================================

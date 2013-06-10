@@ -16,7 +16,7 @@
 #include <boost/mpi.hpp>
 #include "JuceHeader.h"
 
-enum MESSAGE_TAG {msg_sampledata, msg_resultdata, msg_bufferSize, msg_dataReady, msg_workerBusy, msg_workerReady, msg_broadcastData, msg_finished};
+enum MESSAGE_TAG {msg_sampledata, msg_resultdata, msg_bufferSize, msg_dataReady, msg_workerBusy, msg_workerReady, msg_broadcastData, msg_finished, msg_result_real, msg_result_img };
 
 
 class MPIHandler
@@ -42,14 +42,10 @@ public:
         return _singletonInstance;
     };
     
-    void initializeEnvironment(int argc, char* argv[])
-    {
-        
-    };
     
     int getRank()
     {
-        return myWorld.rank();
+        return world.rank();
     };
     
     void sendSampleBuffer(void* buffer, int sliceSize, int destination);
@@ -57,7 +53,7 @@ public:
     template<typename T>
     void mpi_synchronous_recieve(T & value)
     {
-        myWorld.recv(0, 0, value);
+        world.recv(0, 0, value);
     };
     
     void mpi_recFloatArray(void* sampleBuffer, int &count);
@@ -65,18 +61,18 @@ public:
     template<typename T> 
     void mpi_broadcast(T & value, int root)
     {
-        boost::mpi::broadcast(myWorld, value, root);
+        boost::mpi::broadcast(world, value, root);
     };
     
     template<typename T>
     void send(int dest, int tag, const T & value)
     {
-        myWorld.send(dest, tag, value);
+        world.send(dest, tag, value);
     };
     
     int getNumberOfProcesses()
     {
-        return myWorld.size();
+        return world.size();
     }
 
     void getBufferSize(int *buffersize);
@@ -85,7 +81,7 @@ public:
     void readyToSendResult();
     void getResultData(void* sampleBuffer, int &count, int fromWorkerNr);
     
-    boost::mpi::communicator myWorld;
+    boost::mpi::communicator world;
     
     
     

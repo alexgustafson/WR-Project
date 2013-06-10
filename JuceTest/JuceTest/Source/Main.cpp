@@ -9,8 +9,6 @@
 */
 
 #include "../JuceLibraryCode/JuceHeader.h"
-#include "SerializableAudioBuffer.h"
-#include "MainContentComponent.h"
 #include "gui/MainViewComponent.h"
 #include "MPIHandler.h"
 #include "JuceHeader.h"
@@ -122,7 +120,6 @@ extern "C" int main (int argc, char* argv[])
 {
     boost::mpi::environment env(argc, argv);
     MPIHandler* mpiHandle = MPIHandler::getInstance();
-    mpiHandle->initializeEnvironment(argc, argv);
 
     if (mpiHandle->getRank() == 0) {
         std::cout << "my rank " << mpiHandle->getRank() << std::endl;

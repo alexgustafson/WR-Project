@@ -22,7 +22,7 @@ public:
     ~Worker();
     
     void performWindowing(float* samples, int size);
-    void performFFT(float* samples, int size);
+    void performDFT(float* samples, int size, float** dft);
     
     
 private:

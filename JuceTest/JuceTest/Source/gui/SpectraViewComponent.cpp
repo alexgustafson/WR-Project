@@ -37,7 +37,10 @@ SpectraViewComponent::SpectraViewComponent ()
 
 
     //[Constructor] You can add your own custom stuff here..
-    sampleBuffer = new AudioSampleBuffer(1,1);
+    spectraImage = Image (Image::RGB,
+                           100, 100,
+                           false);
+    spectraImage.clear(spectraImage.getBounds(), Colours::black);
     //[/Constructor]
 }
 
@@ -68,20 +71,22 @@ void SpectraViewComponent::paint (Graphics& g)
     g.fillRect (0, 0, proportionOfWidth (1.0000f), proportionOfHeight (1.0000f));
 
     //[UserPaint] Add your own custom painting code here..
-    /*
-    if (sampleBuffer->getNumSamples() > 100) {
-        g.setColour(Colour::fromRGB(255, 1, 1));
-        for(int x = 0; x < sampleBuffer->getNumSamples(); x++)
+    
+    g.drawImageAt (spectraImage, 0, 0, false);
+    
+    for (int x = 0; x < buffers.size(); x++) {
+        
+        for(int y = 0; y < 1024/2; y++)
         {
-
-            float sample = *sampleBuffer->getSampleData(0, x*10);
-            int height = proportionOfHeight (sample ) > 1 ? proportionOfHeight (sample ) : 1;
-
-            g.fillRect(x, proportionOfHeight(0.5f), 1, height );
+            float value = buffers[x][y];
+            g.setColour(Colour::fromFloatRGBA(0.9, 0.0, 0.0, value * 800.0));
+            g.fillRect(x, y, 1, 1 );
+            std::cout << value << std::endl;
+            
+            
         }
-
+        
     }
-     */
 
     //[/UserPaint]
 }
@@ -89,6 +94,7 @@ void SpectraViewComponent::paint (Graphics& g)
 void SpectraViewComponent::resized()
 {
     //[UserResized] Add your own custom resize handling here..
+    spectraImage.rescaled(jmax(1, getWidth()), jmax(1, getHeight()));
     //[/UserResized]
 }
 
@@ -97,7 +103,6 @@ void SpectraViewComponent::resized()
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 void SpectraViewComponent::initSampleBuffer(int numChannels, int numSamples)
 {
-    sampleBuffer = new AudioSampleBuffer(numChannels, numSamples);
 }
 //[/MiscUserCode]
 

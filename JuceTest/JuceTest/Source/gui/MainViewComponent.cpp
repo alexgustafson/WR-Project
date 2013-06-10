@@ -57,7 +57,7 @@ MainViewComponent::MainViewComponent ()
     //[Constructor] You can add your own custom stuff here..
     formatManager.registerBasicFormats();
     serializeableAudioBuffer = new AudioSampleBuffer(1,sliceSize);
-    sliceSize = 10;
+    sliceSize = 1024;
     currentSamplePosition = 0;
     mpiHandle = MPIHandler::getInstance();
     audioLoaded = false;
@@ -132,8 +132,6 @@ void MainViewComponent::buttonClicked (Button* buttonThatWasClicked)
                 currentAudioFileSource = new AudioFormatReaderSource (audioReader, true);
                 audioWavformViewer->setFile(myChooser.getResult());
                 audioLoaded = true;
-                audioWavformViewer2->initSampleBuffer(1, sliceSize * 5);
-                audioReader->read(audioWavformViewer2->sampleBuffer, 0, sliceSize * 5,  currentSamplePosition, true, true);
             }
 
             //std::cout << audioFile.getFileName();
@@ -167,15 +165,13 @@ void MainViewComponent::processAudioFile()
 {
     AudioSampleBuffer *audioBuffer = new AudioSampleBuffer(1,sliceSize);
 
-    currentSamplePosition = 0;
+    
 
     int numOfProcessors = mpiHandle->getNumberOfProcesses();
 
 
     for (int i = 1; i < numOfProcessors; i++) {
         
-        std::vector<double> samples(sliceSize);
-        buffers.push_back( samples );
         audioReader->read(audioBuffer, 0, sliceSize,  currentSamplePosition, true, true);
 
         mpiHandle->send(i, msg_bufferSize, sliceSize);
@@ -191,28 +187,25 @@ void MainViewComponent::timerCallback()
 {
     //check for data from mpi nodes
     int numOfProcessors = mpiHandle->getNumberOfProcesses();
-    
-    for (int i = 1; i < numOfProcessors; i++) {
+
+    for (int i = 1; i < numOfProcessors; i++)
+    {
         
-        double samples[sliceSize];
-        //std::vector<float> samples;
-        //mpiHandle->myWorld.recv(i, msg_resultdata, samples, sliceSize);
+        float* samples = new float[sliceSize];
         
-        //mpiHandle->getResultData(samples, sliceSize, i);
         MPI_Status status;
-        MPI_Recv(samples, sliceSize, MPI_DOUBLE, 0, msg_resultdata, mpiHandle->myWorld, &status);
-        
+        MPI_Recv(samples, sliceSize/2, MPI_DOUBLE, i, msg_result_real, mpiHandle->world, &status);
+        buffers.push_back(samples);
+        audioWavformViewer2->buffers.push_back(samples);
         
         if(i == 1)
         {
-            for(int x = 0; x < sliceSize; x++)
+            for(int x = 0; x < sliceSize/2; x++)
             {
                 
-                std::cout << "data:" << samples[x] << std::endl;
+                //std::cout << "data:" << buffers[0][x] << std::endl;
             }
         }
-
-
     }
 }
 

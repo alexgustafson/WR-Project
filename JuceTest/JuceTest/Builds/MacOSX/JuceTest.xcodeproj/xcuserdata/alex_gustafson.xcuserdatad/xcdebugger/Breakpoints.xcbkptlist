@@ -21,11 +21,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "../../Source/gui/SpectraViewComponent.cpp"
-         timestampString = "392551813.948852"
+         timestampString = "392587337.867025"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "77"
-         endingLineNumber = "77"
+         startingLineNumber = "80"
+         endingLineNumber = "80"
          landmarkName = "SpectraViewComponent::paint (Graphics&amp; g)"
          landmarkType = "5">
       </FileBreakpoint>
