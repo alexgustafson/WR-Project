@@ -57,7 +57,7 @@ MainViewComponent::MainViewComponent ()
     //[Constructor] You can add your own custom stuff here..
     formatManager.registerBasicFormats();
     serializeableAudioBuffer = new SerializableAudioBuffer(1,sliceSize);
-    sliceSize = 1024;
+    sliceSize = 10;
     currentSamplePosition = 0;
     mpiHandle = MPIHandler::getInstance();
     audioLoaded = false;
@@ -171,9 +171,11 @@ void MainViewComponent::processAudioFile()
 
     int numOfProcessors = mpiHandle->getNumberOfProcesses();
 
+
     for (int i = 1; i < numOfProcessors; i++) {
-
-
+        
+        std::vector<double> samples(sliceSize);
+        buffers.push_back( samples );
         audioReader->read(audioBuffer, 0, sliceSize,  currentSamplePosition, true, true);
 
         mpiHandle->send(i, msg_bufferSize, sliceSize);
@@ -192,9 +194,14 @@ void MainViewComponent::timerCallback()
     
     for (int i = 1; i < numOfProcessors; i++) {
         
-        float *samples = new float[sliceSize];
+        double samples[sliceSize];
+        //std::vector<float> samples;
+        //mpiHandle->myWorld.recv(i, msg_resultdata, samples, sliceSize);
         
-        mpiHandle->getResultData(samples, sliceSize, i);
+        //mpiHandle->getResultData(samples, sliceSize, i);
+        MPI_Status status;
+        MPI_Recv(samples, sliceSize, MPI_DOUBLE, 0, msg_resultdata, mpiHandle->myWorld, &status);
+        
         
         if(i == 1)
         {
@@ -207,9 +214,6 @@ void MainViewComponent::timerCallback()
 
 
     }
-    
-
-
 }
 
 

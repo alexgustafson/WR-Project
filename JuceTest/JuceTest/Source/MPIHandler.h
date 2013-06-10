@@ -11,6 +11,8 @@
 
 #include <boost/mpi/environment.hpp>
 #include <boost/mpi/communicator.hpp>
+#include <boost/serialization/vector.hpp>
+#include <boost/serialization/complex.hpp>
 #include <boost/mpi.hpp>
 #include "JuceHeader.h"
 

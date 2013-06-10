@@ -28,16 +28,27 @@ Worker::Worker()
     samples = new float[*count];
     std::vector<float> buffer(*count);
     
-    
+    MPI_Status status;
+    int size = *count;
+    double buffer2[size];
     
     while(true)
     {
         
-        //mpiHandle->mpi_recFloatArray(samples, *count);
+        //mpiHandle->mpi_recFloatArray(samples, size);
+        //mpiHandle->myWorld.recv(0, msg_sampledata, buffer);
+        //mpiHandle->myWorld.recv(0, msg_sampledata, buffer, size);
         
+        //mpiHandle->mpi_recFloatArray(buffer2, size);
+        MPI_Recv(buffer2, size, MPI_DOUBLE, 0, msg_sampledata, mpiHandle->myWorld, &status);
         
-        //performWindowing(samples, *count);
-        std::cout << "count is " << *count << std::endl;
+        for(int i = 0; i < size; i++)
+        {
+            buffer[i] = samples[i];
+        }
+        
+        //performWindowing(samples, size);
+        std::cout << "count is " << size << std::endl;
         std::cout << "worker nr: " << mpiHandle->getRank() << " finished window " << std::endl;
         
         mpiHandle->readyToSendResult();
@@ -46,13 +57,16 @@ Worker::Worker()
         
         if(mpiHandle->getRank() == 1)
         {
-            for(int i = 0; i < *count;i++)
+            for(int i = 0; i < size ;i++)
             {
-                std::cout << "1 data: " << samples[i] << std::endl;
+                std::cout << "1 data: " << buffer2[i] << std::endl;
             }
+           // mpiHandle->sendResultData(&buffer2[0], *count);
+            
         }
-        
-        mpiHandle->sendResultData(samples, *count);
+        MPI_Send(&buffer2[0],size,MPI_DOUBLE,0,msg_resultdata,mpiHandle->myWorld);
+        //mpiHandle->myWorld.send(0, msg_resultdata, buffer);
+        //mpiHandle->sendResultData(&buffer2[0], *count);
         
         std::cout << "worker nr: " << mpiHandle->getRank() << " result sent " << std::endl;
         

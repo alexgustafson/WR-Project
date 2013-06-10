@@ -17,31 +17,24 @@ void MPIHandler::getBufferSize(int *buffersize)
 
 void MPIHandler::sendSampleBuffer(void* buffer, int sliceSize, int destination)
 {
-    MPI_Send(buffer, sliceSize, MPI_FLOAT, destination , msg_sampledata, myWorld);
+    MPI_Send(buffer, sliceSize, MPI_DOUBLE, destination , msg_sampledata, myWorld);
 }
 
 void MPIHandler::sendResultData(void *sampleBuffer, int &count)
 {
-    MPI_Send(sampleBuffer, count, MPI_FLOAT, 0 , msg_resultdata, myWorld);
+    MPI_Send(sampleBuffer, count, MPI_DOUBLE, 0 , msg_resultdata, myWorld);
 }
 
 void MPIHandler::getResultData(void* sampleBuffer, int &count, int fromWorkerNr)
 {
-    MPI_Recv(sampleBuffer, count, MPI_FLOAT, fromWorkerNr, msg_resultdata, myWorld, NULL);
+    MPI_Recv(sampleBuffer, count, MPI_DOUBLE, fromWorkerNr, msg_resultdata, myWorld, NULL);
 }
 
 void MPIHandler::mpi_recFloatArray(void* sampleBuffer, int &count)
 {
-    MPI_Recv(sampleBuffer, count, MPI_FLOAT, 0, msg_sampledata, myWorld, NULL);
+    MPI_Recv(sampleBuffer, count, MPI_DOUBLE, 0, msg_sampledata, myWorld, NULL);
     
 }
-
-/*
-boost::mpi::request MPIHandler::igetResultData(void* sampleBuffer, int &count, int fromWorkerNr)
-{
-    return myWorld.irecv(fromWorkerNr, msg_resultdata, sampleBuffer);
-}
-*/
 
 
 void MPIHandler::readyToSendResult()
