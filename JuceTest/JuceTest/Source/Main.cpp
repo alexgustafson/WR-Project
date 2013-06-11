@@ -72,7 +72,7 @@ public:
                                         Colours::lightgrey,
                                         DocumentWindow::allButtons)
         {
-            setContentOwned (new MainViewComponent(), true);
+            setContentOwned (new MainViewComponent("render thread"), true);
             centreWithSize (getWidth(), getHeight());
             setUsingNativeTitleBar(true);
             setResizable(true, true);

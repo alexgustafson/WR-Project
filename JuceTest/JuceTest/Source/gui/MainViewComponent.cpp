@@ -22,12 +22,15 @@
 
 #include "MainViewComponent.h"
 
+#define PI 3.14159265359
+
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
 //[/MiscUserDefs]
 
 //==============================================================================
-MainViewComponent::MainViewComponent ()
+MainViewComponent::MainViewComponent (const String& name)
+: Thread (name)
 {
     addAndMakeVisible (audioWavformViewer = new AudioWavViewComponent (formatManager));
     audioWavformViewer->setName ("audio waveform viewer");
@@ -44,8 +47,8 @@ MainViewComponent::MainViewComponent ()
     testButton->setButtonText ("test timer callback");
     testButton->addListener (this);
 
-    addAndMakeVisible (audioWavformViewer2 = new SpectraViewComponent());
-    audioWavformViewer2->setName ("audio waveform viewer");
+    addAndMakeVisible (spectraViewer = new SpectraViewComponent());
+    spectraViewer->setName ("audio waveform viewer");
 
 
     //[UserPreSize]
@@ -56,24 +59,26 @@ MainViewComponent::MainViewComponent ()
 
     //[Constructor] You can add your own custom stuff here..
     formatManager.registerBasicFormats();
-    serializeableAudioBuffer = new AudioSampleBuffer(1,sliceSize);
-    sliceSize = 1024;
+    sliceSize = 2048;
     currentSamplePosition = 0;
     mpiHandle = MPIHandler::getInstance();
     audioLoaded = false;
+    audioBuffer = new AudioSampleBuffer(1, sliceSize);
+
     //[/Constructor]
 }
 
 MainViewComponent::~MainViewComponent()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
+    stopThread(500);
     //[/Destructor_pre]
 
     audioWavformViewer = nullptr;
     audioSelectButton = nullptr;
     startProcessButton = nullptr;
     testButton = nullptr;
-    audioWavformViewer2 = nullptr;
+    spectraViewer = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -104,7 +109,7 @@ void MainViewComponent::resized()
     audioSelectButton->setBounds (8, 8, 150, 24);
     startProcessButton->setBounds (168, 8, 150, 24);
     testButton->setBounds (328, 8, 150, 24);
-    audioWavformViewer2->setBounds (8, getHeight() - 292, getWidth() - 16, 280);
+    spectraViewer->setBounds (8, getHeight() - 292, getWidth() - 16, 280);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -132,6 +137,7 @@ void MainViewComponent::buttonClicked (Button* buttonThatWasClicked)
                 currentAudioFileSource = new AudioFormatReaderSource (audioReader, true);
                 audioWavformViewer->setFile(myChooser.getResult());
                 audioLoaded = true;
+                spectraViewer->setSpectrumSize(audioReader->lengthInSamples, sliceSize/2);
             }
 
             //std::cout << audioFile.getFileName();
@@ -143,7 +149,14 @@ void MainViewComponent::buttonClicked (Button* buttonThatWasClicked)
     {
         //[UserButtonCode_startProcessButton] -- add your button handler code here..
         if (currentAudioFileSource != nullptr) {
-            processAudioFile();
+            
+            for(int i = 0; i < 30; i++)
+            {
+                //processAudioFile();
+                //timerCallback();
+            }
+            startThread();
+            
         }
         //[/UserButtonCode_startProcessButton]
     }
@@ -163,50 +176,74 @@ void MainViewComponent::buttonClicked (Button* buttonThatWasClicked)
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 void MainViewComponent::processAudioFile()
 {
-    AudioSampleBuffer *audioBuffer = new AudioSampleBuffer(1,sliceSize);
 
     
-
-    int numOfProcessors = mpiHandle->getNumberOfProcesses();
-
-
-    for (int i = 1; i < numOfProcessors; i++) {
-        
-        audioReader->read(audioBuffer, 0, sliceSize,  currentSamplePosition, true, true);
-
-        mpiHandle->send(i, msg_bufferSize, sliceSize);
-        mpiHandle->sendSampleBuffer(audioBuffer->getSampleData(0), sliceSize, i);
-        currentSamplePosition += sliceSize;
-    }
-    //startTimer(50);
-    delete audioBuffer;
-
+    
 }
 
 void MainViewComponent::timerCallback()
 {
-    //check for data from mpi nodes
-    int numOfProcessors = mpiHandle->getNumberOfProcesses();
 
-    for (int i = 1; i < numOfProcessors; i++)
+}
+
+void MainViewComponent::run()
+{
+    
+    //create dft matrix
+    /*
+    long bin, k;
+    double arg, sign = -1.0;
+    
+    float** realCoefs = new float*[sliceSize/2];
+    float** imgCoefs = new float*[sliceSize/2];
+    
+    for(int i = 0; i < sliceSize/2; i++)
+    {
+        realCoefs[i] = new float[sliceSize];
+        imgCoefs[i] = new float[sliceSize];
+        
+        for(int j = 0; j < sliceSize; j++)
+        {
+            arg = 2.0 * (float)bin*PI*(float)k / (float)sliceSize;
+            realCoefs[i][j] = sign * sin(arg);
+            imgCoefs[i][j] = cos(arg);
+        }
+    }*/
+    
+    
+    
+    
+    while(currentSamplePosition < audioReader->lengthInSamples)
     {
         
-        float* samples = new float[sliceSize];
+        int numOfProcessors = mpiHandle->getNumberOfProcesses();
         
-        MPI_Status status;
-        MPI_Recv(samples, sliceSize/2, MPI_DOUBLE, i, msg_result_real, mpiHandle->world, &status);
-        buffers.push_back(samples);
-        audioWavformViewer2->buffers.push_back(samples);
-        
-        if(i == 1)
-        {
-            for(int x = 0; x < sliceSize/2; x++)
-            {
-                
-                //std::cout << "data:" << buffers[0][x] << std::endl;
-            }
+        for (int i = 1; i < numOfProcessors; i++) {
+            
+            audioReader->read(audioBuffer, 0, sliceSize,  currentSamplePosition, true, true);
+            
+            mpiHandle->send(i, msg_bufferSize, sliceSize);
+            mpiHandle->sendSampleBuffer(audioBuffer->getSampleData(0), sliceSize, i);
+            currentSamplePosition += sliceSize;
         }
+        
+        for (int i = 1; i < numOfProcessors; i++)
+        {
+            
+            float* samples = new float[sliceSize];
+            
+            MPI_Status status;
+            MPI_Recv(samples, sliceSize/2, MPI_DOUBLE, i, msg_result_real, mpiHandle->world, &status);
+            spectraViewer->addDFTData(samples);
+            
+        }
+        
+        currentSamplePosition += sliceSize;
+        
     }
+    
+
+    
 }
 
 

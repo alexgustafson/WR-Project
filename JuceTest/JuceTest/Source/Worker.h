@@ -23,13 +23,18 @@ public:
     
     void performWindowing(float* samples, int size);
     void performDFT(float* samples, int size, float** dft);
+    void initializeDFTCoeffs();
     
     
 private:
     
     int myRank;
     int numOfSamples;
+    int size;
     float *samples;
+    
+    float** realCoefs;
+    float** imgCoefs;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Worker)
     

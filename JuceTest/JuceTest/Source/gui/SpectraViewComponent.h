@@ -34,7 +34,8 @@
     Describe your class and how it works here!
                                                                     //[/Comments]
 */
-class SpectraViewComponent  : public Component
+class SpectraViewComponent  : public Component,
+                                public Timer
 {
 public:
     //==============================================================================
@@ -43,9 +44,11 @@ public:
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
-    std::vector< float* > buffers;
+    void addDFTData(float* newVector);
     void initSampleBuffer(int numChannels, int numSamples);
-    Image spectraImage;
+    void setSpectrumSize(int length, int resolution);
+    void timerCallback();
+    int xDrawPostion;
     //[/UserMethods]
 
     void paint (Graphics& g);
@@ -55,6 +58,16 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
+    int spectrumLength;
+    int numOfFrequencies;
+    std::vector< float* > buffers;
+    float scopeLineW;
+    CriticalSection lock;
+    int bufferUntilDraw;
+    Image spectraImage;
+    Image bufferImage;
+    float yStep;
+    float xStep;
     //[/UserVariables]
 
     //==============================================================================

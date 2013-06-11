@@ -66,7 +66,7 @@ void AudioWavViewComponent::paint (Graphics& g)
     //[UserPaint] Add your own custom painting code here..
     if (thumbnail.getTotalLength() > 0)
     {
-        g.fillAll (Colours::white);
+        g.fillAll (Colour::fromHSV(0.5, 1.0, 1.0, 0.1));
         g.setColour (Colours::lightblue);
         thumbnail.drawChannels (g, getLocalBounds().reduced (2),
                                 startTime, endTime, 1.0f);

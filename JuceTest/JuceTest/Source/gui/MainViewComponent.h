@@ -40,11 +40,12 @@
 */
 class MainViewComponent  : public Component,
                            public Timer,
-                           public ButtonListener
+                           public ButtonListener,
+                        public Thread
 {
 public:
     //==============================================================================
-    MainViewComponent ();
+    MainViewComponent (const String& name);
     ~MainViewComponent();
 
     //==============================================================================
@@ -53,6 +54,7 @@ public:
     void loadFileIntoTransport (const File& audioFile);
     void processAudioFile () ;
     void timerCallback();
+    void run();
     //[/UserMethods]
 
     void paint (Graphics& g);
@@ -76,6 +78,7 @@ private:
     MPIHandler* mpiHandle;
     bool audioLoaded;
     std::vector< float* > buffers;
+    AudioSampleBuffer *audioBuffer;
     //[/UserVariables]
 
     //==============================================================================
@@ -83,7 +86,7 @@ private:
     ScopedPointer<TextButton> audioSelectButton;
     ScopedPointer<TextButton> startProcessButton;
     ScopedPointer<TextButton> testButton;
-    ScopedPointer<SpectraViewComponent> audioWavformViewer2;
+    ScopedPointer<SpectraViewComponent> spectraViewer;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainViewComponent)
