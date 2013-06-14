@@ -65,6 +65,7 @@ Worker::~Worker()
 void Worker::performWindowing(float *samples, int size)
 {
     // 4 Term Blackmann Harris
+    // adapted from : http://stackoverflow.com/questions/10660218/blackman-harris-in-c
     
     float a0 = 0.35875;
     float a1 = 0.48829;

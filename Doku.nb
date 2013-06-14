@@ -1,0 +1,1042 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 9.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       157,          7]
+NotebookDataLength[     36059,       1033]
+NotebookOptionsPosition[     30938,        861]
+NotebookOutlinePosition[     31680,        890]
+CellTagsIndexPosition[     31582,        884]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell["\<\
+FFT Transform of audio files with MPI\
+\>", "Title",
+ CellChangeTimes->{{3.580140983604534*^9, 3.580140991457531*^9}}],
+
+Cell[CellGroupData[{
+
+Cell["Alexander Gustafson", "Author",
+ CellChangeTimes->{{3.5801409954027576`*^9, 3.580140998161181*^9}, 
+   3.580141164931535*^9}],
+
+Cell["ZHAW 2013", "Institution",
+ CellChangeTimes->{{3.5801410011707*^9, 3.580141004457034*^9}, 
+   3.5801411649317017`*^9}],
+
+Cell["alexg.hsz@gmail.com", "Institution",
+ CellChangeTimes->{{3.5801410011707*^9, 3.580141004457034*^9}, 
+   3.5801411649317017`*^9, {3.580141263767501*^9, 3.5801412758676434`*^9}}],
+
+Cell["", "AbstractContinuation",
+ CellChangeTimes->{
+  3.580141016413422*^9, {3.580141154885763*^9, 3.580141164931839*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["ABSTRACT", "Subsection",
+ CellChangeTimes->{{3.580141299584237*^9, 3.580141301499361*^9}}],
+
+Cell["\<\
+The goal of this seminar project was to implement a cross platform \
+application in C++ that would analyse audio files using the Fast Fourier \
+Transformation. One of the requirements of the seminar project was to use MPI \
+in order to optimize the preformance in a multiprocessor or multicore \
+environment.\
+\>", "Text",
+ CellChangeTimes->{{3.580141197787624*^9, 3.580141197788968*^9}, {
+  3.5801413139323063`*^9, 3.580141335666582*^9}, {3.580141367777989*^9, 
+  3.5801414885432262`*^9}, {3.580141632055726*^9, 3.580141632428534*^9}, {
+  3.580141746972705*^9, 3.5801419229868927`*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["1. INTRODUCTION", "Section",
+ CellChangeTimes->{{3.580141299584237*^9, 3.580141301499361*^9}, {
+  3.580141969907702*^9, 3.580141976069519*^9}}],
+
+Cell["\<\
+The Fourier Transformation is a method of approximating a function or signal \
+by breaking in into sin waves or varying frequency and phase. For \
+mathematical functions the Fourier Ttransformation can result in an infinite \
+amount of sinusoid components of increasing frequency. For discreet signals \
+like digital audio recordings or images the Fourier Transformation has an \
+upper bound definied by the sampling frequency or resolution of the signal. \
+The Nyquist-Shannon sampling theorem states that a signal can only contain \
+frequencies up to half the sampling rate. In order to simplify the project a \
+little, I have made the assumption that all audio signal to be analysed will \
+have a fixed sampling rate of 44.1kHz. \
+\>", "Text",
+ CellChangeTimes->{{3.580141197787624*^9, 3.580141197788968*^9}, {
+  3.5801413139323063`*^9, 3.580141335666582*^9}, {3.580141367777989*^9, 
+  3.5801414885432262`*^9}, {3.580141632055726*^9, 3.580141632428534*^9}, {
+  3.580141746972705*^9, 3.5801419229868927`*^9}, {3.580142097919031*^9, 
+  3.580142178033577*^9}, {3.5801422253366537`*^9, 3.580142436580509*^9}, {
+  3.580142782631893*^9, 3.580142785549156*^9}, {3.580143092505657*^9, 
+  3.580143142262034*^9}, {3.580143199191574*^9, 3.580143216092757*^9}, {
+  3.580143275507463*^9, 3.580143364649575*^9}, {3.580143395065186*^9, 
+  3.5801433955291843`*^9}, {3.5801434325997972`*^9, 3.5801434326047564`*^9}}],
+
+Cell["\<\
+Formally the Fourier Series Equation is defined by the following equation:\
+\>", "Text",
+ CellChangeTimes->{{3.580141197787624*^9, 3.580141197788968*^9}, {
+  3.5801413139323063`*^9, 3.580141335666582*^9}, {3.580141367777989*^9, 
+  3.5801414885432262`*^9}, {3.580141632055726*^9, 3.580141632428534*^9}, {
+  3.580141746972705*^9, 3.5801419229868927`*^9}, {3.580142097919031*^9, 
+  3.580142178033577*^9}, {3.5801422253366537`*^9, 3.580142436580509*^9}, {
+  3.580142782631893*^9, 3.580142785549156*^9}, {3.580143092505657*^9, 
+  3.580143142262034*^9}, {3.580143199191574*^9, 3.580143216092757*^9}, {
+  3.580143275507463*^9, 3.580143364649575*^9}, {3.580143395065186*^9, 
+  3.5801433955291843`*^9}, {3.5801434325997972`*^9, 3.580143517918376*^9}, {
+  3.5801435790396957`*^9, 3.580143582092988*^9}, {3.5801436803976307`*^9, 
+  3.580143683450789*^9}, {3.5801437519241753`*^9, 3.580143779689316*^9}}],
+
+Cell[BoxData[
+ FormBox[
+  RowBox[{
+   RowBox[{"f", "(", "t", ")"}], " ", "=", " ", 
+   RowBox[{
+    UnderoverscriptBox["\[Sum]", 
+     RowBox[{"n", "=", 
+      RowBox[{"-", "\[Infinity]"}]}], "\[Infinity]"], 
+    RowBox[{"(", 
+     RowBox[{
+      SubscriptBox["c", "n"], 
+      SuperscriptBox["e", 
+       RowBox[{"-", 
+        RowBox[{"(", 
+         StyleBox[
+          RowBox[{"j\[Omega]", 
+           StyleBox["0",
+            FontSize->7,
+            FontVariations->{"CompatibilityType"->Subscript}], "nt"}]], 
+         ")"}]}]]}], ")"}]}]}], TraditionalForm]], "EquationNumbered",
+ CellChangeTimes->{{3.5801438015913258`*^9, 3.580143823826132*^9}, {
+  3.5801439092900963`*^9, 3.580143991736158*^9}, {3.580144073335417*^9, 
+  3.5801440917336807`*^9}, {3.580144603179928*^9, 3.580144603361106*^9}}],
+
+Cell[TextData[{
+ "This states that a function \[ScriptF](t) can be described as the sum of a \
+series of sinusoid components, where ",
+ Cell[BoxData[
+  FormBox[
+   SubscriptBox["c", "n"], TraditionalForm]],
+  CellChangeTimes->{{3.5801438015913258`*^9, 3.580143823826132*^9}, {
+   3.5801439092900963`*^9, 3.580143991736158*^9}, {3.580144073335417*^9, 
+   3.5801440917336807`*^9}}],
+ " indicates the contribution that a sinusoid at frequency \[Omega]",
+ StyleBox["0",
+  FontSize->7,
+  FontVariations->{"CompatibilityType"->Subscript}],
+ "n makes to the function \[ScriptF](t) . If ",
+ Cell[BoxData[
+  FormBox[
+   SubscriptBox["c", "n"], TraditionalForm]],
+  CellChangeTimes->{{3.5801438015913258`*^9, 3.580143823826132*^9}, {
+   3.5801439092900963`*^9, 3.580143991736158*^9}, {3.580144073335417*^9, 
+   3.5801440917336807`*^9}}],
+ " is small for large \[Omega]",
+ StyleBox["0",
+  FontSize->7,
+  FontVariations->{"CompatibilityType"->Subscript}],
+ "n this indicates that the function will be \[OpenCurlyDoubleQuote]smooth\
+\[CloseCurlyDoubleQuote], and vary slowly over time.",
+ ButtonBox[Cell[TextData[StyleBox[ButtonBox["1"],
+  FontVariations->{"CompatibilityType"->"Superscript"}]], "Citation",
+  Editable->False,
+  TaggingRules->{NoteData -> RowBox[{
+       RowBox[{
+        "R", ".", " ", "Baraniuk", ".", " ", "\"Signals and Systems\""}], ",",
+        " ", "p115", ",", " ", 
+       RowBox[{"from", " ", "Connexions"}], ",", " ", 
+       RowBox[{"Rice", " ", "University"}], " ", "\[LongDash]", "  ", 
+       RowBox[{
+         RowBox[{"http", ":"}], "//", 
+         RowBox[{
+           RowBox[{
+             RowBox[{
+               RowBox[{"cnx", ".", "org"}], "/", "content"}], "/", 
+             "col10064"}], "/", 
+           RowBox[{"latest", "."}]}]}]}]}],
+  BaseStyle->"Hyperlink",
+  ButtonData->"00006CE1"]
+}], "Text",
+ CellChangeTimes->{{3.580141197787624*^9, 3.580141197788968*^9}, {
+   3.5801413139323063`*^9, 3.580141335666582*^9}, {3.580141367777989*^9, 
+   3.5801414885432262`*^9}, {3.580141632055726*^9, 3.580141632428534*^9}, {
+   3.580141746972705*^9, 3.580141923615719*^9}, {3.580144114596772*^9, 
+   3.580144224520172*^9}, {3.5801444294145737`*^9, 3.580144639024*^9}, 
+   3.580146446253643*^9, {3.5801465016358433`*^9, 3.580146519341235*^9}, {
+   3.580146666481669*^9, 3.580146695032185*^9}, {3.5801469798751583`*^9, 
+   3.580147019511409*^9}, {3.580217187489191*^9, 3.580217190871213*^9}, {
+   3.580219819264328*^9, 3.580219819319379*^9}}],
+
+Cell["\<\
+For discrete or sampled signals the Fourier Transformation has limits imposed \
+by the \[OpenCurlyDoubleQuote]quality\[CloseCurlyDoubleQuote] of the signal \
+to be analysed, this bounded transformation is called the Discrete Time \
+Fourier Series:\
+\>", "Text",
+ CellChangeTimes->CompressedData["
+1:eJxTTMoPSmViYGAQBWIQbW6y8+LkNa8crewhdMlV2wcgeknI10cg2vPpj2cg
+WiZJ8BuIbjrByDEFSPdu4wXTaQrxYiB6wZR4HRC9JcPWCUQLCDv6gOh7R7WC
+QHTH5Ek5ILrC4sp0EL1hkuEMEB2hN2EfiJ6adOIIiE5QfHYarO870zkQrWxb
+cBVEB52c8gBEM4olPQHRIu8LwHSXofBLEB2WvPcziDZwTfwNog/9PASmU3by
+cEwF0ndz8sD0jUl/BUD0A74yERD9Zqln9HQgHSveEwOiExZbV4HoquvuYJpp
+F0MDiJ4U83wxiD4Sc2cjiL6XJbkXRPt9jheYAaTrjrAKgmgAQni5ew==
+  "]],
+
+Cell[BoxData[
+ FormBox[
+  RowBox[{
+   RowBox[{"f", "[", "n", "]"}], "=", 
+   RowBox[{
+    FractionBox["1", 
+     SqrtBox["N"]], " ", 
+    RowBox[{
+     UnderoverscriptBox["\[Sum]", 
+      RowBox[{"k", " ", "=", " ", "0"}], 
+      RowBox[{"N", " ", "-", " ", "1"}]], 
+     RowBox[{"(", 
+      RowBox[{
+       SubscriptBox["c", "k"], 
+       SuperscriptBox["e", 
+        RowBox[{
+         RowBox[{"j", 
+          FractionBox[
+           RowBox[{"2", "\[Pi]"}], "N"], "k", " ", "n"}], ")"}]]}], 
+      ")"}]}]}]}], TraditionalForm]], "EquationNumbered",
+ CellChangeTimes->{{3.5801438015913258`*^9, 3.580143823826132*^9}, {
+  3.5801439092900963`*^9, 3.580143991736158*^9}, {3.580144073335417*^9, 
+  3.5801440917336807`*^9}, {3.580144603179928*^9, 3.580144603361106*^9}, {
+  3.580149250173183*^9, 3.5801492555797377`*^9}, {3.5801494052907677`*^9, 
+  3.5801495253744087`*^9}}],
+
+Cell[TextData[{
+ "Where N is the number of samples in \[ScriptF][n]. For the analysis, what \
+really interests us are the ",
+ Cell[BoxData[
+  FormBox[
+   SubscriptBox["c", "k"], TraditionalForm]],
+  CellChangeTimes->{{3.5801438015913258`*^9, 3.580143823826132*^9}, {
+   3.5801439092900963`*^9, 3.580143991736158*^9}, {3.580144073335417*^9, 
+   3.5801440917336807`*^9}, {3.580144603179928*^9, 3.580144603361106*^9}, {
+   3.580149250173183*^9, 3.5801492555797377`*^9}, {3.5801494052907677`*^9, 
+   3.5801495253744087`*^9}}],
+ " terms, as these describe the how much of a frequency component at step k \
+exists in the signal. So we can rewrite equation 2 in the following: "
+}], "Text",
+ CellChangeTimes->{{3.580149235567018*^9, 3.5801492355681257`*^9}, {
+   3.5801495425650787`*^9, 3.580149561819104*^9}, {3.580149712074606*^9, 
+   3.580149773326725*^9}, 3.580149861644548*^9, {3.580149916667839*^9, 
+   3.580149925309428*^9}, {3.58015005161945*^9, 3.5801501725504837`*^9}, {
+   3.580150238541442*^9, 3.5801502415332336`*^9}, {3.5802172481496983`*^9, 
+   3.580217248325472*^9}}],
+
+Cell[BoxData[
+ FormBox[
+  RowBox[{
+   SubscriptBox["c", "k"], "=", 
+   RowBox[{
+    FractionBox["1", 
+     SqrtBox["N"]], " ", 
+    RowBox[{
+     UnderoverscriptBox["\[Sum]", 
+      RowBox[{"n", " ", "=", " ", "0"}], 
+      RowBox[{"N", " ", "-", " ", "1"}]], 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"f", "[", "n", "]"}], 
+       SuperscriptBox["e", 
+        RowBox[{
+         RowBox[{"j", 
+          FractionBox[
+           RowBox[{"2", "\[Pi]"}], "N"], "k", " ", "n"}], ")"}]]}], 
+      ")"}]}]}]}], TraditionalForm]], "EquationNumbered",
+ CellChangeTimes->{{3.5801438015913258`*^9, 3.580143823826132*^9}, {
+  3.5801439092900963`*^9, 3.580143991736158*^9}, {3.580144073335417*^9, 
+  3.5801440917336807`*^9}, {3.580144603179928*^9, 3.580144603361106*^9}, {
+  3.580149250173183*^9, 3.5801492555797377`*^9}, {3.5801494052907677`*^9, 
+  3.5801495253744087`*^9}, {3.580150187692691*^9, 3.580150218449636*^9}}],
+
+Cell[TextData[{
+ "For k = 0, ",
+ Cell[BoxData[
+  FormBox[
+   SubscriptBox["c", "k"], TraditionalForm]],
+  CellChangeTimes->{{3.5801438015913258`*^9, 3.580143823826132*^9}, {
+   3.5801439092900963`*^9, 3.580143991736158*^9}, {3.580144073335417*^9, 
+   3.5801440917336807`*^9}, {3.580144603179928*^9, 3.580144603361106*^9}, {
+   3.580149250173183*^9, 3.5801492555797377`*^9}, {3.5801494052907677`*^9, 
+   3.5801495253744087`*^9}, {3.580150187692691*^9, 3.580150218449636*^9}}],
+ " will tell us how much or a zero-frequency signal, or DC-Offset, the signal \
+contains.",
+ Cell[BoxData[
+  FormBox[
+   RowBox[{" ", 
+    SubscriptBox["c", "k"]}], TraditionalForm]],
+  CellChangeTimes->{{3.5801438015913258`*^9, 3.580143823826132*^9}, {
+   3.5801439092900963`*^9, 3.580143991736158*^9}, {3.580144073335417*^9, 
+   3.5801440917336807`*^9}, {3.580144603179928*^9, 3.580144603361106*^9}, {
+   3.580149250173183*^9, 3.5801492555797377`*^9}, {3.5801494052907677`*^9, 
+   3.5801495253744087`*^9}, {3.580150187692691*^9, 3.580150218449636*^9}}],
+ " at k = 1 will tell us how much the sinusoid with period of length N \
+contributes to the signal. At k = N - 1, ",
+ Cell[BoxData[
+  FormBox[
+   SubscriptBox["c", "k"], TraditionalForm]],
+  CellChangeTimes->{{3.5801438015913258`*^9, 3.580143823826132*^9}, {
+   3.5801439092900963`*^9, 3.580143991736158*^9}, {3.580144073335417*^9, 
+   3.5801440917336807`*^9}, {3.580144603179928*^9, 3.580144603361106*^9}, {
+   3.580149250173183*^9, 3.5801492555797377`*^9}, {3.5801494052907677`*^9, 
+   3.5801495253744087`*^9}, {3.580150187692691*^9, 3.580150218449636*^9}}],
+ " is the factor that the sinusoid with a period of length 2/N ( cycling \
+every 2 samples ) contributes to the signal. Any sinusoid cycling faster than \
+2 samples would not be able to be represented acurately because it would be \
+cycling \[OpenCurlyDoubleQuote]between\[CloseCurlyDoubleQuote] the samples \
+and appear in the context of the signal to be slower \
+(\[OpenCurlyDoubleQuote]aliasing\[CloseCurlyDoubleQuote]), hence it cannot be \
+used for the analysis."
+}], "Text",
+ CellChangeTimes->{{3.580149235567018*^9, 3.5801492355681257`*^9}, {
+   3.5801495425650787`*^9, 3.580149561819104*^9}, {3.580149712074606*^9, 
+   3.580149773326725*^9}, 3.580149861644548*^9, {3.580149916667839*^9, 
+   3.580149925309428*^9}, {3.58015005161945*^9, 3.5801501725504837`*^9}, {
+   3.580150238541442*^9, 3.5801502415332336`*^9}, {3.580150297494244*^9, 
+   3.580150456752615*^9}, {3.580150606552041*^9, 3.58015071434713*^9}, {
+   3.580150752562791*^9, 3.580151031788807*^9}, {3.5801511356928883`*^9, 
+   3.580151143962632*^9}, {3.580151673130006*^9, 3.580151681926815*^9}, {
+   3.58021707562801*^9, 3.5802170806888866`*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["2. WINDOWING", "Section",
+ CellChangeTimes->{{3.580141299584237*^9, 3.580141301499361*^9}, {
+   3.580141969907702*^9, 3.580141976069519*^9}, 3.580217300136673*^9, {
+   3.5802173562551537`*^9, 3.580217358106678*^9}}],
+
+Cell[TextData[{
+ "Using equation 3 to analyse an audio file will result in N ",
+ Cell[BoxData[
+  FormBox[
+   SubscriptBox["c", "k"], TraditionalForm]],
+  CellChangeTimes->{{3.5801438015913258`*^9, 3.580143823826132*^9}, {
+   3.5801439092900963`*^9, 3.580143991736158*^9}, {3.580144073335417*^9, 
+   3.5801440917336807`*^9}, {3.580144603179928*^9, 3.580144603361106*^9}, {
+   3.580149250173183*^9, 3.5801492555797377`*^9}, {3.5801494052907677`*^9, 
+   3.5801495253744087`*^9}, {3.580150187692691*^9, 3.580150218449636*^9}}],
+ " terms, where c is a complex number. The real component tells us the amount \
+of a signal, the imaginary component indicates the phase. From this we can \
+gain information about the content of the signal. However, this information \
+is static and does not give any insight into how the signal is changing over \
+time. Also, consider a 1 minute audio recording, with a sampling rate of \
+44.1kHz. N will be 44100*60, giving us the coefficients of 2646000 frequency \
+steps between 0 and 22.5kHz. This gives us a resolution orders of magnitude \
+smaller than the human ear is able to percieve",
+ ButtonBox[Cell[TextData[StyleBox[ButtonBox["2"],
+  FontVariations->{"CompatibilityType"->"Superscript"}]], "Citation",
+  Editable->False,
+  TaggingRules->{NoteData -> RowBox[{
+       RowBox[{"http", ":"}], "//", 
+       RowBox[{
+         RowBox[{
+           RowBox[{"en", ".", "wikipedia", ".", "org"}], "/", "wiki"}], "/", 
+         "Psychoacoustics"}]}]}],
+  BaseStyle->"Hyperlink",
+  ButtonData->"00002BA5"],
+ ", so it is also too much static information. "
+}], "Text",
+ CellChangeTimes->{{3.580141197787624*^9, 3.580141197788968*^9}, {
+  3.5801413139323063`*^9, 3.580141335666582*^9}, {3.580141367777989*^9, 
+  3.5801414885432262`*^9}, {3.580141632055726*^9, 3.580141632428534*^9}, {
+  3.580141746972705*^9, 3.5801419236143017`*^9}, {3.580217399981921*^9, 
+  3.580217570169015*^9}, {3.580217602478053*^9, 3.580217707580019*^9}, {
+  3.580217741021975*^9, 3.58021779006253*^9}, {3.580217854355365*^9, 
+  3.580217886311057*^9}, {3.58021806645496*^9, 3.580218159474536*^9}, {
+  3.580218537978374*^9, 3.580218617531989*^9}, {3.580218686290522*^9, 
+  3.580218693112484*^9}, {3.580218759187014*^9, 3.580218887555039*^9}, {
+  3.580219819228796*^9, 3.580219819424468*^9}, {3.580219860099826*^9, 
+  3.5802198905750637`*^9}}],
+
+Cell["\<\
+The solution is to slice the audio signal into blocks and transform these \
+individually.  Considering that human hearing is in the range of 20Hz - 20kHz \
+we have lower limit to what is usefull. A 20Hz signal will cycle in 1/20th of \
+a second so N will need to be 44100 / 20, or 2205 samples. As we will see \
+later, the optimized implementation of the Fourier Transformation needs N to \
+be a power of 2. 2048 will give us a lower frequency limit of 21.5 Hz, this \
+should be good enough for our purposes. It is important when choosing the \
+size of the slices to understand how the size effects the result.\
+\>", "Text",
+ CellChangeTimes->{{3.580141197787624*^9, 3.580141197788968*^9}, {
+   3.5801413139323063`*^9, 3.580141335666582*^9}, {3.580141367777989*^9, 
+   3.5801414885432262`*^9}, {3.580141632055726*^9, 3.580141632428534*^9}, {
+   3.580141746972705*^9, 3.5801419236143017`*^9}, {3.580217399981921*^9, 
+   3.580217570169015*^9}, {3.580217602478053*^9, 3.580217707580019*^9}, {
+   3.580217741021975*^9, 3.58021779006253*^9}, {3.580217854355365*^9, 
+   3.580217886311057*^9}, {3.58021806645496*^9, 3.580218159474536*^9}, {
+   3.580218537978374*^9, 3.580218617531989*^9}, {3.580218686290522*^9, 
+   3.580218693112484*^9}, {3.580218759187014*^9, 3.580218921874989*^9}, 
+   3.5802189564907*^9, {3.580219962968155*^9, 3.580220058020234*^9}, {
+   3.580220104819365*^9, 3.580220281434185*^9}, {3.580220316073423*^9, 
+   3.580220513954711*^9}}],
+
+Cell["", "Text",
+ CellChangeTimes->{{3.580141197787624*^9, 3.580141197788968*^9}, {
+   3.5801413139323063`*^9, 3.580141335666582*^9}, {3.580141367777989*^9, 
+   3.5801414885432262`*^9}, {3.580141632055726*^9, 3.580141632428534*^9}, {
+   3.580141746972705*^9, 3.5801419236143017`*^9}, {3.580217399981921*^9, 
+   3.580217570169015*^9}, {3.580217602478053*^9, 3.580217707580019*^9}, {
+   3.580217741021975*^9, 3.58021779006253*^9}, {3.580217854355365*^9, 
+   3.580217886311057*^9}, {3.58021806645496*^9, 3.580218159474536*^9}, {
+   3.580218537978374*^9, 3.580218617531989*^9}, {3.580218686290522*^9, 
+   3.580218693112484*^9}, {3.580218759187014*^9, 3.580218921874989*^9}, 
+   3.5802189564907*^9, {3.580219962968155*^9, 3.580220058020234*^9}, {
+   3.580220104819365*^9, 3.580220281434185*^9}, {3.580220316073423*^9, 
+   3.58022051395267*^9}}],
+
+Cell["", "Text",
+ CellChangeTimes->{{3.580141197787624*^9, 3.580141197788968*^9}, {
+   3.5801413139323063`*^9, 3.580141335666582*^9}, {3.580141367777989*^9, 
+   3.5801414885432262`*^9}, {3.580141632055726*^9, 3.580141632428534*^9}, {
+   3.580141746972705*^9, 3.5801419236143017`*^9}, {3.580217399981921*^9, 
+   3.580217570169015*^9}, {3.580217602478053*^9, 3.580217707580019*^9}, {
+   3.580217741021975*^9, 3.58021779006253*^9}, {3.580217854355365*^9, 
+   3.580217886311057*^9}, {3.58021806645496*^9, 3.580218159474536*^9}, {
+   3.580218537978374*^9, 3.580218617531989*^9}, {3.580218686290522*^9, 
+   3.580218693112484*^9}, {3.580218759187014*^9, 3.580218921874989*^9}, 
+   3.5802189564907*^9, {3.580219962968155*^9, 3.580220058020234*^9}, {
+   3.580220104819365*^9, 3.580220281434185*^9}, {3.580220316073423*^9, 
+   3.5802204696068*^9}}],
+
+Cell["", "Text",
+ CellChangeTimes->{{3.580141197787624*^9, 3.580141197788968*^9}, {
+  3.5801413139323063`*^9, 3.580141335666582*^9}, {3.580141367777989*^9, 
+  3.5801414885432262`*^9}, {3.580141632055726*^9, 3.580141632428534*^9}, {
+  3.580141746972705*^9, 3.5801419236143017`*^9}, {3.580217399981921*^9, 
+  3.580217570169015*^9}, {3.580217602478053*^9, 3.580217707580019*^9}, {
+  3.580217741021975*^9, 3.580217742847106*^9}}],
+
+Cell["", "Text",
+ CellChangeTimes->{{3.580141197787624*^9, 3.580141197788968*^9}, {
+  3.5801413139323063`*^9, 3.580141335666582*^9}, {3.580141367777989*^9, 
+  3.5801414885432262`*^9}, {3.580141632055726*^9, 3.580141632428534*^9}, {
+  3.580141746972705*^9, 3.5801419236143017`*^9}, {3.580217399981921*^9, 
+  3.580217570169015*^9}, {3.580217602478053*^9, 3.580217707580019*^9}, {
+  3.580217741021975*^9, 3.580217742845952*^9}}],
+
+Cell[CellGroupData[{
+
+Cell["Enter item1numbered text here.", "Item1Numbered"],
+
+Cell[CellGroupData[{
+
+Cell["Enter item1paragraph text here.", "Item1Paragraph"],
+
+Cell[CellGroupData[{
+
+Cell["Enter item2numbered text here.", "Item2Numbered"],
+
+Cell[CellGroupData[{
+
+Cell["Enter item2paragraph text here.", "Item2Paragraph"],
+
+Cell[CellGroupData[{
+
+Cell["Enter item3numbered text here.", "Item3Numbered"],
+
+Cell["Enter item3paragraph text here.", "Item3Paragraph"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]],
+
+Cell["\<\
+Enter text here. Enter numbered equation for display in a separate cell below:\
+\>", "Text"],
+
+Cell[BoxData[
+ FormBox[
+  RowBox[{
+   RowBox[{"\[Integral]", 
+    RowBox[{"x", 
+     RowBox[{"\[DifferentialD]", "x"}]}]}], "+", 
+   SqrtBox["z"]}], TraditionalForm]], "EquationNumbered"],
+
+Cell[CellGroupData[{
+
+Cell["Enter item1 text here.", "Item1"],
+
+Cell[CellGroupData[{
+
+Cell["Enter item1paragraph text here.", "Item1Paragraph"],
+
+Cell[CellGroupData[{
+
+Cell["Enter item2 text here.", "Item2"],
+
+Cell[CellGroupData[{
+
+Cell["Enter item2paragraph text here.", "Item2Paragraph"],
+
+Cell[CellGroupData[{
+
+Cell["Enter item3 text here.", "Item3"],
+
+Cell["Enter item3paragraph text here.", "Item3Paragraph"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]],
+
+Cell["", "Text",
+ CellChangeTimes->{{3.580141197787624*^9, 3.580141197788968*^9}, {
+  3.5801413139323063`*^9, 3.580141335666582*^9}, {3.580141367777989*^9, 
+  3.5801414885432262`*^9}, {3.580141632055726*^9, 3.580141632428534*^9}, {
+  3.580141746972705*^9, 3.580141923615719*^9}}],
+
+Cell["", "Text",
+ CellChangeTimes->{{3.580141197787624*^9, 3.580141197788968*^9}, {
+  3.5801413139323063`*^9, 3.580141335666582*^9}, {3.580141367777989*^9, 
+  3.5801414885432262`*^9}, {3.580141632055726*^9, 3.580141632428534*^9}, {
+  3.580141746972705*^9, 3.5801419236143017`*^9}}],
+
+Cell[CellGroupData[{
+
+Cell["Enter item1numbered text here.", "Item1Numbered"],
+
+Cell[CellGroupData[{
+
+Cell["Enter item1paragraph text here.", "Item1Paragraph"],
+
+Cell[CellGroupData[{
+
+Cell["Enter item2numbered text here.", "Item2Numbered"],
+
+Cell[CellGroupData[{
+
+Cell["Enter item2paragraph text here.", "Item2Paragraph"],
+
+Cell[CellGroupData[{
+
+Cell["Enter item3numbered text here.", "Item3Numbered"],
+
+Cell["Enter item3paragraph text here.", "Item3Paragraph"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]],
+
+Cell["\<\
+Enter text here. Enter numbered equation for display in a separate cell below:\
+\>", "Text"],
+
+Cell[BoxData[
+ FormBox[
+  RowBox[{
+   RowBox[{"\[Integral]", 
+    RowBox[{"x", 
+     RowBox[{"\[DifferentialD]", "x"}]}]}], "+", 
+   SqrtBox["z"]}], TraditionalForm]], "EquationNumbered"],
+
+Cell[CellGroupData[{
+
+Cell["Enter item1 text here.", "Item1"],
+
+Cell[CellGroupData[{
+
+Cell["Enter item1paragraph text here.", "Item1Paragraph"],
+
+Cell[CellGroupData[{
+
+Cell["Enter item2 text here.", "Item2"],
+
+Cell[CellGroupData[{
+
+Cell["Enter item2paragraph text here.", "Item2Paragraph"],
+
+Cell[CellGroupData[{
+
+Cell["Enter item3 text here.", "Item3"],
+
+Cell["Enter item3paragraph text here.", "Item3Paragraph"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Enter subsection title here", "Subsection"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[Cell[GraphicsData["CompressedBitmap", "\<\
+eJztWLtKA0EUvdnNCwULH30aC7XzFwStbPwAYQlCLEQxYit2FhZpJIVWamMh
+iCCIjTYKNkIKGxEbsRDBQkTs1jl35q6768QQJSA4xc7O3HPfc2Y2ZDJYqszM
+BUuz5aA0sRgsVGbL1dL4/KIS+RkiquEpEeahmpqhRvWxZTXx+R2GIT/rGDMO
+cpCDHOQgB/1zaJBHnzamPmW5lOz65JI82qmsUS/PD1c36Xh9l7H31zc6re/T
+1vQK7VVrdN+4ieQX20cshx/oQwZMrX2eZBNhlbrH+gW2FLGoSCSt001XB2cJ
+7JtoNPKTBhQiGdw+3T3wXMJ6vOrhlCDDCjrQRWjIgEkamEvTLA0w6h7r9ye8
+igoKhDzejJR5s2i/rB8bjujY3JfH51j9xahesUUPsAYZ1Ns37oUXME3XDmYp
+Vc9EhTVE8dqNioma47lgJhLZQv2ycLgF49FeNOCzcD9KSa/0KPzTehizLJN0
+oirbKl5aLKayBQbL2gMNtyjdN3sBM1AFG+el6o+faCE363jMsHwCQFqGt9pP
+d0RLSUvONUzgO05dTf2clfo6XMFKfdHXMfNfYqI2VcNQKybkE0yQzJR1uilI
+HicCa2zV7XkjOg1yEQkG8sSS1ndX8cv9BDUgxp1stFxpePh21F1N34hiCS/2
+2zLfLGLLriTPR5q8xtuARbXLIstaZKPt74v5BnkWb30dzESXnWPiytdA2tmh
+DvyRHwkOcpCDHOQgB3UCkv9qMx+BuT88\
+\>"], "Graphics",
+  Evaluatable->False,
+  ImageSize->{144, 144},
+  ImageMargins->{{0, 0}, {0, 0}},
+  ImageRegion->{{0, 1}, {0, 1}}]], "Figure"],
+
+Cell[TextData[{
+ StyleBox["Figure ", "FigureCaptionLabel"],
+ StyleBox[
+ CounterBox["FigureCaption"], "FigureCaptionLabel"],
+ StyleBox[".\[ThickSpace]\[ThickSpace]\[ThickSpace]", "FigureCaptionLabel"],
+ "Figure caption."
+}], "FigureCaption"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[Cell[GraphicsData["CompressedBitmap", "\<\
+eJztWLtKA0EUvdnNCwULH30aC7XzFwStbPwAYQlCLEQxYit2FhZpJIVWamMh
+iCCIjTYKNkIKGxEbsRDBQkTs1jl35q6768QQJSA4xc7O3HPfc2Y2ZDJYqszM
+BUuz5aA0sRgsVGbL1dL4/KIS+RkiquEpEeahmpqhRvWxZTXx+R2GIT/rGDMO
+cpCDHOQgB/1zaJBHnzamPmW5lOz65JI82qmsUS/PD1c36Xh9l7H31zc6re/T
+1vQK7VVrdN+4ieQX20cshx/oQwZMrX2eZBNhlbrH+gW2FLGoSCSt001XB2cJ
+7JtoNPKTBhQiGdw+3T3wXMJ6vOrhlCDDCjrQRWjIgEkamEvTLA0w6h7r9ye8
+igoKhDzejJR5s2i/rB8bjujY3JfH51j9xahesUUPsAYZ1Ns37oUXME3XDmYp
+Vc9EhTVE8dqNioma47lgJhLZQv2ycLgF49FeNOCzcD9KSa/0KPzTehizLJN0
+oirbKl5aLKayBQbL2gMNtyjdN3sBM1AFG+el6o+faCE363jMsHwCQFqGt9pP
+d0RLSUvONUzgO05dTf2clfo6XMFKfdHXMfNfYqI2VcNQKybkE0yQzJR1uilI
+HicCa2zV7XkjOg1yEQkG8sSS1ndX8cv9BDUgxp1stFxpePh21F1N34hiCS/2
+2zLfLGLLriTPR5q8xtuARbXLIstaZKPt74v5BnkWb30dzESXnWPiytdA2tmh
+DvyRHwkOcpCDHOQgB3UCkv9qMx+BuT88\
+\>"], "Graphics",
+  Evaluatable->False,
+  ImageSize->{144, 144},
+  ImageMargins->{{0, 0}, {0, 0}},
+  ImageRegion->{{0, 1}, {0, 1}}]], "Picture"],
+
+Cell[TextData[{
+ StyleBox["Picture ", "PictureCaptionLabel"],
+ StyleBox[
+ CounterBox["PictureCaption"], "PictureCaptionLabel"],
+ StyleBox[".\[ThickSpace]\[ThickSpace]\[ThickSpace]", "PictureCaptionLabel"],
+ "Picture caption."
+}], "PictureCaption"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Enter appendix title here", "AppendixSection"],
+
+Cell[CellGroupData[{
+
+Cell["\<\
+Enter appendix text here. Enter appendix equation for display in a separate \
+cell below:\
+\>", "Appendix"],
+
+Cell[BoxData[
+ FormBox[
+  RowBox[{
+   RowBox[{"\[Integral]", 
+    RowBox[{"x", 
+     RowBox[{"\[DifferentialD]", "x"}]}]}], "+", 
+   SqrtBox["z"]}], TraditionalForm]], "AppendixEquation"]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Enter acknowledgments title here", "AcknowledgmentsSection"],
+
+Cell["Enter acknowledgment text here.", "Acknowledgments"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["References", "ReferenceSection",
+ CellChangeTimes->{{3.5801460273674994`*^9, 3.580146030211277*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[TextData[{
+ "A. Authorlast, \[OpenCurlyDoubleQuote]Article \
+Title,\[CloseCurlyDoubleQuote] ",
+ StyleBox["Journal Title",
+  FontSlant->"Italic"],
+ ", ",
+ StyleBox["Volume",
+  FontWeight->"Bold"],
+ "(Issue), 2005 pp. #\[Dash]#."
+}], "Reference"],
+
+Cell[TextData[{
+ "A. Authorlast1 and B. Authorlast2, \[OpenCurlyDoubleQuote]Article Title,\
+\[CloseCurlyDoubleQuote] ",
+ StyleBox["Journal Title",
+  FontSlant->"Italic"],
+ ", ",
+ StyleBox["Volume",
+  FontWeight->"Bold"],
+ "(Issue), 2005 pp. #\[Dash]#."
+}], "Reference"],
+
+Cell[TextData[{
+ "A. Authorlast1, B. Authorlast2, and C. Authorlast3, \
+\[OpenCurlyDoubleQuote]Article Title,\[CloseCurlyDoubleQuote] ",
+ StyleBox["Journal Title",
+  FontSlant->"Italic"],
+ ", ",
+ StyleBox["Volume",
+  FontWeight->"Bold"],
+ "(Issue), 2005 pp. #\[Dash]#."
+}], "Reference"],
+
+Cell[TextData[{
+ "A. Authorlast, ",
+ StyleBox["Book Title",
+  FontSlant->"Italic"],
+ ", ",
+ StyleBox["n",
+  FontSlant->"Italic"],
+ "th ed., Publisher Location: Publisher Name, 2005."
+}], "Reference"],
+
+Cell[TextData[{
+ "A. Authorlast1 and B. Authorlast2, ",
+ StyleBox["Book Title",
+  FontSlant->"Italic"],
+ ", ",
+ StyleBox["n",
+  FontSlant->"Italic"],
+ "th ed., Publisher Location: Publisher Name, 2005."
+}], "Reference"],
+
+Cell[TextData[{
+ "A. Authorlast1, B. Authorlast2, and C. Authorlast3, ",
+ StyleBox["Book Title",
+  FontSlant->"Italic"],
+ ", ",
+ StyleBox["n",
+  FontSlant->"Italic"],
+ "th ed., Publisher Location: Publisher Name, 2005."
+}], "Reference"],
+
+Cell[TextData[{
+ "A. Authorlast, \[OpenCurlyDoubleQuote]Paper Title,\[CloseCurlyDoubleQuote] \
+in ",
+ StyleBox["Conference Proceedings Title (Conference Acronym and Year)",
+  FontSlant->"Italic"],
+ ", Conference Location (A. Authorlast, ed.), Publisher Location: Publisher \
+Name, Publication Date pp. #\[Dash]#."
+}], "Reference"],
+
+Cell[TextData[{
+ "A. Authorlast1, B. Authorlast2, and C. Authorlast3, \
+\[OpenCurlyDoubleQuote]Paper Title,\[CloseCurlyDoubleQuote] in ",
+ StyleBox["Conference Proceedings Title (Conference Acronym and Year)",
+  FontSlant->"Italic"],
+ ", Conference Location (A. Authorlast, ed.), Publisher Location: Publisher \
+Name, Publication Date pp. #\[Dash]#."
+}], "Reference"],
+
+Cell[TextData[{
+ "A. Authorlast1, B. Authorlast2, and C. Authorlast3, \
+\[OpenCurlyDoubleQuote]Paper Title,\[CloseCurlyDoubleQuote] in ",
+ StyleBox["Conference Proceedings Title (Conference Acronym and Year)",
+  FontSlant->"Italic"],
+ ", Conference Location (A. Authorlast, ed.), Publisher Location: Publisher \
+Name, Publication Date pp. #\[Dash]#."
+}], "Reference"],
+
+Cell["\<\
+A. Authorlast. \[OpenCurlyDoubleQuote]Website Title.\[CloseCurlyDoubleQuote] \
+(Last updated date or date visited in three-character Month Day, Year format) \
+URL.\
+\>", "Reference"],
+
+Cell["\<\
+A. B. Authorlast. \[OpenCurlyDoubleQuote]Entry Title\[CloseCurlyDoubleQuote] \
+from CompanyN\[LongDash]A CompanyN Web Resource. URL.\
+\>", "Reference"],
+
+Cell[TextData[{
+ "\t",
+ StyleBox["1",
+  FontVariations->{"CompatibilityType"->"Superscript"}],
+ "\t",
+ "R",
+ ".",
+ " ",
+ "Baraniuk",
+ ".",
+ " ",
+ "\"Signals and Systems\"",
+ ",",
+ " ",
+ "p115",
+ ",",
+ " ",
+ "from",
+ " ",
+ "Connexions",
+ ",",
+ " ",
+ "Rice",
+ " ",
+ "University",
+ " ",
+ "\[LongDash]",
+ "  ",
+ "http",
+ ":",
+ "//",
+ "cnx",
+ ".",
+ "org",
+ "/",
+ "content",
+ "/",
+ "col10064",
+ "/",
+ "latest",
+ "."
+}], "Reference",
+ Editable->False,
+ TaggingRules->{ReferenceNoteData -> ""},
+ CellTags->"00006CE1"],
+
+Cell[TextData[{
+ "\t",
+ StyleBox["2",
+  FontVariations->{"CompatibilityType"->"Superscript"}],
+ "\t",
+ "http",
+ ":",
+ "//",
+ "en",
+ ".",
+ "wikipedia",
+ ".",
+ "org",
+ "/",
+ "wiki",
+ "/",
+ "Psychoacoustics"
+}], "Reference",
+ Editable->False,
+ TaggingRules->{ReferenceNoteData -> ""},
+ CellTags->"00002BA5"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+},
+WindowSize->{834, 881},
+WindowMargins->{{167, Automatic}, {Automatic, 54}},
+Magnification:>1.25 Inherited,
+FrontEndVersion->"9.0 for Mac OS X x86 (32-bit, 64-bit Kernel) (January 25, \
+2013)",
+StyleDefinitions->FrontEnd`FileName[{"Article"}, "JournalArticle.nb", 
+  CharacterEncoding -> "UTF-8"],
+PrivateNotebookOptions -> {"NotebookAuthor" -> ""}
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{
+ "00006CE1"->{
+  Cell[30082, 790, 509, 44, 31, "Reference",
+   CellTags->"00006CE1"]},
+ "00002BA5"->{
+  Cell[30594, 836, 304, 20, 31, "Reference",
+   CellTags->"00002BA5"]}
+ }
+*)
+(*CellTagsIndex
+CellTagsIndex->{
+ {"00006CE1", 31400, 875},
+ {"00002BA5", 31487, 878}
+ }
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[579, 22, 128, 3, 90, "Title"],
+Cell[CellGroupData[{
+Cell[732, 29, 131, 2, 51, "Author"],
+Cell[866, 33, 124, 2, 16, "Institution"],
+Cell[993, 37, 182, 2, 16, "Institution"],
+Cell[1178, 41, 123, 2, 21, "AbstractContinuation"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[1338, 48, 96, 1, 40, "Subsection"],
+Cell[1437, 51, 597, 10, 66, "Text"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[2071, 66, 149, 2, 59, "Section"],
+Cell[2223, 70, 1412, 20, 125, "Text"],
+Cell[3638, 92, 902, 13, 26, "Text"],
+Cell[4543, 107, 802, 22, 64, "EquationNumbered"],
+Cell[5348, 131, 2461, 54, 79, "Text"],
+Cell[7812, 187, 676, 13, 46, "Text"],
+Cell[8491, 202, 870, 24, 68, "EquationNumbered"],
+Cell[9364, 228, 1076, 19, 47, "Text"],
+Cell[10443, 249, 916, 24, 68, "EquationNumbered"],
+Cell[11362, 275, 2708, 47, 107, "Text"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[14107, 327, 221, 3, 59, "Section"],
+Cell[14331, 332, 2338, 41, 136, "Text"],
+Cell[16672, 375, 1458, 21, 105, "Text"],
+Cell[18133, 398, 839, 12, 26, "Text"],
+Cell[18975, 412, 838, 12, 26, "Text"],
+Cell[19816, 426, 425, 6, 26, "Text"],
+Cell[20244, 434, 425, 6, 26, "Text"],
+Cell[CellGroupData[{
+Cell[20694, 444, 55, 0, 19, "Item1Numbered"],
+Cell[CellGroupData[{
+Cell[20774, 448, 57, 0, 18, "Item1Paragraph"],
+Cell[CellGroupData[{
+Cell[20856, 452, 55, 0, 19, "Item2Numbered"],
+Cell[CellGroupData[{
+Cell[20936, 456, 57, 0, 18, "Item2Paragraph"],
+Cell[CellGroupData[{
+Cell[21018, 460, 55, 0, 19, "Item3Numbered"],
+Cell[21076, 462, 57, 0, 18, "Item3Paragraph"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]],
+Cell[21196, 469, 102, 2, 26, "Text"],
+Cell[21301, 473, 187, 6, 53, "EquationNumbered"],
+Cell[CellGroupData[{
+Cell[21513, 483, 39, 0, 19, "Item1"],
+Cell[CellGroupData[{
+Cell[21577, 487, 57, 0, 18, "Item1Paragraph"],
+Cell[CellGroupData[{
+Cell[21659, 491, 39, 0, 19, "Item2"],
+Cell[CellGroupData[{
+Cell[21723, 495, 57, 0, 18, "Item2Paragraph"],
+Cell[CellGroupData[{
+Cell[21805, 499, 39, 0, 19, "Item3"],
+Cell[21847, 501, 57, 0, 18, "Item3Paragraph"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]],
+Cell[21967, 508, 279, 4, 26, "Text"],
+Cell[22249, 514, 281, 4, 26, "Text"],
+Cell[CellGroupData[{
+Cell[22555, 522, 55, 0, 19, "Item1Numbered"],
+Cell[CellGroupData[{
+Cell[22635, 526, 57, 0, 18, "Item1Paragraph"],
+Cell[CellGroupData[{
+Cell[22717, 530, 55, 0, 19, "Item2Numbered"],
+Cell[CellGroupData[{
+Cell[22797, 534, 57, 0, 18, "Item2Paragraph"],
+Cell[CellGroupData[{
+Cell[22879, 538, 55, 0, 19, "Item3Numbered"],
+Cell[22937, 540, 57, 0, 18, "Item3Paragraph"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]],
+Cell[23057, 547, 102, 2, 26, "Text"],
+Cell[23162, 551, 187, 6, 53, "EquationNumbered"],
+Cell[CellGroupData[{
+Cell[23374, 561, 39, 0, 19, "Item1"],
+Cell[CellGroupData[{
+Cell[23438, 565, 57, 0, 18, "Item1Paragraph"],
+Cell[CellGroupData[{
+Cell[23520, 569, 39, 0, 19, "Item2"],
+Cell[CellGroupData[{
+Cell[23584, 573, 57, 0, 18, "Item2Paragraph"],
+Cell[CellGroupData[{
+Cell[23666, 577, 39, 0, 19, "Item3"],
+Cell[23708, 579, 57, 0, 18, "Item3Paragraph"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[23850, 588, 49, 0, 40, "Subsection"],
+Cell[CellGroupData[{
+Cell[23924, 592, 965, 18, 201, "Figure"],
+Cell[24892, 612, 240, 6, 22, "FigureCaption"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[25169, 623, 966, 18, 202, "Picture"],
+Cell[26138, 643, 247, 6, 22, "PictureCaption"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[26446, 656, 52, 0, 59, "AppendixSection"],
+Cell[CellGroupData[{
+Cell[26523, 660, 117, 3, 26, "Appendix"],
+Cell[26643, 665, 187, 6, 53, "AppendixEquation"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[26879, 677, 66, 0, 59, "AcknowledgmentsSection"],
+Cell[26948, 679, 58, 0, 26, "Acknowledgments"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[27043, 684, 106, 1, 59, "ReferenceSection"],
+Cell[CellGroupData[{
+Cell[27174, 689, 249, 9, 21, "Reference"],
+Cell[27426, 700, 269, 9, 21, "Reference"],
+Cell[27698, 711, 286, 9, 21, "Reference"],
+Cell[27987, 722, 199, 8, 21, "Reference"],
+Cell[28189, 732, 219, 8, 21, "Reference"],
+Cell[28411, 742, 236, 8, 21, "Reference"],
+Cell[28650, 752, 330, 7, 40, "Reference"],
+Cell[28983, 761, 367, 7, 40, "Reference"],
+Cell[29353, 770, 367, 7, 40, "Reference"],
+Cell[29723, 779, 192, 4, 21, "Reference"],
+Cell[29918, 785, 161, 3, 21, "Reference"],
+Cell[30082, 790, 509, 44, 31, "Reference",
+ CellTags->"00006CE1"],
+Cell[30594, 836, 304, 20, 31, "Reference",
+ CellTags->"00002BA5"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+}
+]
+*)
+
+(* End of internal cache information *)

@@ -96,8 +96,7 @@ void SpectraViewComponent::resized()
     //const ScopedLock sl (lock);
     //std::cout << "called resize" << std::endl;
 
-    yStep = ((float)numOfFrequencies) / (float)getHeight();
-    xStep = ((float)spectrumLength) / ((float)getWidth() * (float)numOfFrequencies * 2.0);
+    xStep = ((float)spectrumLength) / ((float)bufferImage.getWidth() * (float)numOfFrequencies * 2.0);
     spectraImage = spectraImage.rescaled(getWidth(), getHeight());
     //[/UserResized]
 }
@@ -115,13 +114,8 @@ void SpectraViewComponent::setSpectrumSize(int length, int resolution)
     //std::cout << "calles setSpectrumSize" << std::endl;
     spectrumLength = length;
     numOfFrequencies = resolution;
-    bufferImage = Image (Image::RGB,
-                         (int)(length * 0.001), resolution,
-                         false);
-    bufferImage.clear(spectraImage.getBounds(), Colour::fromFloatRGBA(0.0, 0.0, 0.0, 0.0));
-    yStep = ((float)numOfFrequencies) / (float)getHeight();
-    xStep = ((float)spectrumLength) / (float)getWidth() ;
-    startTimer(500);
+    xStep = ((float)spectrumLength) / ((float)spectraImage.getWidth() * (float)numOfFrequencies * 2.0);
+    startTimer(160);
 }
 
 void SpectraViewComponent::addDFTData(float *newVector)
@@ -132,6 +126,9 @@ void SpectraViewComponent::addDFTData(float *newVector)
 
     
     if (bufferUntilDraw > xStep) {
+        
+        Graphics g (spectraImage);
+        
         bufferUntilDraw = 0;
         
         xDrawPostion = xDrawPostion + 1;
@@ -139,9 +136,9 @@ void SpectraViewComponent::addDFTData(float *newVector)
         for(int y = 0; y < numOfFrequencies; y++)
         {
             float value = buffers[buffers.size() - 1][y] ;
+            g.setColour(Colour::fromHSV(value * 5 , 1.0, 1.0, value * 5 ));
+            g.fillRect(xDrawPostion , spectraImage.getHeight() - (y/2), 1, 1);
             
-            value = fmodf(value * 5, 1.0);
-            bufferImage.setPixelAt(xDrawPostion, bufferImage.getHeight() - y, Colour::fromHSV(value * 5 , 1.0, 1.0, value * 10 ));
             
         }
     
@@ -149,13 +146,14 @@ void SpectraViewComponent::addDFTData(float *newVector)
     }
 
     bufferUntilDraw++;
+    
+    //std::cout <<  xStep << std::endl;
 }
 
 void SpectraViewComponent::timerCallback()
 {
     //const ScopedLock sl (lock);
 
-    spectraImage = bufferImage.rescaled(getWidth(), getHeight());
     repaint();
 }
 //[/MiscUserCode]

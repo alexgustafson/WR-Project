@@ -238,8 +238,8 @@ void MainViewComponent::run()
             
         }
         
-        currentSamplePosition += sliceSize;
-        
+        currentSamplePosition += (sliceSize / 4) ;
+        std::cout << currentSamplePosition << std::endl;
     }
     
 
