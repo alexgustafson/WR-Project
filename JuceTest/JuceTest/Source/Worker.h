@@ -27,7 +27,7 @@ public:
     void initializeDFTCoeffs();
     void initializeFFTBufferArray(float *samples, float *buffer, int sizeOfSampleBuffer);
     void deInterlace(float *buffer, int sizeOfSampleBuffer);
-    void SWAP();
+
     
     
 private:

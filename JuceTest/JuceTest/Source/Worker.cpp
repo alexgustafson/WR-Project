@@ -219,13 +219,13 @@ void Worker::performDFT(float *samples, int size, float** dft)
         }
         mmax=istep;
     }
-    
+ 
     
 }*/
 
 float Worker::performFFT(float *samples, unsigned long number_of_complex_samples, int isign)
 {
-    
+
     float wr, wi, arg, *p1, *p2, temp;
     float tr, ti, ur, ui, *p1r, *p1i, *p2r, *p2i;
     long i, bitm, j, le, le2, k, logN;
@@ -237,6 +237,7 @@ float Worker::performFFT(float *samples, unsigned long number_of_complex_samples
             j <<= 1;
 		}
 		if (i < j) {
+
 			p1 = samples+i; p2 = samples+j;
 			temp = *p1; *(p1++) = *p2;
 			*(p2++) = temp; temp = *p1;

@@ -57,7 +57,7 @@ MainViewComponent::MainViewComponent (String threadName)
 
     //[Constructor] You can add your own custom stuff here..
     formatManager.registerBasicFormats();
-    sliceSize = 4096;
+    sliceSize = 1024;
     currentSamplePosition = 0;
     mpiHandle = MPIHandler::getInstance();
     audioLoaded = false;
@@ -180,7 +180,6 @@ void MainViewComponent::timerCallback()
 
 void MainViewComponent::run()
 {
-
     int numOfProcessors = mpiHandle->getNumberOfProcesses();
     ScopedPointer<AudioFormatReader> audioReader ( formatManager.createReaderFor (currentFile));
 
@@ -197,7 +196,7 @@ void MainViewComponent::run()
                 mpiHandle->send(i, msg_bufferSize, sliceSize); //send size of N
                 mpiHandle->send(i, msg_usefft, fftButton->getToggleState()); //should use DFT or FFT ?
                 mpiHandle->sendSampleBuffer(audioBuffer->getSampleData(0), sliceSize, i); //send data slice
-                currentSamplePosition += sliceSize;
+                currentSamplePosition += sliceSize / 4;
             }
 
             for (int i = 1; i < numOfProcessors; i++)
@@ -213,14 +212,7 @@ void MainViewComponent::run()
 
             }
         }
-
-
-
-        currentSamplePosition += (sliceSize / 4) ;
-        //std::cout << currentSamplePosition << std::endl;
     }
-
-
 
 }
 
