@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="qGBbDF" name="JuceTest" projectType="guiapp" version="1.0.0"
+<JUCERPROJECT id="qGBbDF" name="FFTMPI" projectType="guiapp" version="1.0.0"
               bundleIdentifier="com.yourcompany.JuceTest" jucerVersion="3.1.0">
-  <MAINGROUP id="XEC9Vj" name="JuceTest">
+  <MAINGROUP id="XEC9Vj" name="FFTMPI">
     <GROUP id="{6CA9CFE0-5D39-191E-E30C-9DC1C58A6F5D}" name="Source">
       <FILE id="awdWEM" name="Worker.cpp" compile="1" resource="0" file="Source/Worker.cpp"/>
       <FILE id="blyvAZ" name="Worker.h" compile="0" resource="0" file="Source/Worker.h"/>
@@ -55,9 +55,9 @@
                 extraLinkerFlags="" userNotes="add CXX := mpic++ to top of makefile">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" libraryPath="/usr/X11R6/lib/&#10;" isDebug="1" optimisation="1"
-                       targetName="JuceTest" headerPath="/usr/include/mpich2/"/>
+                       targetName="JuceTest" headerPath=""/>
         <CONFIGURATION name="Release" libraryPath="/usr/X11R6/lib/&#10;" isDebug="0"
-                       optimisation="2" targetName="JuceTest" headerPath="/usr/include/mpich2/"/>
+                       optimisation="2" targetName="JuceTest" headerPath=""/>
       </CONFIGURATIONS>
     </LINUX_MAKE>
   </EXPORTFORMATS>

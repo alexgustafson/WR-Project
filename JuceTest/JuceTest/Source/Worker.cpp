@@ -135,6 +135,7 @@ void Worker::performDFT(float *samples, int size, float** dft)
             
         }
         dft[0][bin] = (dft[0][bin]*dft[0][bin]) + (dft[1][bin]*dft[1][bin]);
+        dft[0][bin] =  2. * sqrt( dft[0][bin] / size  ) ;
                 
     }
 }
@@ -226,6 +227,8 @@ void Worker::performDFT(float *samples, int size, float** dft)
 float Worker::performFFT(float *samples, unsigned long number_of_complex_samples, int isign)
 {
 
+    //taken from http://www.dspdimension.com/admin/dft-a-pied/
+    
     float wr, wi, arg, *p1, *p2, temp;
     float tr, ti, ur, ui, *p1r, *p1i, *p2r, *p2i;
     long i, bitm, j, le, le2, k, logN;
@@ -273,6 +276,9 @@ float Worker::performFFT(float *samples, unsigned long number_of_complex_samples
 }
 
 
+
+
+
 void Worker::initializeFFTBufferArray(float *samples, float *buffer, int sizeOfSampleBuffer)
 {
     for (int i = 0; i < sizeOfSampleBuffer; i++) {
@@ -288,7 +294,8 @@ void Worker::deInterlace(float *buffer, int sizeOfSampleBuffer)
     
     for (int i = 2; i < sizeOfSampleBuffer; i+=2) {
         
-        buffer[i/2] = (buffer[i] * buffer[i]) + (buffer[i-1] * buffer[i-1]);
+        buffer[i/2] = ((buffer[i] * buffer[i]) + (buffer[i-1] * buffer[i-1])) / (float)sizeOfSampleBuffer;
+        buffer[i/2] =  2. * sqrt( buffer[i/2]  ) ;
         //buffer[(i/2)-1] = buffer[i-1];
         
     }

@@ -71,6 +71,7 @@ private:
     Image bufferImage;
     float yStep;
     float xStep;
+    float fudgeFactor;
     //[/UserVariables]
 
     //==============================================================================

@@ -47,6 +47,7 @@ MainViewComponent::MainViewComponent (String threadName)
     addAndMakeVisible (fftButton = new ToggleButton ("fftButton"));
     fftButton->setButtonText ("useFFT");
     fftButton->addListener (this);
+    fftButton->setToggleState (true, false);
 
 
     //[UserPreSize]
@@ -57,7 +58,7 @@ MainViewComponent::MainViewComponent (String threadName)
 
     //[Constructor] You can add your own custom stuff here..
     formatManager.registerBasicFormats();
-    sliceSize = 1024;
+    sliceSize = 2048;
     currentSamplePosition = 0;
     mpiHandle = MPIHandler::getInstance();
     audioLoaded = false;
@@ -102,10 +103,10 @@ void MainViewComponent::paint (Graphics& g)
 
 void MainViewComponent::resized()
 {
-    audioWavformViewer->setBounds (8, 40, getWidth() - 16, getHeight() - 338);
+    audioWavformViewer->setBounds (8, 40, getWidth() - 16, proportionOfHeight (0.3187f));
     audioSelectButton->setBounds (8, 8, 150, 24);
     startProcessButton->setBounds (168, 8, 150, 24);
-    spectraViewer->setBounds (8, getHeight() - 292, getWidth() - 16, 280);
+    spectraViewer->setBounds ((8) + 0, (40) + roundFloatToInt ((proportionOfHeight (0.3187f)) * 1.0550f), getWidth() - 16, proportionOfHeight (0.5800f));
     fftButton->setBounds (480, 8, 72, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
@@ -238,7 +239,7 @@ BEGIN_JUCER_METADATA
     <RECT pos="0 0 100% 100%" fill="solid: ff808080" hasStroke="0"/>
   </BACKGROUND>
   <GENERICCOMPONENT name="audio waveform viewer" id="8c88d9e639609ba1" memberName="audioWavformViewer"
-                    virtualName="" explicitFocusOrder="0" pos="8 40 16M 338M" class="AudioWavViewComponent"
+                    virtualName="" explicitFocusOrder="0" pos="8 40 16M 31.77%" class="AudioWavViewComponent"
                     params="formatManager"/>
   <TEXTBUTTON name="audio select button" id="22779fde320537b4" memberName="audioSelectButton"
               virtualName="" explicitFocusOrder="0" pos="8 8 150 24" buttonText="select audio file"
@@ -247,11 +248,12 @@ BEGIN_JUCER_METADATA
               virtualName="" explicitFocusOrder="0" pos="168 8 150 24" buttonText="start processing"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <GENERICCOMPONENT name="audio spectrum viewer" id="4378df9a975403d5" memberName="spectraViewer"
-                    virtualName="" explicitFocusOrder="0" pos="8 292R 16M 280" class="SpectraViewComponent"
-                    params=""/>
+                    virtualName="" explicitFocusOrder="0" pos="0 105.369% 16M 57.996%"
+                    posRelativeX="8c88d9e639609ba1" posRelativeY="8c88d9e639609ba1"
+                    class="SpectraViewComponent" params=""/>
   <TOGGLEBUTTON name="fftButton" id="6b0560a9f4d85735" memberName="fftButton"
                 virtualName="" explicitFocusOrder="0" pos="480 8 72 24" buttonText="useFFT"
-                connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
+                connectedEdges="0" needsCallback="1" radioGroupId="0" state="1"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

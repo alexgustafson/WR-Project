@@ -42,7 +42,7 @@ SpectraViewComponent::SpectraViewComponent ()
                           false);
     spectraImage.clear(spectraImage.getBounds(), Colour::fromFloatRGBA(0.0, 0.0, 0.0, 0.0));
     
-
+    
     
     numOfFrequencies = 0;
     spectrumLength = 0;
@@ -50,6 +50,7 @@ SpectraViewComponent::SpectraViewComponent ()
     xDrawPostion = 0;
     scopeLineW = 1;
     bufferUntilDraw = 0;
+    fudgeFactor = 5.0;
     //[/Constructor]
 }
 
@@ -84,7 +85,7 @@ void SpectraViewComponent::paint (Graphics& g)
     
     g.drawImageAt (spectraImage, 0, 0, false);
     //std::cout << "called redraw" << std::endl;
-
+    
     //[/UserPaint]
 }
 
@@ -92,10 +93,10 @@ void SpectraViewComponent::resized()
 {
     //[UserResized] Add your own custom resize handling here..
     
-
-    //const ScopedLock sl (lock);
+    
+    const ScopedLock sl (lock);
     //std::cout << "called resize" << std::endl;
-
+    
     xStep = ((float)spectrumLength) / ((float)spectraImage.getWidth() * (float)numOfFrequencies );
     spectraImage = spectraImage.rescaled(getWidth(), getHeight());
     
@@ -115,7 +116,7 @@ void SpectraViewComponent::initSampleBuffer(int numChannels, int numSamples)
 
 void SpectraViewComponent::setSpectrumSize(int length, int resolution)
 {
-    //const ScopedLock sl (lock);
+    const ScopedLock sl (lock);
     //std::cout << "called setSpectrumSize" << std::endl;
     bufferUntilDraw = 0;
     spectrumLength = length;
@@ -133,7 +134,7 @@ void SpectraViewComponent::addDFTData(float *newVector)
     const float h = (float)spectraImage.getHeight();
     
     float x_scale_factor = ((float)buffers.size() / (((float)spectrumLength) /((float)numOfFrequencies)));
-        
+    
     if (bufferUntilDraw > xStep - 1) {
         
         Graphics g (spectraImage);
@@ -145,8 +146,8 @@ void SpectraViewComponent::addDFTData(float *newVector)
         for(int i = 0; i < numOfFrequencies; i++)
         {
             float value = buffers[buffers.size() - 1][i] ;
-            g.setColour(Colour::fromHSV(value / 15  , 1.0, 1.0, value * 10  ));
-            float y = log10 (1 + 39 * ((i + 1.0f) / numOfFrequencies)) / log10 (40.0f) * h;
+            g.setColour(Colour::fromHSV(value * fudgeFactor   , 1.0, 1.0, value  * fudgeFactor ));
+            float y = log10 (1 + 39 * ((i + 1.0f) / numOfFrequencies)) / log10 (40.0f) * h; //frequency on log scale
             g.fillRect((float)w * x_scale_factor /2.0 ,h - y , 1.0, 1.0);
             
         }
@@ -158,39 +159,33 @@ void SpectraViewComponent::addDFTData(float *newVector)
 
 void SpectraViewComponent::redrawData()
 {
-    const ScopedLock sl (lock);
-
     
-    float localxStep = ((float)spectrumLength) / ((float)spectraImage.getWidth() * (float)numOfFrequencies );
+    const float w = (float)spectraImage.getWidth();
+    const float h = (float)spectraImage.getHeight();
     
-    const int w = getWidth();
-    const int h = spectraImage.getHeight();
-    float x_scale_factor = ((float)buffers.size() / (((float)spectrumLength) /((float)numOfFrequencies)));
-    
-    for (int x = 0; x < buffers.size() - 1; x++) {
-        /*
-        if ((x % localxStep) == 0) {
+    int count = 0;
+    for (int j = 0; j < buffers.size(); j ++) {
+        
+        count++;
+        if (count > xStep - 1) {
             
             Graphics g (spectraImage);
             
-            bufferUntilDraw = 0;
+            count = 0;
             
             xDrawPostion = xDrawPostion + 1;
             
             for(int i = 0; i < numOfFrequencies; i++)
             {
                 float value = buffers[buffers.size() - 1][i] ;
-                g.setColour(Colour::fromHSV(value / 15  , 1.0, 1.0, value * 10  ));
-                float y =  log10 (1 + 39 * ((i + 1.0f) / numOfFrequencies)) / log10 (40.0f) * h;
-                g.fillRect((float)w * x_scale_factor / 2.0, h - y , 1.0, 1.0);
+                g.setColour(Colour::fromHSV(value * fudgeFactor   , 1.0, 1.0, value  * fudgeFactor ));
+                float y = log10 (1 + 39 * ((i + 1.0f) / numOfFrequencies)) / log10 (40.0f) * h; //frequency on log scale
+                g.fillRect((float)w * (float)i / (float)numOfFrequencies ,h - y , 1.0, 1.0);
                 
             }
             
-            
-        }*/
-        
+        }
     }
-    
     
     //std::cout <<  xStep << std::endl;
 }
@@ -199,7 +194,7 @@ void SpectraViewComponent::redrawData()
 void SpectraViewComponent::timerCallback()
 {
     //const ScopedLock sl (lock);
-
+    
     repaint();
 }
 

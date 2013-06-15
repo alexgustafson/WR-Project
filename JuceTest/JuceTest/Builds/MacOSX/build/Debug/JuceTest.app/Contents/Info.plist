@@ -9,7 +9,7 @@
 	<key>CFBundleIdentifier</key>
 	<string>com.yourcompany.JuceTest</string>
 	<key>CFBundleName</key>
-	<string>JuceTest</string>
+	<string>FFTMPI</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
