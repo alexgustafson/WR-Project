@@ -23,10 +23,12 @@
 //[Headers]     -- You can add your own extra header files here --
 #include "JuceHeader.h"
 #include "AudioWavViewComponent.h"
-#include "MPIHandler.h"
+//#include "MPIHandler.h"
+#include "../MPIHandler.h"
+#include "../Worker.h"
 #include <boost/serialization/vector.hpp>
 #include "SpectraViewComponent.h"
-#include "Worker.h"
+//#include "Worker.h"
 //[/Headers]
 
 
