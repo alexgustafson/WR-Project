@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       157,          7]
-NotebookDataLength[     64709,       1722]
-NotebookOptionsPosition[     58190,       1509]
-NotebookOutlinePosition[     59308,       1551]
-CellTagsIndexPosition[     59124,       1542]
+NotebookDataLength[     66124,       1745]
+NotebookOptionsPosition[     59522,       1530]
+NotebookOutlinePosition[     60640,       1572]
+CellTagsIndexPosition[     60456,       1563]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -906,13 +906,11 @@ Repeating this recursivly leads us to an cost model of \[ScriptCapitalO](5N",
  Cell[BoxData[
   FormBox[
    RowBox[{
-    SubscriptBox["log", "2"], "N"}], TraditionalForm]],
-  FormatType->"TraditionalForm"],
+    SubscriptBox["log", "2"], "N"}], TraditionalForm]]],
  ") as opposed to \[ScriptCapitalO]( 8 ",
  Cell[BoxData[
   FormBox[
-   SuperscriptBox["N", "2"], TraditionalForm]],
-  FormatType->"TraditionalForm"],
+   SuperscriptBox["N", "2"], TraditionalForm]]],
  " ). ",
  ButtonBox[Cell[TextData[StyleBox[ButtonBox["5"],
   FontVariations->{"CompatibilityType"->"Superscript"}]], "Citation",
@@ -941,7 +939,7 @@ Repeating this recursivly leads us to an cost model of \[ScriptCapitalO](5N",
   3.580235966604974*^9, 3.5802360321627207`*^9}, {3.5802360637061663`*^9, 
   3.580236089033712*^9}, {3.580236166586664*^9, 3.580236202544746*^9}, {
   3.580236282672501*^9, 3.580236377052053*^9}, {3.580236431508053*^9, 
-  3.580236457138277*^9}}]
+  3.580236457138277*^9}, {3.580279408571088*^9, 3.580279411885693*^9}}]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -952,11 +950,34 @@ Cell["3. IMPLEMENTATION WITH MPI", "Section",
    3.5802173562551537`*^9, 3.580217358106678*^9}, {3.5802316094394407`*^9, 
    3.5802316181000834`*^9}, {3.580246193023316*^9, 3.580246198551453*^9}}],
 
-Cell["The ", "Text",
+Cell["\<\
+Due to the divide and conquer nature of the FFT, the FFT algorithm itself is \
+a good candidate for parallel processing, especially for calculations with \
+large values of N. For this project though, will be using a more trivial \
+parallelization by slicing the audio signal into blocks, each of which is \
+distributed to a worker node. The worker nodes calculate the transform and \
+send the result back to a central dispatch node which uses the data to create \
+a spectragraph of the audio signal. \
+\>", "Text",
  CellChangeTimes->{{3.580231594869746*^9, 3.58023159755344*^9}, {
   3.580231681290956*^9, 3.580231835536284*^9}, {3.580232118491294*^9, 
   3.5802321249705353`*^9}, {3.580246202924137*^9, 3.5802462322693233`*^9}, {
-  3.580246515947727*^9, 3.5802465369446983`*^9}}],
+  3.580246515947727*^9, 3.5802465369446983`*^9}, {3.580284599653453*^9, 
+  3.580284696899021*^9}, {3.58028784696498*^9, 3.580288013183056*^9}}],
+
+Cell["", "Text",
+ CellChangeTimes->{{3.580231594869746*^9, 3.58023159755344*^9}, {
+  3.580231681290956*^9, 3.580231835536284*^9}, {3.580232118491294*^9, 
+  3.5802321249705353`*^9}, {3.580246202924137*^9, 3.5802462322693233`*^9}, {
+  3.580246515947727*^9, 3.5802465369446983`*^9}, {3.580284599653453*^9, 
+  3.580284696899021*^9}, {3.58028784696498*^9, 3.580288013420705*^9}}],
+
+Cell["", "Text",
+ CellChangeTimes->{{3.580231594869746*^9, 3.58023159755344*^9}, {
+  3.580231681290956*^9, 3.580231835536284*^9}, {3.580232118491294*^9, 
+  3.5802321249705353`*^9}, {3.580246202924137*^9, 3.5802462322693233`*^9}, {
+  3.580246515947727*^9, 3.5802465369446983`*^9}, {3.580284599653453*^9, 
+  3.580284696899021*^9}, {3.58028784696498*^9, 3.580288013419539*^9}}],
 
 Cell["", "Text",
  CellChangeTimes->{{3.580231594869746*^9, 3.58023159755344*^9}, {
@@ -1509,7 +1530,7 @@ Cell[TextData[{
 },
 NotebookAutoSave->True,
 WindowSize->{737, 912},
-WindowMargins->{{213, Automatic}, {Automatic, 32}},
+WindowMargins->{{110, Automatic}, {59, Automatic}},
 Magnification:>1.25 Inherited,
 FrontEndVersion->"9.0 for Mac OS X x86 (32-bit, 64-bit Kernel) (January 25, \
 2013)",
@@ -1523,29 +1544,29 @@ PrivateNotebookOptions -> {"NotebookAuthor" -> ""}
 (*CellTagsOutline
 CellTagsIndex->{
  "00006CE1"->{
-  Cell[56119, 1333, 509, 44, 50, "Reference",
+  Cell[57451, 1354, 509, 44, 62, "Reference",
    CellTags->"00006CE1"]},
  "00002BA5"->{
-  Cell[56631, 1379, 304, 20, 31, "Reference",
+  Cell[57963, 1400, 304, 20, 38, "Reference",
    CellTags->"00002BA5"]},
  "000030FD"->{
-  Cell[56938, 1401, 316, 22, 31, "Reference",
+  Cell[58270, 1422, 316, 22, 38, "Reference",
    CellTags->"000030FD"]},
  "00004221"->{
-  Cell[57257, 1425, 370, 27, 31, "Reference",
+  Cell[58589, 1446, 370, 27, 38, "Reference",
    CellTags->"00004221"]},
  "00005888"->{
-  Cell[57630, 1454, 520, 50, 50, "Reference",
+  Cell[58962, 1475, 520, 50, 62, "Reference",
    CellTags->"00005888"]}
  }
 *)
 (*CellTagsIndex
 CellTagsIndex->{
- {"00006CE1", 58676, 1524},
- {"00002BA5", 58764, 1527},
- {"000030FD", 58852, 1530},
- {"00004221", 58940, 1533},
- {"00005888", 59028, 1536}
+ {"00006CE1", 60008, 1545},
+ {"00002BA5", 60096, 1548},
+ {"000030FD", 60184, 1551},
+ {"00004221", 60272, 1554},
+ {"00005888", 60360, 1557}
  }
 *)
 (*NotebookFileOutline
@@ -1594,132 +1615,134 @@ Cell[36187, 733, 1865, 32, 80, "Text"],
 Cell[38055, 767, 2224, 63, 69, "EquationNumbered"],
 Cell[40282, 832, 597, 9, 26, "Text"],
 Cell[40882, 843, 2052, 56, 69, "EquationNumbered"],
-Cell[42937, 901, 1958, 42, 79, "Text"]
+Cell[42937, 901, 1938, 40, 79, "Text"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[44932, 948, 335, 4, 59, "Section"],
-Cell[45270, 954, 284, 4, 26, "Text"],
-Cell[45557, 960, 227, 3, 26, "Text"],
-Cell[45787, 965, 227, 3, 26, "Text"],
-Cell[46017, 970, 229, 3, 26, "Text"],
-Cell[46249, 975, 227, 3, 26, "Text"],
-Cell[46479, 980, 227, 3, 26, "Text"],
+Cell[44912, 946, 335, 4, 59, "Section"],
+Cell[45250, 952, 882, 13, 105, "Text"],
+Cell[46135, 967, 374, 5, 26, "Text"],
+Cell[46512, 974, 374, 5, 26, "Text"],
+Cell[46889, 981, 227, 3, 26, "Text"],
+Cell[47119, 986, 227, 3, 26, "Text"],
+Cell[47349, 991, 229, 3, 26, "Text"],
+Cell[47581, 996, 227, 3, 26, "Text"],
+Cell[47811, 1001, 227, 3, 26, "Text"],
 Cell[CellGroupData[{
-Cell[46731, 987, 55, 0, 19, "Item1Numbered"],
+Cell[48063, 1008, 55, 0, 19, "Item1Numbered"],
 Cell[CellGroupData[{
-Cell[46811, 991, 57, 0, 18, "Item1Paragraph"],
+Cell[48143, 1012, 57, 0, 18, "Item1Paragraph"],
 Cell[CellGroupData[{
-Cell[46893, 995, 55, 0, 19, "Item2Numbered"],
+Cell[48225, 1016, 55, 0, 19, "Item2Numbered"],
 Cell[CellGroupData[{
-Cell[46973, 999, 57, 0, 18, "Item2Paragraph"],
+Cell[48305, 1020, 57, 0, 18, "Item2Paragraph"],
 Cell[CellGroupData[{
-Cell[47055, 1003, 55, 0, 19, "Item3Numbered"],
-Cell[47113, 1005, 57, 0, 18, "Item3Paragraph"]
-}, Open  ]]
-}, Open  ]]
-}, Open  ]]
-}, Open  ]]
-}, Open  ]],
-Cell[47233, 1012, 102, 2, 26, "Text"],
-Cell[47338, 1016, 187, 6, 53, "EquationNumbered"],
-Cell[CellGroupData[{
-Cell[47550, 1026, 39, 0, 19, "Item1"],
-Cell[CellGroupData[{
-Cell[47614, 1030, 57, 0, 18, "Item1Paragraph"],
-Cell[CellGroupData[{
-Cell[47696, 1034, 39, 0, 19, "Item2"],
-Cell[CellGroupData[{
-Cell[47760, 1038, 57, 0, 18, "Item2Paragraph"],
-Cell[CellGroupData[{
-Cell[47842, 1042, 39, 0, 19, "Item3"],
-Cell[47884, 1044, 57, 0, 18, "Item3Paragraph"]
+Cell[48387, 1024, 55, 0, 19, "Item3Numbered"],
+Cell[48445, 1026, 57, 0, 18, "Item3Paragraph"]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]],
-Cell[48004, 1051, 279, 4, 26, "Text"],
-Cell[48286, 1057, 281, 4, 26, "Text"],
+Cell[48565, 1033, 102, 2, 26, "Text"],
+Cell[48670, 1037, 187, 6, 53, "EquationNumbered"],
 Cell[CellGroupData[{
-Cell[48592, 1065, 55, 0, 19, "Item1Numbered"],
+Cell[48882, 1047, 39, 0, 19, "Item1"],
 Cell[CellGroupData[{
-Cell[48672, 1069, 57, 0, 18, "Item1Paragraph"],
+Cell[48946, 1051, 57, 0, 18, "Item1Paragraph"],
 Cell[CellGroupData[{
-Cell[48754, 1073, 55, 0, 19, "Item2Numbered"],
+Cell[49028, 1055, 39, 0, 19, "Item2"],
 Cell[CellGroupData[{
-Cell[48834, 1077, 57, 0, 18, "Item2Paragraph"],
+Cell[49092, 1059, 57, 0, 18, "Item2Paragraph"],
 Cell[CellGroupData[{
-Cell[48916, 1081, 55, 0, 19, "Item3Numbered"],
-Cell[48974, 1083, 57, 0, 18, "Item3Paragraph"]
+Cell[49174, 1063, 39, 0, 19, "Item3"],
+Cell[49216, 1065, 57, 0, 18, "Item3Paragraph"]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]],
-Cell[49094, 1090, 102, 2, 26, "Text"],
-Cell[49199, 1094, 187, 6, 53, "EquationNumbered"],
+Cell[49336, 1072, 279, 4, 26, "Text"],
+Cell[49618, 1078, 281, 4, 26, "Text"],
 Cell[CellGroupData[{
-Cell[49411, 1104, 39, 0, 19, "Item1"],
+Cell[49924, 1086, 55, 0, 19, "Item1Numbered"],
 Cell[CellGroupData[{
-Cell[49475, 1108, 57, 0, 18, "Item1Paragraph"],
+Cell[50004, 1090, 57, 0, 18, "Item1Paragraph"],
 Cell[CellGroupData[{
-Cell[49557, 1112, 39, 0, 19, "Item2"],
+Cell[50086, 1094, 55, 0, 19, "Item2Numbered"],
 Cell[CellGroupData[{
-Cell[49621, 1116, 57, 0, 18, "Item2Paragraph"],
+Cell[50166, 1098, 57, 0, 18, "Item2Paragraph"],
 Cell[CellGroupData[{
-Cell[49703, 1120, 39, 0, 19, "Item3"],
-Cell[49745, 1122, 57, 0, 18, "Item3Paragraph"]
+Cell[50248, 1102, 55, 0, 19, "Item3Numbered"],
+Cell[50306, 1104, 57, 0, 18, "Item3Paragraph"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]],
+Cell[50426, 1111, 102, 2, 26, "Text"],
+Cell[50531, 1115, 187, 6, 53, "EquationNumbered"],
+Cell[CellGroupData[{
+Cell[50743, 1125, 39, 0, 19, "Item1"],
+Cell[CellGroupData[{
+Cell[50807, 1129, 57, 0, 18, "Item1Paragraph"],
+Cell[CellGroupData[{
+Cell[50889, 1133, 39, 0, 19, "Item2"],
+Cell[CellGroupData[{
+Cell[50953, 1137, 57, 0, 18, "Item2Paragraph"],
+Cell[CellGroupData[{
+Cell[51035, 1141, 39, 0, 19, "Item3"],
+Cell[51077, 1143, 57, 0, 18, "Item3Paragraph"]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[49887, 1131, 49, 0, 40, "Subsection"],
+Cell[51219, 1152, 49, 0, 40, "Subsection"],
 Cell[CellGroupData[{
-Cell[49961, 1135, 965, 18, 201, "Figure"],
-Cell[50929, 1155, 240, 6, 22, "FigureCaption"]
+Cell[51293, 1156, 965, 18, 201, "Figure"],
+Cell[52261, 1176, 240, 6, 22, "FigureCaption"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[51206, 1166, 966, 18, 202, "Picture"],
-Cell[52175, 1186, 247, 6, 22, "PictureCaption"]
+Cell[52538, 1187, 966, 18, 202, "Picture"],
+Cell[53507, 1207, 247, 6, 22, "PictureCaption"]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[52483, 1199, 52, 0, 59, "AppendixSection"],
+Cell[53815, 1220, 52, 0, 59, "AppendixSection"],
 Cell[CellGroupData[{
-Cell[52560, 1203, 117, 3, 26, "Appendix"],
-Cell[52680, 1208, 187, 6, 53, "AppendixEquation"]
+Cell[53892, 1224, 117, 3, 26, "Appendix"],
+Cell[54012, 1229, 187, 6, 53, "AppendixEquation"]
 }, Open  ]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[52916, 1220, 66, 0, 59, "AcknowledgmentsSection"],
-Cell[52985, 1222, 58, 0, 26, "Acknowledgments"]
+Cell[54248, 1241, 66, 0, 59, "AcknowledgmentsSection"],
+Cell[54317, 1243, 58, 0, 26, "Acknowledgments"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[53080, 1227, 106, 1, 59, "ReferenceSection"],
+Cell[54412, 1248, 106, 1, 73, "ReferenceSection"],
 Cell[CellGroupData[{
-Cell[53211, 1232, 249, 9, 21, "Reference"],
-Cell[53463, 1243, 269, 9, 21, "Reference"],
-Cell[53735, 1254, 286, 9, 40, "Reference"],
-Cell[54024, 1265, 199, 8, 21, "Reference"],
-Cell[54226, 1275, 219, 8, 21, "Reference"],
-Cell[54448, 1285, 236, 8, 40, "Reference"],
-Cell[54687, 1295, 330, 7, 40, "Reference"],
-Cell[55020, 1304, 367, 7, 58, "Reference"],
-Cell[55390, 1313, 367, 7, 58, "Reference"],
-Cell[55760, 1322, 192, 4, 40, "Reference"],
-Cell[55955, 1328, 161, 3, 21, "Reference"],
-Cell[56119, 1333, 509, 44, 50, "Reference",
+Cell[54543, 1253, 249, 9, 26, "Reference"],
+Cell[54795, 1264, 269, 9, 26, "Reference"],
+Cell[55067, 1275, 286, 9, 50, "Reference"],
+Cell[55356, 1286, 199, 8, 26, "Reference"],
+Cell[55558, 1296, 219, 8, 26, "Reference"],
+Cell[55780, 1306, 236, 8, 50, "Reference"],
+Cell[56019, 1316, 330, 7, 50, "Reference"],
+Cell[56352, 1325, 367, 7, 72, "Reference"],
+Cell[56722, 1334, 367, 7, 72, "Reference"],
+Cell[57092, 1343, 192, 4, 50, "Reference"],
+Cell[57287, 1349, 161, 3, 26, "Reference"],
+Cell[57451, 1354, 509, 44, 62, "Reference",
  CellTags->"00006CE1"],
-Cell[56631, 1379, 304, 20, 31, "Reference",
+Cell[57963, 1400, 304, 20, 38, "Reference",
  CellTags->"00002BA5"],
-Cell[56938, 1401, 316, 22, 31, "Reference",
+Cell[58270, 1422, 316, 22, 38, "Reference",
  CellTags->"000030FD"],
-Cell[57257, 1425, 370, 27, 31, "Reference",
+Cell[58589, 1446, 370, 27, 38, "Reference",
  CellTags->"00004221"],
-Cell[57630, 1454, 520, 50, 50, "Reference",
+Cell[58962, 1475, 520, 50, 62, "Reference",
  CellTags->"00005888"]
 }, Open  ]]
 }, Open  ]]

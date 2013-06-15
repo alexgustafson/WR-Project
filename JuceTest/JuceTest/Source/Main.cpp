@@ -118,7 +118,8 @@ static juce::JUCEApplicationBase* juce_CreateApplication()
 
 extern "C" int main (int argc, char* argv[])
 {
-    boost::mpi::environment env(argc, argv);
+    //boost::mpi::environment env(argc, argv);
+    MPI_Init(&argc, &argv);
     MPIHandler* mpiHandle = MPIHandler::getInstance();
 
     if (mpiHandle->getRank() == 0) {

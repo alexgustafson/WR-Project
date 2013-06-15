@@ -120,7 +120,7 @@ void SpectraViewComponent::setSpectrumSize(int length, int resolution)
     bufferUntilDraw = 0;
     spectrumLength = length;
     numOfFrequencies = resolution;
-    xStep = ((float)spectrumLength) / ((float)spectraImage.getWidth() * (float)numOfFrequencies * 2.0);
+    xStep = ((float)spectrumLength) / ((float)spectraImage.getWidth() * (float)numOfFrequencies );
     startTimer(100);
 }
 
@@ -128,6 +128,11 @@ void SpectraViewComponent::addDFTData(float *newVector)
 {
     const ScopedLock sl (lock);
     buffers.push_back(newVector);
+    
+    const float w = (float)spectraImage.getWidth();
+    const float h = (float)spectraImage.getHeight();
+    
+    float x_scale_factor = ((float)buffers.size() / (((float)spectrumLength)/((float)numOfFrequencies)));
         
     if (bufferUntilDraw > xStep - 1) {
         
@@ -137,13 +142,15 @@ void SpectraViewComponent::addDFTData(float *newVector)
         
         xDrawPostion = xDrawPostion + 1;
         
-        for(int y = 0; y < numOfFrequencies; y++)
+        for(int i = 0; i < numOfFrequencies; i++)
         {
-            float value = buffers[buffers.size() - 1][y] ;
-            g.setColour(Colour::fromHSV(value / 5  , 1.0, 1.0, value  ));
-            g.fillRect(xDrawPostion , spectraImage.getHeight() - (y/2), 1, 1);
+            float value = buffers[buffers.size() - 1][i] ;
+            float y = jlimit(0.0f, 1.0f, float  ( value ) );
             
+            g.setColour(Colour::fromHSV(value / 5  , 1.0, 1.0, value * 10  ));
+            g.fillRect((float)w * x_scale_factor , h - (h * ((float)i/numOfFrequencies)), 1.0, 1.0);
             
+            std::cout << x_scale_factor << std::endl;
         }
     
 
@@ -159,7 +166,8 @@ void SpectraViewComponent::redrawData()
 
     
     int localxStep  = ((float)spectrumLength) / ((float)spectraImage.getWidth() * (float)numOfFrequencies * 2.0);
-    
+    const int w = getWidth();
+    const int h = spectraImage.getHeight();
     
     for (int x = 0; x < buffers.size() - 1; x++) {
         
@@ -171,11 +179,12 @@ void SpectraViewComponent::redrawData()
             
             xDrawPostion = xDrawPostion + 1;
             
-            for(int y = 0; y < numOfFrequencies; y++)
+            for(int i = 0; i < numOfFrequencies; i++)
             {
-                float value = buffers[buffers.size() - 1][y] ;
-                g.setColour(Colour::fromHSV(value / 5  , 1.0, 1.0, value  ));
-                g.fillRect(xDrawPostion , spectraImage.getHeight() - (y/2), 1, 1);
+                float value = buffers[buffers.size() - 1][i] ;
+                float y = jlimit(0.0f, 1.0f, float  ( value ) );
+                g.setColour(Colour::fromHSV(value / 5  , 1.0, 1.0, value * 10  ));
+                g.fillRect(xDrawPostion , h - (h * y), 1.0, 1.0);
                 
                 
             }
@@ -201,6 +210,12 @@ void SpectraViewComponent::resetImage()
 {
     
 }
+
+float SpectraViewComponent::toDecibels (float absoluteValue)
+{
+    return 20.0 * log10 (absoluteValue);
+}
+
 //[/MiscUserCode]
 
 

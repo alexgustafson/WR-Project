@@ -57,7 +57,7 @@ MainViewComponent::MainViewComponent (String threadName)
 
     //[Constructor] You can add your own custom stuff here..
     formatManager.registerBasicFormats();
-    sliceSize = 2048;
+    sliceSize = 4096;
     currentSamplePosition = 0;
     mpiHandle = MPIHandler::getInstance();
     audioLoaded = false;

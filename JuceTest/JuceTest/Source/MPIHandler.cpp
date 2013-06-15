@@ -42,13 +42,7 @@ void MPIHandler::mpi_recFloatArray(void* sampleBuffer, int &count)
 }
 
 
-void MPIHandler::readyToSendResult()
-{
-    std::string ready;
-    ready = "ready";
-    world.send(0, msg_resultdata, ready);
-    
-}
+
 
 
 

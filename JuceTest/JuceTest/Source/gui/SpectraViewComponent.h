@@ -44,11 +44,12 @@ public:
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
+    float toDecibels (float absoluteValue);
     void addDFTData(float* newVector);
     void initSampleBuffer(int numChannels, int numSamples);
     void setSpectrumSize(int length, int resolution);
     void timerCallback();
-    int xDrawPostion;
+    float xDrawPostion;
     void redrawData();
     void resetImage();
     //[/UserMethods]
