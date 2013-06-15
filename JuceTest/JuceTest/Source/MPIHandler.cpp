@@ -15,6 +15,11 @@ void MPIHandler::getBufferSize(int *buffersize)
     MPI_Recv(buffersize, 1, MPI_INT, 0, msg_bufferSize, world, NULL);
 }
 
+void MPIHandler::getShouldUseFFT(int *shouldUseFFT)
+{
+    MPI_Recv(shouldUseFFT, 1, MPI_INT, 0, msg_usefft, world, NULL);
+}
+
 void MPIHandler::sendSampleBuffer(void* buffer, int sliceSize, int destination)
 {
     MPI_Send(buffer, sliceSize, MPI_FLOAT, destination , msg_sampledata, world);

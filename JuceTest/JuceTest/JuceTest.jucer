@@ -52,13 +52,12 @@
       </CONFIGURATIONS>
     </XCODE_MAC>
     <LINUX_MAKE targetFolder="Builds/Linux" juceFolder="../../../../juce/modules"
-                extraLinkerFlags="boost_mpi&#10;boost_serialization&#10;mpichxx&#10;mpich"
-                userNotes="add CXX := mpic++ to top of makefile">
+                extraLinkerFlags="" userNotes="add CXX := mpic++ to top of makefile">
       <CONFIGURATIONS>
-        <CONFIGURATION name="Debug" libraryPath="/usr/X11R6/lib/&#10;/usr/lib/mpich2/lib/"
-                       isDebug="1" optimisation="1" targetName="JuceTest" headerPath="/usr/include/mpich2/"/>
-        <CONFIGURATION name="Release" libraryPath="/usr/X11R6/lib/&#10;/usr/lib/mpich2/lib/"
-                       isDebug="0" optimisation="2" targetName="JuceTest" headerPath="/usr/include/mpich2/"/>
+        <CONFIGURATION name="Debug" libraryPath="/usr/X11R6/lib/&#10;" isDebug="1" optimisation="1"
+                       targetName="JuceTest" headerPath="/usr/include/mpich2/"/>
+        <CONFIGURATION name="Release" libraryPath="/usr/X11R6/lib/&#10;" isDebug="0"
+                       optimisation="2" targetName="JuceTest" headerPath="/usr/include/mpich2/"/>
       </CONFIGURATIONS>
     </LINUX_MAKE>
   </EXPORTFORMATS>

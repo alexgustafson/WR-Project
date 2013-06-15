@@ -98,6 +98,11 @@ void SpectraViewComponent::resized()
 
     xStep = ((float)spectrumLength) / ((float)bufferImage.getWidth() * (float)numOfFrequencies * 2.0);
     spectraImage = spectraImage.rescaled(getWidth(), getHeight());
+    
+    if (spectrumLength > 10) {
+        redrawData();
+    }
+    
     //[/UserResized]
 }
 
@@ -111,21 +116,20 @@ void SpectraViewComponent::initSampleBuffer(int numChannels, int numSamples)
 void SpectraViewComponent::setSpectrumSize(int length, int resolution)
 {
     //const ScopedLock sl (lock);
-    //std::cout << "calles setSpectrumSize" << std::endl;
+    //std::cout << "called setSpectrumSize" << std::endl;
+    bufferUntilDraw = 0;
     spectrumLength = length;
     numOfFrequencies = resolution;
     xStep = ((float)spectrumLength) / ((float)spectraImage.getWidth() * (float)numOfFrequencies * 2.0);
-    startTimer(160);
+    startTimer(100);
 }
 
 void SpectraViewComponent::addDFTData(float *newVector)
 {
     const ScopedLock sl (lock);
     buffers.push_back(newVector);
-    
-
-    
-    if (bufferUntilDraw > xStep) {
+        
+    if (bufferUntilDraw > xStep - 1) {
         
         Graphics g (spectraImage);
         
@@ -136,7 +140,7 @@ void SpectraViewComponent::addDFTData(float *newVector)
         for(int y = 0; y < numOfFrequencies; y++)
         {
             float value = buffers[buffers.size() - 1][y] ;
-            g.setColour(Colour::fromHSV(value * 5 , 1.0, 1.0, value * 5 ));
+            g.setColour(Colour::fromHSV(value / 5  , 1.0, 1.0, value  ));
             g.fillRect(xDrawPostion , spectraImage.getHeight() - (y/2), 1, 1);
             
             
@@ -144,17 +148,58 @@ void SpectraViewComponent::addDFTData(float *newVector)
     
 
     }
-
+    
     bufferUntilDraw++;
+    
+}
+
+void SpectraViewComponent::redrawData()
+{
+    const ScopedLock sl (lock);
+
+    
+    int localxStep  = ((float)spectrumLength) / ((float)spectraImage.getWidth() * (float)numOfFrequencies * 2.0);
+    
+    
+    for (int x = 0; x < buffers.size() - 1; x++) {
+        
+        if ((x % localxStep) == 0) {
+            
+            Graphics g (spectraImage);
+            
+            bufferUntilDraw = 0;
+            
+            xDrawPostion = xDrawPostion + 1;
+            
+            for(int y = 0; y < numOfFrequencies; y++)
+            {
+                float value = buffers[buffers.size() - 1][y] ;
+                g.setColour(Colour::fromHSV(value / 5  , 1.0, 1.0, value  ));
+                g.fillRect(xDrawPostion , spectraImage.getHeight() - (y/2), 1, 1);
+                
+                
+            }
+            
+            
+        }
+        
+    }
+    
     
     //std::cout <<  xStep << std::endl;
 }
+
 
 void SpectraViewComponent::timerCallback()
 {
     //const ScopedLock sl (lock);
 
     repaint();
+}
+
+void SpectraViewComponent::resetImage()
+{
+    
 }
 //[/MiscUserCode]
 

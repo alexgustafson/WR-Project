@@ -22,15 +22,13 @@
 
 #include "MainViewComponent.h"
 
-#define PI 3.14159265359
-
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
 //[/MiscUserDefs]
 
 //==============================================================================
-MainViewComponent::MainViewComponent (const String& name)
-: Thread (name)
+MainViewComponent::MainViewComponent (String threadName)
+    : Thread ( threadName )
 {
     addAndMakeVisible (audioWavformViewer = new AudioWavViewComponent (formatManager));
     audioWavformViewer->setName ("audio waveform viewer");
@@ -43,12 +41,12 @@ MainViewComponent::MainViewComponent (const String& name)
     startProcessButton->setButtonText ("start processing");
     startProcessButton->addListener (this);
 
-    addAndMakeVisible (testButton = new TextButton ("testButton"));
-    testButton->setButtonText ("test timer callback");
-    testButton->addListener (this);
-
     addAndMakeVisible (spectraViewer = new SpectraViewComponent());
-    spectraViewer->setName ("audio waveform viewer");
+    spectraViewer->setName ("audio spectrum viewer");
+
+    addAndMakeVisible (fftButton = new ToggleButton ("fftButton"));
+    fftButton->setButtonText ("useFFT");
+    fftButton->addListener (this);
 
 
     //[UserPreSize]
@@ -71,20 +69,19 @@ MainViewComponent::MainViewComponent (const String& name)
 MainViewComponent::~MainViewComponent()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
-    stopThread(500);
+    stopThread(100);
+    delete audioBuffer;
     //[/Destructor_pre]
 
     audioWavformViewer = nullptr;
     audioSelectButton = nullptr;
     startProcessButton = nullptr;
-    testButton = nullptr;
     spectraViewer = nullptr;
+    fftButton = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
-    audioReader = nullptr;
-    currentAudioFileSource->releaseResources();
-    currentAudioFileSource = nullptr;
+
     //[/Destructor]
 }
 
@@ -108,8 +105,8 @@ void MainViewComponent::resized()
     audioWavformViewer->setBounds (8, 40, getWidth() - 16, getHeight() - 338);
     audioSelectButton->setBounds (8, 8, 150, 24);
     startProcessButton->setBounds (168, 8, 150, 24);
-    testButton->setBounds (328, 8, 150, 24);
     spectraViewer->setBounds (8, getHeight() - 292, getWidth() - 16, 280);
+    fftButton->setBounds (480, 8, 72, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -129,15 +126,16 @@ void MainViewComponent::buttonClicked (Button* buttonThatWasClicked)
         {
 
             //audioFile = (myChooser.getResult());
-            currentAudioFileSource = nullptr;
-            audioReader = formatManager.createReaderFor (myChooser.getResult());
+            currentFile = myChooser.getResult();
+            //ScopedPointer<AudioFormatReaderSource> currentAudioFileSource;
+            ScopedPointer<AudioFormatReader> audioReader ( formatManager.createReaderFor (currentFile));
 
             if (audioReader != nullptr)
             {
-                currentAudioFileSource = new AudioFormatReaderSource (audioReader, true);
                 audioWavformViewer->setFile(myChooser.getResult());
                 audioLoaded = true;
                 spectraViewer->setSpectrumSize(audioReader->lengthInSamples, sliceSize/2);
+                currentSamplePosition = 0;
             }
 
             //std::cout << audioFile.getFileName();
@@ -148,23 +146,17 @@ void MainViewComponent::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == startProcessButton)
     {
         //[UserButtonCode_startProcessButton] -- add your button handler code here..
-        if (currentAudioFileSource != nullptr) {
-            
-            for(int i = 0; i < 30; i++)
-            {
-                //processAudioFile();
-                //timerCallback();
-            }
+        if (audioLoaded) {
+
             startThread();
-            
+
         }
         //[/UserButtonCode_startProcessButton]
     }
-    else if (buttonThatWasClicked == testButton)
+    else if (buttonThatWasClicked == fftButton)
     {
-        //[UserButtonCode_testButton] -- add your button handler code here..
-        timerCallback();
-        //[/UserButtonCode_testButton]
+        //[UserButtonCode_fftButton] -- add your button handler code here..
+        //[/UserButtonCode_fftButton]
     }
 
     //[UserbuttonClicked_Post]
@@ -177,8 +169,8 @@ void MainViewComponent::buttonClicked (Button* buttonThatWasClicked)
 void MainViewComponent::processAudioFile()
 {
 
-    
-    
+
+
 }
 
 void MainViewComponent::timerCallback()
@@ -188,62 +180,48 @@ void MainViewComponent::timerCallback()
 
 void MainViewComponent::run()
 {
-    
-    //create dft matrix
-    /*
-    long bin, k;
-    double arg, sign = -1.0;
-    
-    float** realCoefs = new float*[sliceSize/2];
-    float** imgCoefs = new float*[sliceSize/2];
-    
-    for(int i = 0; i < sliceSize/2; i++)
-    {
-        realCoefs[i] = new float[sliceSize];
-        imgCoefs[i] = new float[sliceSize];
-        
-        for(int j = 0; j < sliceSize; j++)
-        {
-            arg = 2.0 * (float)bin*PI*(float)k / (float)sliceSize;
-            realCoefs[i][j] = sign * sin(arg);
-            imgCoefs[i][j] = cos(arg);
-        }
-    }*/
-    
-    
-    
-    
+
+    int numOfProcessors = mpiHandle->getNumberOfProcesses();
+    ScopedPointer<AudioFormatReader> audioReader ( formatManager.createReaderFor (currentFile));
+
     while(currentSamplePosition < audioReader->lengthInSamples)
     {
-        
-        int numOfProcessors = mpiHandle->getNumberOfProcesses();
-        
-        for (int i = 1; i < numOfProcessors; i++) {
-            
-            audioReader->read(audioBuffer, 0, sliceSize,  currentSamplePosition, true, true);
-            
-            mpiHandle->send(i, msg_bufferSize, sliceSize);
-            mpiHandle->sendSampleBuffer(audioBuffer->getSampleData(0), sliceSize, i);
-            currentSamplePosition += sliceSize;
-        }
-        
-        for (int i = 1; i < numOfProcessors; i++)
-        {
-            
-            float* samples = new float[sliceSize];
-            
-            MPI_Status status;
-            MPI_Recv(samples, sliceSize/2, MPI_DOUBLE, i, msg_result_real, mpiHandle->world, &status);
-            spectraViewer->addDFTData(samples);
-            
-        }
-        
-        currentSamplePosition += (sliceSize / 4) ;
-        std::cout << currentSamplePosition << std::endl;
-    }
-    
 
-    
+
+        if(numOfProcessors > 1)
+        {
+            for (int i = 1; i < numOfProcessors; i++) {
+
+                audioReader->read(audioBuffer, 0, sliceSize,  currentSamplePosition, true, true);
+
+                mpiHandle->send(i, msg_bufferSize, sliceSize); //send size of N
+                mpiHandle->send(i, msg_usefft, fftButton->getToggleState()); //should use DFT or FFT ?
+                mpiHandle->sendSampleBuffer(audioBuffer->getSampleData(0), sliceSize, i); //send data slice
+                currentSamplePosition += sliceSize;
+            }
+
+            for (int i = 1; i < numOfProcessors; i++)
+            {
+
+                float* samples = new float[sliceSize];
+
+                MPI_Status status;
+                MPI_Recv(samples, sliceSize/2, MPI_DOUBLE, i, msg_result_real, mpiHandle->world, &status);
+                spectraViewer->addDFTData(samples);
+
+                delete []samples;
+
+            }
+        }
+
+
+
+        currentSamplePosition += (sliceSize / 4) ;
+        //std::cout << currentSamplePosition << std::endl;
+    }
+
+
+
 }
 
 
@@ -260,10 +238,10 @@ void MainViewComponent::run()
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="MainViewComponent" componentName=""
-                 parentClasses="public Component, public Timer" constructorParams=""
-                 variableInitialisers="" snapPixels="8" snapActive="1" snapShown="1"
-                 overlayOpacity="0.330000013" fixedSize="0" initialWidth="600"
-                 initialHeight="400">
+                 parentClasses="public Component, public Timer, public Thread"
+                 constructorParams="String threadName" variableInitialisers="Thread ( threadName )"
+                 snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330000013"
+                 fixedSize="0" initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ffededed">
     <RECT pos="0 0 100% 100%" fill="solid: ff808080" hasStroke="0"/>
   </BACKGROUND>
@@ -276,12 +254,12 @@ BEGIN_JUCER_METADATA
   <TEXTBUTTON name="start process button" id="84404b26681951e" memberName="startProcessButton"
               virtualName="" explicitFocusOrder="0" pos="168 8 150 24" buttonText="start processing"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
-  <TEXTBUTTON name="testButton" id="a911b67fb4d3996d" memberName="testButton"
-              virtualName="" explicitFocusOrder="0" pos="328 8 150 24" buttonText="test timer callback"
-              connectedEdges="0" needsCallback="1" radioGroupId="0"/>
-  <GENERICCOMPONENT name="audio waveform viewer" id="4378df9a975403d5" memberName="audioWavformViewer2"
+  <GENERICCOMPONENT name="audio spectrum viewer" id="4378df9a975403d5" memberName="spectraViewer"
                     virtualName="" explicitFocusOrder="0" pos="8 292R 16M 280" class="SpectraViewComponent"
                     params=""/>
+  <TOGGLEBUTTON name="fftButton" id="6b0560a9f4d85735" memberName="fftButton"
+                virtualName="" explicitFocusOrder="0" pos="480 8 72 24" buttonText="useFFT"
+                connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

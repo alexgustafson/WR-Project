@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       157,          7]
-NotebookDataLength[     57354,       1504]
-NotebookOptionsPosition[     51440,       1308]
-NotebookOutlinePosition[     52442,       1346]
-CellTagsIndexPosition[     52286,       1338]
+NotebookDataLength[     64709,       1722]
+NotebookOptionsPosition[     58190,       1509]
+NotebookOutlinePosition[     59308,       1551]
+CellTagsIndexPosition[     59124,       1542]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -184,7 +184,8 @@ series of sinusoid components, where ",
    3.580146666481669*^9, 3.580146695032185*^9}, {3.5801469798751583`*^9, 
    3.580147019511409*^9}, {3.580217187489191*^9, 3.580217190871213*^9}, {
    3.580219819264328*^9, 3.580219819319379*^9}, {3.580229947055543*^9, 
-   3.580229947113186*^9}, {3.5802303142207823`*^9, 3.580230314262995*^9}}],
+   3.580229947113186*^9}, {3.5802303142207823`*^9, 3.580230314262995*^9}, {
+   3.5802364315419283`*^9, 3.580236431589789*^9}}],
 
 Cell["\<\
 For discrete or sampled signals the Fourier Transformation has limits imposed \
@@ -376,7 +377,8 @@ smaller than the human ear is able to percieve",
   3.580218693112484*^9}, {3.580218759187014*^9, 3.580218887555039*^9}, {
   3.580219819228796*^9, 3.580219819424468*^9}, {3.580219860099826*^9, 
   3.5802198905750637`*^9}, {3.5802299471785517`*^9, 3.580229947239276*^9}, {
-  3.580230314319624*^9, 3.580230314382823*^9}}],
+  3.580230314319624*^9, 3.580230314382823*^9}, {3.580236431641384*^9, 
+  3.580236431700642*^9}}],
 
 Cell["\<\
 The solution is to slice the audio signal into blocks and transform these \
@@ -452,7 +454,8 @@ signal when added together. The Harris Blackman ",
    3.58022051395267*^9}, {3.580229737324354*^9, 3.580229888397621*^9}, {
    3.580229947008483*^9, 3.5802301247301693`*^9}, {3.580230155050846*^9, 
    3.5802301568588343`*^9}, {3.580230292488069*^9, 3.5802303146164017`*^9}, {
-   3.580230355876437*^9, 3.580230357377082*^9}}],
+   3.580230355876437*^9, 3.580230357377082*^9}, {3.5802364317546787`*^9, 
+   3.5802364319340963`*^9}}],
 
 Cell[CellGroupData[{
 
@@ -805,33 +808,180 @@ Cell[BoxData[
       RowBox[{"(", 
        RowBox[{
         SubscriptBox["c", 
-         RowBox[{
-          RowBox[{"2", "m"}], "+", "1"}]], 
+         RowBox[{"(", 
+          RowBox[{
+           RowBox[{"2", "m"}], "+", "1"}], ")"}]], 
         SuperscriptBox["e", 
          RowBox[{
           RowBox[{
-           RowBox[{
-            RowBox[{"-", "j"}], 
-            FractionBox[
-             RowBox[{"2", "\[Pi]"}], "N"], "2", "m"}], "-", 
-           RowBox[{"1", " ", "n"}]}], ")"}]]}], ")"}], " "}]}]}]}], 
-  TraditionalForm]], "EquationNumbered",
+           RowBox[{"-", "j"}], 
+           FractionBox[
+            RowBox[{"2", "\[Pi]"}], "N"], 
+           RowBox[{"(", 
+            RowBox[{
+             RowBox[{"2", "m"}], "-", "1"}], ")"}], " ", "n"}], ")"}]]}], 
+       ")"}], " "}]}]}]}], TraditionalForm]], "EquationNumbered",
  CellChangeTimes->{{3.5801438015913258`*^9, 3.580143823826132*^9}, {
   3.5801439092900963`*^9, 3.580143991736158*^9}, {3.580144073335417*^9, 
   3.5801440917336807`*^9}, {3.580144603179928*^9, 3.580144603361106*^9}, {
   3.580149250173183*^9, 3.5801492555797377`*^9}, {3.5801494052907677`*^9, 
   3.5801495253744087`*^9}, {3.5802339881356487`*^9, 3.58023399861522*^9}, {
   3.580234104297565*^9, 3.5802341425916348`*^9}, {3.580234175580097*^9, 
-  3.580234205762992*^9}}],
+  3.580234205762992*^9}, {3.580235354632361*^9, 3.580235385251939*^9}, {
+  3.5802354774262877`*^9, 3.580235478474011*^9}}],
 
-Cell["", "Text",
+Cell["\<\
+We can factor a constant term out of the odd steps to simplify.\
+\>", "Text",
  CellChangeTimes->{{3.580141197787624*^9, 3.580141197788968*^9}, {
   3.5801413139323063`*^9, 3.580141335666582*^9}, {3.580141367777989*^9, 
   3.5801414885432262`*^9}, {3.580141632055726*^9, 3.580141632428534*^9}, {
   3.580141746972705*^9, 3.5801419236143017`*^9}, {3.580217399981921*^9, 
   3.580217570169015*^9}, {3.580217602478053*^9, 3.580217707580019*^9}, {
   3.580217741021975*^9, 3.580217742845952*^9}, {3.5802303904937162`*^9, 
-  3.580230391042992*^9}}],
+  3.580230391042992*^9}, {3.5802354018325377`*^9, 3.5802354331271687`*^9}}],
+
+Cell[BoxData[
+ FormBox[
+  RowBox[{
+   RowBox[{"f", "[", "n", "]"}], "=", " ", 
+   RowBox[{
+    RowBox[{
+     UnderoverscriptBox["\[Sum]", 
+      RowBox[{"m", " ", "=", " ", "0"}], 
+      RowBox[{
+       RowBox[{"N", " ", "/", " ", "2"}], "-", " ", "1"}]], 
+     RowBox[{"(", 
+      RowBox[{
+       SubscriptBox["c", 
+        RowBox[{"2", "m"}]], 
+       SuperscriptBox["e", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"-", "j"}], 
+          FractionBox[
+           RowBox[{"2", "\[Pi]"}], 
+           RowBox[{"N", "/", "2"}]], "2", "m", " ", "n"}], ")"}]]}], ")"}]}], 
+    " ", "+", 
+    RowBox[{
+     SuperscriptBox["e", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"-", "j"}], 
+        FractionBox[
+         RowBox[{"2", "\[Pi]"}], "N"], "n"}], ")"}]], " ", 
+     RowBox[{
+      UnderoverscriptBox["\[Sum]", 
+       RowBox[{"m", " ", "=", " ", "0"}], 
+       RowBox[{
+        RowBox[{"N", " ", "/", " ", "2"}], "-", " ", "1"}]], 
+      RowBox[{"(", 
+       RowBox[{
+        SubscriptBox["c", 
+         RowBox[{"(", 
+          RowBox[{
+           RowBox[{"2", "m"}], "+", "1"}], ")"}]], 
+        SuperscriptBox["e", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"-", "j"}], 
+           FractionBox[
+            RowBox[{"2", "\[Pi]"}], 
+            RowBox[{"N", "/", "2"}]], "m", " ", "n"}], ")"}]]}], ")"}], 
+      " "}]}]}]}], TraditionalForm]], "EquationNumbered",
+ CellChangeTimes->{{3.5801438015913258`*^9, 3.580143823826132*^9}, {
+  3.5801439092900963`*^9, 3.580143991736158*^9}, {3.580144073335417*^9, 
+  3.5801440917336807`*^9}, {3.580144603179928*^9, 3.580144603361106*^9}, {
+  3.580149250173183*^9, 3.5801492555797377`*^9}, {3.5801494052907677`*^9, 
+  3.5801495253744087`*^9}, {3.5802339881356487`*^9, 3.58023399861522*^9}, {
+  3.580234104297565*^9, 3.5802341425916348`*^9}, {3.580234175580097*^9, 
+  3.580234205762992*^9}, {3.580235354632361*^9, 3.580235385251939*^9}, {
+  3.5802354731218843`*^9, 3.580235474273986*^9}, {3.580235557277231*^9, 
+  3.580235603087556*^9}, {3.5802356647696667`*^9, 3.580235678813718*^9}}],
+
+Cell[TextData[{
+ "Now we have 2 two sets of calculations to perform, but each with length \
+N/2. Each of these can also be split into even and odd components and summed. \
+Repeating this recursivly leads us to an cost model of \[ScriptCapitalO](5N",
+ Cell[BoxData[
+  FormBox[
+   RowBox[{
+    SubscriptBox["log", "2"], "N"}], TraditionalForm]],
+  FormatType->"TraditionalForm"],
+ ") as opposed to \[ScriptCapitalO]( 8 ",
+ Cell[BoxData[
+  FormBox[
+   SuperscriptBox["N", "2"], TraditionalForm]],
+  FormatType->"TraditionalForm"],
+ " ). ",
+ ButtonBox[Cell[TextData[StyleBox[ButtonBox["5"],
+  FontVariations->{"CompatibilityType"->"Superscript"}]], "Citation",
+  Editable->False,
+  TaggingRules->{NoteData -> RowBox[{
+       RowBox[{
+         RowBox[{"G", ".", " ", "E", ".", " ", "Karniadakis"}], " ", "and", 
+         " ", 
+         RowBox[{"R", ".", " ", "M", ".", " ", "Kirby"}], " ", "II"}], ",", 
+       " ", 
+       RowBox[{
+        "Parallel", " ", "Scientific", " ", "Computing", " ", "in", " ", 
+         RowBox[{"C", "++"}], " ", "and", " ", "MPI"}], ",", " ", 
+       RowBox[{"Cambridge", " ", "University", " ", "Press"}]}]}],
+  BaseStyle->"Hyperlink",
+  ButtonData->"00005888"],
+ " "
+}], "Text",
+ CellChangeTimes->{{3.580141197787624*^9, 3.580141197788968*^9}, {
+  3.5801413139323063`*^9, 3.580141335666582*^9}, {3.580141367777989*^9, 
+  3.5801414885432262`*^9}, {3.580141632055726*^9, 3.580141632428534*^9}, {
+  3.580141746972705*^9, 3.5801419236143017`*^9}, {3.580217399981921*^9, 
+  3.580217570169015*^9}, {3.580217602478053*^9, 3.580217707580019*^9}, {
+  3.580217741021975*^9, 3.580217742845952*^9}, {3.5802303904937162`*^9, 
+  3.580230391042992*^9}, {3.5802354018325377`*^9, 3.58023540227302*^9}, {
+  3.580235966604974*^9, 3.5802360321627207`*^9}, {3.5802360637061663`*^9, 
+  3.580236089033712*^9}, {3.580236166586664*^9, 3.580236202544746*^9}, {
+  3.580236282672501*^9, 3.580236377052053*^9}, {3.580236431508053*^9, 
+  3.580236457138277*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["3. IMPLEMENTATION WITH MPI", "Section",
+ CellChangeTimes->{{3.580141299584237*^9, 3.580141301499361*^9}, {
+   3.580141969907702*^9, 3.580141976069519*^9}, 3.580217300136673*^9, {
+   3.5802173562551537`*^9, 3.580217358106678*^9}, {3.5802316094394407`*^9, 
+   3.5802316181000834`*^9}, {3.580246193023316*^9, 3.580246198551453*^9}}],
+
+Cell["The ", "Text",
+ CellChangeTimes->{{3.580231594869746*^9, 3.58023159755344*^9}, {
+  3.580231681290956*^9, 3.580231835536284*^9}, {3.580232118491294*^9, 
+  3.5802321249705353`*^9}, {3.580246202924137*^9, 3.5802462322693233`*^9}, {
+  3.580246515947727*^9, 3.5802465369446983`*^9}}],
+
+Cell["", "Text",
+ CellChangeTimes->{{3.580231594869746*^9, 3.58023159755344*^9}, {
+  3.580231681290956*^9, 3.580231835536284*^9}, {3.580232118491294*^9, 
+  3.5802321249705353`*^9}, {3.580246202924137*^9, 3.580246203096694*^9}}],
+
+Cell["", "Text",
+ CellChangeTimes->{{3.580231594869746*^9, 3.58023159755344*^9}, {
+  3.580231681290956*^9, 3.580231835536284*^9}, {3.580232118491294*^9, 
+  3.5802321249705353`*^9}, {3.580246202924137*^9, 3.580246203267598*^9}}],
+
+Cell["", "Text",
+ CellChangeTimes->{{3.580231594869746*^9, 3.58023159755344*^9}, {
+  3.580231681290956*^9, 3.580231835536284*^9}, {3.580232118491294*^9, 
+  3.5802321249705353`*^9}, {3.580246202924137*^9, 3.5802462034725227`*^9}}],
+
+Cell["", "Text",
+ CellChangeTimes->{{3.580231594869746*^9, 3.58023159755344*^9}, {
+  3.580231681290956*^9, 3.580231835536284*^9}, {3.580232118491294*^9, 
+  3.5802321249705353`*^9}, {3.580246202924137*^9, 3.580246203584041*^9}}],
+
+Cell["", "Text",
+ CellChangeTimes->{{3.580231594869746*^9, 3.58023159755344*^9}, {
+  3.580231681290956*^9, 3.580231835536284*^9}, {3.580232118491294*^9, 
+  3.5802321249705353`*^9}, {3.580246202924137*^9, 3.580246203575039*^9}}],
 
 Cell[CellGroupData[{
 
@@ -1247,7 +1397,6 @@ Cell[TextData[{
 }], "Reference",
  Editable->False,
  TaggingRules->{ReferenceNoteData -> ""},
- CellChangeTimes->{3.580231643990787*^9},
  CellTags->"00002BA5"],
 
 Cell[TextData[{
@@ -1301,14 +1450,66 @@ Cell[TextData[{
 }], "Reference",
  Editable->False,
  TaggingRules->{ReferenceNoteData -> ""},
- CellTags->"00004221"]
+ CellTags->"00004221"],
+
+Cell[TextData[{
+ "\t",
+ StyleBox["5",
+  FontVariations->{"CompatibilityType"->"Superscript"}],
+ "\t",
+ "G",
+ ".",
+ " ",
+ "E",
+ ".",
+ " ",
+ "Karniadakis",
+ " ",
+ "and",
+ " ",
+ "R",
+ ".",
+ " ",
+ "M",
+ ".",
+ " ",
+ "Kirby",
+ " ",
+ "II",
+ ",",
+ " ",
+ "Parallel",
+ " ",
+ "Scientific",
+ " ",
+ "Computing",
+ " ",
+ "in",
+ " ",
+ "C",
+ "++",
+ " ",
+ "and",
+ " ",
+ "MPI",
+ ",",
+ " ",
+ "Cambridge",
+ " ",
+ "University",
+ " ",
+ "Press"
+}], "Reference",
+ Editable->False,
+ TaggingRules->{ReferenceNoteData -> ""},
+ CellTags->"00005888"]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]]
 },
 NotebookAutoSave->True,
-WindowSize->{705, 911},
-WindowMargins->{{113, Automatic}, {58, Automatic}},
+WindowSize->{737, 912},
+WindowMargins->{{213, Automatic}, {Automatic, 32}},
 Magnification:>1.25 Inherited,
 FrontEndVersion->"9.0 for Mac OS X x86 (32-bit, 64-bit Kernel) (January 25, \
 2013)",
@@ -1321,32 +1522,36 @@ PrivateNotebookOptions -> {"NotebookAuthor" -> ""}
 (* Internal cache information *)
 (*CellTagsOutline
 CellTagsIndex->{
+ "00006CE1"->{
+  Cell[56119, 1333, 509, 44, 50, "Reference",
+   CellTags->"00006CE1"]},
  "00002BA5"->{
-  Cell[50362, 1229, 346, 21, 31, "Reference",
+  Cell[56631, 1379, 304, 20, 31, "Reference",
    CellTags->"00002BA5"]},
  "000030FD"->{
-  Cell[50711, 1252, 316, 22, 31, "Reference",
+  Cell[56938, 1401, 316, 22, 31, "Reference",
    CellTags->"000030FD"]},
  "00004221"->{
-  Cell[51030, 1276, 370, 27, 31, "Reference",
+  Cell[57257, 1425, 370, 27, 31, "Reference",
    CellTags->"00004221"]},
- "00006CE1"->{
-  Cell[49850, 1183, 509, 44, 50, "Reference",
-   CellTags->"00006CE1"]}
+ "00005888"->{
+  Cell[57630, 1454, 520, 50, 50, "Reference",
+   CellTags->"00005888"]}
  }
 *)
 (*CellTagsIndex
 CellTagsIndex->{
- {"00002BA5", 51926, 1323},
- {"000030FD", 52014, 1326},
- {"00004221", 52102, 1329},
- {"00006CE1", 52190, 1332}
+ {"00006CE1", 58676, 1524},
+ {"00002BA5", 58764, 1527},
+ {"000030FD", 58852, 1530},
+ {"00004221", 58940, 1533},
+ {"00005888", 59028, 1536}
  }
 *)
 (*NotebookFileOutline
 Notebook[{
 Cell[CellGroupData[{
-Cell[579, 22, 128, 3, 133, "Title"],
+Cell[579, 22, 128, 3, 90, "Title"],
 Cell[CellGroupData[{
 Cell[732, 29, 131, 2, 51, "Author"],
 Cell[866, 33, 124, 2, 16, "Institution"],
@@ -1362,147 +1567,160 @@ Cell[2071, 66, 149, 2, 59, "Section"],
 Cell[2223, 70, 1412, 20, 145, "Text"],
 Cell[3638, 92, 902, 13, 26, "Text"],
 Cell[4543, 107, 802, 22, 64, "EquationNumbered"],
-Cell[5348, 131, 2559, 55, 79, "Text"],
-Cell[7910, 188, 676, 13, 46, "Text"],
-Cell[8589, 203, 924, 25, 68, "EquationNumbered"],
-Cell[9516, 230, 1076, 19, 67, "Text"],
-Cell[10595, 251, 972, 26, 68, "EquationNumbered"],
-Cell[11570, 279, 2708, 47, 127, "Text"]
+Cell[5348, 131, 2611, 56, 79, "Text"],
+Cell[7962, 189, 676, 13, 46, "Text"],
+Cell[8641, 204, 924, 25, 68, "EquationNumbered"],
+Cell[9568, 231, 1076, 19, 67, "Text"],
+Cell[10647, 252, 972, 26, 68, "EquationNumbered"],
+Cell[11622, 280, 2708, 47, 127, "Text"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[14315, 331, 221, 3, 59, "Section"],
-Cell[14539, 336, 2435, 42, 156, "Text"],
-Cell[16977, 380, 1458, 21, 125, "Text"],
-Cell[18438, 403, 2659, 51, 145, "Text"],
+Cell[14367, 332, 221, 3, 59, "Section"],
+Cell[14591, 337, 2484, 43, 156, "Text"],
+Cell[17078, 382, 1458, 21, 125, "Text"],
+Cell[18539, 405, 2713, 52, 145, "Text"],
 Cell[CellGroupData[{
-Cell[21122, 458, 10711, 178, 318, "Figure"],
-Cell[31836, 638, 554, 9, 22, "FigureCaption"]
+Cell[21277, 461, 10711, 178, 334, "Figure"],
+Cell[31991, 641, 554, 9, 22, "FigureCaption"]
 }, Open  ]],
-Cell[32405, 650, 82, 1, 26, "Text"]
+Cell[32560, 653, 82, 1, 26, "Text"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[32524, 656, 293, 4, 59, "Section"],
-Cell[32820, 662, 716, 11, 105, "Text"],
-Cell[33539, 675, 1458, 36, 290, "Code"],
-Cell[35000, 713, 1029, 15, 86, "Text"],
-Cell[36032, 730, 1865, 32, 80, "Text"],
-Cell[37900, 764, 2058, 60, 69, "EquationNumbered"],
-Cell[39961, 826, 476, 7, 26, "Text"],
-Cell[CellGroupData[{
-Cell[40462, 837, 55, 0, 19, "Item1Numbered"],
-Cell[CellGroupData[{
-Cell[40542, 841, 57, 0, 18, "Item1Paragraph"],
-Cell[CellGroupData[{
-Cell[40624, 845, 55, 0, 19, "Item2Numbered"],
-Cell[CellGroupData[{
-Cell[40704, 849, 57, 0, 18, "Item2Paragraph"],
-Cell[CellGroupData[{
-Cell[40786, 853, 55, 0, 19, "Item3Numbered"],
-Cell[40844, 855, 57, 0, 18, "Item3Paragraph"]
-}, Open  ]]
-}, Open  ]]
-}, Open  ]]
-}, Open  ]]
+Cell[32679, 659, 293, 4, 59, "Section"],
+Cell[32975, 665, 716, 11, 105, "Text"],
+Cell[33694, 678, 1458, 36, 290, "Code"],
+Cell[35155, 716, 1029, 15, 86, "Text"],
+Cell[36187, 733, 1865, 32, 80, "Text"],
+Cell[38055, 767, 2224, 63, 69, "EquationNumbered"],
+Cell[40282, 832, 597, 9, 26, "Text"],
+Cell[40882, 843, 2052, 56, 69, "EquationNumbered"],
+Cell[42937, 901, 1958, 42, 79, "Text"]
 }, Open  ]],
-Cell[40964, 862, 102, 2, 26, "Text"],
-Cell[41069, 866, 187, 6, 53, "EquationNumbered"],
 Cell[CellGroupData[{
-Cell[41281, 876, 39, 0, 19, "Item1"],
+Cell[44932, 948, 335, 4, 59, "Section"],
+Cell[45270, 954, 284, 4, 26, "Text"],
+Cell[45557, 960, 227, 3, 26, "Text"],
+Cell[45787, 965, 227, 3, 26, "Text"],
+Cell[46017, 970, 229, 3, 26, "Text"],
+Cell[46249, 975, 227, 3, 26, "Text"],
+Cell[46479, 980, 227, 3, 26, "Text"],
 Cell[CellGroupData[{
-Cell[41345, 880, 57, 0, 18, "Item1Paragraph"],
+Cell[46731, 987, 55, 0, 19, "Item1Numbered"],
 Cell[CellGroupData[{
-Cell[41427, 884, 39, 0, 19, "Item2"],
+Cell[46811, 991, 57, 0, 18, "Item1Paragraph"],
 Cell[CellGroupData[{
-Cell[41491, 888, 57, 0, 18, "Item2Paragraph"],
+Cell[46893, 995, 55, 0, 19, "Item2Numbered"],
 Cell[CellGroupData[{
-Cell[41573, 892, 39, 0, 19, "Item3"],
-Cell[41615, 894, 57, 0, 18, "Item3Paragraph"]
+Cell[46973, 999, 57, 0, 18, "Item2Paragraph"],
+Cell[CellGroupData[{
+Cell[47055, 1003, 55, 0, 19, "Item3Numbered"],
+Cell[47113, 1005, 57, 0, 18, "Item3Paragraph"]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]],
-Cell[41735, 901, 279, 4, 26, "Text"],
-Cell[42017, 907, 281, 4, 26, "Text"],
+Cell[47233, 1012, 102, 2, 26, "Text"],
+Cell[47338, 1016, 187, 6, 53, "EquationNumbered"],
 Cell[CellGroupData[{
-Cell[42323, 915, 55, 0, 19, "Item1Numbered"],
+Cell[47550, 1026, 39, 0, 19, "Item1"],
 Cell[CellGroupData[{
-Cell[42403, 919, 57, 0, 18, "Item1Paragraph"],
+Cell[47614, 1030, 57, 0, 18, "Item1Paragraph"],
 Cell[CellGroupData[{
-Cell[42485, 923, 55, 0, 19, "Item2Numbered"],
+Cell[47696, 1034, 39, 0, 19, "Item2"],
 Cell[CellGroupData[{
-Cell[42565, 927, 57, 0, 18, "Item2Paragraph"],
+Cell[47760, 1038, 57, 0, 18, "Item2Paragraph"],
 Cell[CellGroupData[{
-Cell[42647, 931, 55, 0, 19, "Item3Numbered"],
-Cell[42705, 933, 57, 0, 18, "Item3Paragraph"]
+Cell[47842, 1042, 39, 0, 19, "Item3"],
+Cell[47884, 1044, 57, 0, 18, "Item3Paragraph"]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]],
-Cell[42825, 940, 102, 2, 26, "Text"],
-Cell[42930, 944, 187, 6, 53, "EquationNumbered"],
+Cell[48004, 1051, 279, 4, 26, "Text"],
+Cell[48286, 1057, 281, 4, 26, "Text"],
 Cell[CellGroupData[{
-Cell[43142, 954, 39, 0, 19, "Item1"],
+Cell[48592, 1065, 55, 0, 19, "Item1Numbered"],
 Cell[CellGroupData[{
-Cell[43206, 958, 57, 0, 18, "Item1Paragraph"],
+Cell[48672, 1069, 57, 0, 18, "Item1Paragraph"],
 Cell[CellGroupData[{
-Cell[43288, 962, 39, 0, 19, "Item2"],
+Cell[48754, 1073, 55, 0, 19, "Item2Numbered"],
 Cell[CellGroupData[{
-Cell[43352, 966, 57, 0, 18, "Item2Paragraph"],
+Cell[48834, 1077, 57, 0, 18, "Item2Paragraph"],
 Cell[CellGroupData[{
-Cell[43434, 970, 39, 0, 19, "Item3"],
-Cell[43476, 972, 57, 0, 18, "Item3Paragraph"]
+Cell[48916, 1081, 55, 0, 19, "Item3Numbered"],
+Cell[48974, 1083, 57, 0, 18, "Item3Paragraph"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]],
+Cell[49094, 1090, 102, 2, 26, "Text"],
+Cell[49199, 1094, 187, 6, 53, "EquationNumbered"],
+Cell[CellGroupData[{
+Cell[49411, 1104, 39, 0, 19, "Item1"],
+Cell[CellGroupData[{
+Cell[49475, 1108, 57, 0, 18, "Item1Paragraph"],
+Cell[CellGroupData[{
+Cell[49557, 1112, 39, 0, 19, "Item2"],
+Cell[CellGroupData[{
+Cell[49621, 1116, 57, 0, 18, "Item2Paragraph"],
+Cell[CellGroupData[{
+Cell[49703, 1120, 39, 0, 19, "Item3"],
+Cell[49745, 1122, 57, 0, 18, "Item3Paragraph"]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[43618, 981, 49, 0, 40, "Subsection"],
+Cell[49887, 1131, 49, 0, 40, "Subsection"],
 Cell[CellGroupData[{
-Cell[43692, 985, 965, 18, 201, "Figure"],
-Cell[44660, 1005, 240, 6, 22, "FigureCaption"]
+Cell[49961, 1135, 965, 18, 201, "Figure"],
+Cell[50929, 1155, 240, 6, 22, "FigureCaption"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[44937, 1016, 966, 18, 202, "Picture"],
-Cell[45906, 1036, 247, 6, 22, "PictureCaption"]
+Cell[51206, 1166, 966, 18, 202, "Picture"],
+Cell[52175, 1186, 247, 6, 22, "PictureCaption"]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[46214, 1049, 52, 0, 59, "AppendixSection"],
+Cell[52483, 1199, 52, 0, 59, "AppendixSection"],
 Cell[CellGroupData[{
-Cell[46291, 1053, 117, 3, 26, "Appendix"],
-Cell[46411, 1058, 187, 6, 53, "AppendixEquation"]
+Cell[52560, 1203, 117, 3, 26, "Appendix"],
+Cell[52680, 1208, 187, 6, 53, "AppendixEquation"]
 }, Open  ]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[46647, 1070, 66, 0, 59, "AcknowledgmentsSection"],
-Cell[46716, 1072, 58, 0, 26, "Acknowledgments"]
+Cell[52916, 1220, 66, 0, 59, "AcknowledgmentsSection"],
+Cell[52985, 1222, 58, 0, 26, "Acknowledgments"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[46811, 1077, 106, 1, 59, "ReferenceSection"],
+Cell[53080, 1227, 106, 1, 59, "ReferenceSection"],
 Cell[CellGroupData[{
-Cell[46942, 1082, 249, 9, 21, "Reference"],
-Cell[47194, 1093, 269, 9, 21, "Reference"],
-Cell[47466, 1104, 286, 9, 40, "Reference"],
-Cell[47755, 1115, 199, 8, 21, "Reference"],
-Cell[47957, 1125, 219, 8, 21, "Reference"],
-Cell[48179, 1135, 236, 8, 40, "Reference"],
-Cell[48418, 1145, 330, 7, 40, "Reference"],
-Cell[48751, 1154, 367, 7, 58, "Reference"],
-Cell[49121, 1163, 367, 7, 58, "Reference"],
-Cell[49491, 1172, 192, 4, 40, "Reference"],
-Cell[49686, 1178, 161, 3, 21, "Reference"],
-Cell[49850, 1183, 509, 44, 50, "Reference",
+Cell[53211, 1232, 249, 9, 21, "Reference"],
+Cell[53463, 1243, 269, 9, 21, "Reference"],
+Cell[53735, 1254, 286, 9, 40, "Reference"],
+Cell[54024, 1265, 199, 8, 21, "Reference"],
+Cell[54226, 1275, 219, 8, 21, "Reference"],
+Cell[54448, 1285, 236, 8, 40, "Reference"],
+Cell[54687, 1295, 330, 7, 40, "Reference"],
+Cell[55020, 1304, 367, 7, 58, "Reference"],
+Cell[55390, 1313, 367, 7, 58, "Reference"],
+Cell[55760, 1322, 192, 4, 40, "Reference"],
+Cell[55955, 1328, 161, 3, 21, "Reference"],
+Cell[56119, 1333, 509, 44, 50, "Reference",
  CellTags->"00006CE1"],
-Cell[50362, 1229, 346, 21, 31, "Reference",
+Cell[56631, 1379, 304, 20, 31, "Reference",
  CellTags->"00002BA5"],
-Cell[50711, 1252, 316, 22, 31, "Reference",
+Cell[56938, 1401, 316, 22, 31, "Reference",
  CellTags->"000030FD"],
-Cell[51030, 1276, 370, 27, 31, "Reference",
- CellTags->"00004221"]
+Cell[57257, 1425, 370, 27, 31, "Reference",
+ CellTags->"00004221"],
+Cell[57630, 1454, 520, 50, 50, "Reference",
+ CellTags->"00005888"]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]]

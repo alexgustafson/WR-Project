@@ -49,6 +49,8 @@ public:
     void setSpectrumSize(int length, int resolution);
     void timerCallback();
     int xDrawPostion;
+    void redrawData();
+    void resetImage();
     //[/UserMethods]
 
     void paint (Graphics& g);

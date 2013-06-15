@@ -26,6 +26,7 @@
 #include "MPIHandler.h"
 #include <boost/serialization/vector.hpp>
 #include "SpectraViewComponent.h"
+#include "Worker.h"
 //[/Headers]
 
 
@@ -40,12 +41,12 @@
 */
 class MainViewComponent  : public Component,
                            public Timer,
-                           public ButtonListener,
-                        public Thread
+                           public Thread,
+                           public ButtonListener
 {
 public:
     //==============================================================================
-    MainViewComponent (const String& name);
+    MainViewComponent (String threadName);
     ~MainViewComponent();
 
     //==============================================================================
@@ -69,8 +70,7 @@ public:
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
     AudioFormatManager formatManager;
-    ScopedPointer<AudioFormatReaderSource> currentAudioFileSource;
-    ScopedPointer<AudioFormatReader> audioReader;
+
     ScopedPointer<AudioSampleBuffer> serializeableAudioBuffer;
     File audioFile;
     int sliceSize;
@@ -79,14 +79,16 @@ private:
     bool audioLoaded;
     std::vector< float* > buffers;
     AudioSampleBuffer *audioBuffer;
+    File currentFile;
     //[/UserVariables]
 
     //==============================================================================
     ScopedPointer<AudioWavViewComponent> audioWavformViewer;
     ScopedPointer<TextButton> audioSelectButton;
     ScopedPointer<TextButton> startProcessButton;
-    ScopedPointer<TextButton> testButton;
     ScopedPointer<SpectraViewComponent> spectraViewer;
+    ScopedPointer<ToggleButton> fftButton;
+
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainViewComponent)
