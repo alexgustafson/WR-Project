@@ -45,10 +45,10 @@
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" osxSDK="default" osxCompatibility="default" osxArchitecture="64BitIntel"
                        isDebug="1" optimisation="1" targetName="JuceTest" headerPath="/Users/alex_gustafson/Documents/boost/boost/&#10;/Users/alex_gustafson/Development&#10;/opt/local/include/openmpi/&#10;"
-                       libraryPath="/opt/local/lib"/>
+                       libraryPath="/opt/local/lib/&#10;/usr/local/lib/"/>
         <CONFIGURATION name="Release" osxSDK="default" osxCompatibility="default" osxArchitecture="64BitIntel"
                        isDebug="0" optimisation="2" targetName="JuceTest" headerPath="/Users/alex_gustafson/Documents/boost/boost/&#10;/Users/alex_gustafson/Development&#10;/opt/local/include/openmpi/&#10;"
-                       libraryPath="/opt/local/lib"/>
+                       libraryPath="/opt/local/lib/&#10;/usr/local/lib/"/>
       </CONFIGURATIONS>
     </XCODE_MAC>
     <LINUX_MAKE targetFolder="Builds/Linux" juceFolder="../../../../juce/modules"
@@ -56,9 +56,9 @@
                 externalLibraries="boost_mpi&#10;boost_serialization&#10;">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" libraryPath="/usr/X11R6/lib/&#10;" isDebug="1" optimisation="1"
-                       targetName="JuceTest" headerPath="/usr/local/include/boost"/>
+                       targetName="FFTMPI" headerPath="/usr/local/include/boost"/>
         <CONFIGURATION name="Release" libraryPath="/usr/X11R6/lib/&#10;" isDebug="0"
-                       optimisation="2" targetName="JuceTest" headerPath="/usr/local/include/boost"/>
+                       optimisation="2" targetName="FFTMPI" headerPath="/usr/local/include/boost"/>
       </CONFIGURATIONS>
     </LINUX_MAKE>
   </EXPORTFORMATS>

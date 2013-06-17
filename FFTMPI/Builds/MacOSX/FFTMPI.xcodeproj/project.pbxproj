@@ -1847,7 +1847,7 @@
 				CLANG_LINK_OBJC_RUNTIME = NO;
 				COMBINE_HIDPI_IMAGES = YES;
 				OTHER_LDFLAGS = "-lboost_mpi -lboost_serialization -lmpi.1 -lmpi_cxx.1";
-				LIBRARY_SEARCH_PATHS = ("$(inherited)", "\"/opt/local/lib\"");
+				LIBRARY_SEARCH_PATHS = ("$(inherited)", "\"/opt/local/lib/\"", "\"/usr/local/lib/\"");
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -1868,7 +1868,7 @@
 				CLANG_LINK_OBJC_RUNTIME = NO;
 				COMBINE_HIDPI_IMAGES = YES;
 				OTHER_LDFLAGS = "-lboost_mpi -lboost_serialization -lmpi.1 -lmpi_cxx.1";
-				LIBRARY_SEARCH_PATHS = ("$(inherited)", "\"/opt/local/lib\"");
+				LIBRARY_SEARCH_PATHS = ("$(inherited)", "\"/opt/local/lib/\"", "\"/usr/local/lib/\"");
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (

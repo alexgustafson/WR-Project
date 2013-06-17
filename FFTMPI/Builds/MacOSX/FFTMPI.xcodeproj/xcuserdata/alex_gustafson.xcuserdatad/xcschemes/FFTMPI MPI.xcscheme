@@ -66,7 +66,7 @@
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "/Users/alex_gustafson/Documents/WR-Project/JuceTest/JuceTest/Builds/MacOSX/build/Debug/JuceTest.app/Contents/MacOS/JuceTest "
+            argument = "/Users/alex_gustafson/Documents/WR-Project/FFTMPI/Builds/MacOSX/build/Debug/JuceTest.app/Contents/MacOS/JuceTest "
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
