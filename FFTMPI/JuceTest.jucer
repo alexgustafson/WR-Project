@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<JUCERPROJECT id="qGBbDF" name="FFTMPI" projectType="guiapp" version="1.0.0"
+              bundleIdentifier="com.yourcompany.JuceTest" jucerVersion="3.1.0">
+  <MAINGROUP id="XEC9Vj" name="FFTMPI">
+    <GROUP id="{6CA9CFE0-5D39-191E-E30C-9DC1C58A6F5D}" name="Source">
+      <FILE id="awdWEM" name="Worker.cpp" compile="1" resource="0" file="Source/Worker.cpp"/>
+      <FILE id="blyvAZ" name="Worker.h" compile="0" resource="0" file="Source/Worker.h"/>
+      <GROUP id="{AC34EA63-042C-B560-D750-0FFB2F107E82}" name="gui">
+        <FILE id="n73BiZ" name="SpectraViewComponent.cpp" compile="1" resource="0"
+              file="Source/gui/SpectraViewComponent.cpp"/>
+        <FILE id="wfTCcP" name="SpectraViewComponent.h" compile="0" resource="0"
+              file="Source/gui/SpectraViewComponent.h"/>
+        <FILE id="jhabiF" name="AudioWavViewComponent.cpp" compile="1" resource="0"
+              file="Source/gui/AudioWavViewComponent.cpp"/>
+        <FILE id="k6CvzP" name="AudioWavViewComponent.h" compile="0" resource="0"
+              file="Source/gui/AudioWavViewComponent.h"/>
+        <FILE id="kiel7N" name="MainViewComponent.cpp" compile="1" resource="0"
+              file="Source/gui/MainViewComponent.cpp"/>
+        <FILE id="ix2qNo" name="MainViewComponent.h" compile="0" resource="0"
+              file="Source/gui/MainViewComponent.h"/>
+      </GROUP>
+      <FILE id="CvwjVW" name="MPIHandler.cpp" compile="1" resource="0" file="Source/MPIHandler.cpp"/>
+      <FILE id="q3qCJ0" name="MPIHandler.h" compile="0" resource="0" file="Source/MPIHandler.h"/>
+      <FILE id="Cmj4LK" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
+    </GROUP>
+  </MAINGROUP>
+  <MODULES>
+    <MODULE id="juce_core" showAllCode="1" useLocalCopy="1"/>
+    <MODULE id="juce_events" showAllCode="1" useLocalCopy="1"/>
+    <MODULE id="juce_graphics" showAllCode="1" useLocalCopy="1"/>
+    <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="1"/>
+    <MODULE id="juce_gui_audio" showAllCode="1" useLocalCopy="1"/>
+    <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="1"/>
+    <MODULE id="juce_audio_formats" showAllCode="1" useLocalCopy="1"/>
+    <MODULE id="juce_audio_utils" showAllCode="1" useLocalCopy="1"/>
+    <MODULE id="juce_data_structures" showAllCode="1" useLocalCopy="1"/>
+    <MODULE id="juce_audio_devices" showAllCode="1" useLocalCopy="1"/>
+    <MODULE id="juce_gui_extra" showAllCode="1" useLocalCopy="1"/>
+    <MODULE id="juce_audio_processors" showAllCode="1" useLocalCopy="1"/>
+  </MODULES>
+  <EXPORTFORMATS>
+    <XCODE_MAC targetFolder="Builds/MacOSX" juceFolder="../../../JUCE/modules"
+               externalLibraries="boost_mpi&#10;boost_serialization&#10;mpi.1&#10;mpi_cxx.1">
+      <CONFIGURATIONS>
+        <CONFIGURATION name="Debug" osxSDK="default" osxCompatibility="default" osxArchitecture="64BitIntel"
+                       isDebug="1" optimisation="1" targetName="JuceTest" headerPath="/Users/alex_gustafson/Documents/boost/boost/&#10;/Users/alex_gustafson/Development&#10;/opt/local/include/openmpi/&#10;"
+                       libraryPath="/opt/local/lib"/>
+        <CONFIGURATION name="Release" osxSDK="default" osxCompatibility="default" osxArchitecture="64BitIntel"
+                       isDebug="0" optimisation="2" targetName="JuceTest" headerPath="/Users/alex_gustafson/Documents/boost/boost/&#10;/Users/alex_gustafson/Development&#10;/opt/local/include/openmpi/&#10;"
+                       libraryPath="/opt/local/lib"/>
+      </CONFIGURATIONS>
+    </XCODE_MAC>
+    <LINUX_MAKE targetFolder="Builds/Linux" juceFolder="../../../../juce/modules"
+                extraLinkerFlags="" userNotes="add CXX := mpic++ to top of makefile"
+                externalLibraries="boost_mpi&#10;boost_serialization&#10;">
+      <CONFIGURATIONS>
+        <CONFIGURATION name="Debug" libraryPath="/usr/X11R6/lib/&#10;" isDebug="1" optimisation="1"
+                       targetName="JuceTest" headerPath="/usr/local/include/boost"/>
+        <CONFIGURATION name="Release" libraryPath="/usr/X11R6/lib/&#10;" isDebug="0"
+                       optimisation="2" targetName="JuceTest" headerPath="/usr/local/include/boost"/>
+      </CONFIGURATIONS>
+    </LINUX_MAKE>
+  </EXPORTFORMATS>
+  <JUCEOPTIONS JUCE_WEB_BROWSER="disabled"/>
+</JUCERPROJECT>
