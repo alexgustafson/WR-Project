@@ -53,12 +53,12 @@
     </XCODE_MAC>
     <LINUX_MAKE targetFolder="Builds/Linux" juceFolder="../../../../juce/modules"
                 extraLinkerFlags="" userNotes="add CXX := mpic++ to top of makefile"
-                externalLibraries="boost_mpi&#10;boost_serialization&#10;">
+                externalLibraries="boost_mpi&#10;boost_serialization&#10;mpi&#10;mpi_cxx&#10;">
       <CONFIGURATIONS>
-        <CONFIGURATION name="Debug" libraryPath="/usr/X11R6/lib/&#10;" isDebug="1" optimisation="1"
-                       targetName="FFTMPI" headerPath="/usr/local/include/boost"/>
-        <CONFIGURATION name="Release" libraryPath="/usr/X11R6/lib/&#10;" isDebug="0"
-                       optimisation="2" targetName="FFTMPI" headerPath="/usr/local/include/boost"/>
+        <CONFIGURATION name="Debug" libraryPath="/usr/X11R6/lib/&#10;/usr/lib/openmpi/lib/"
+                       isDebug="1" optimisation="1" targetName="FFTMPI" headerPath="/usr/local/include/boost&#10;/usr/lib/openmpi/include"/>
+        <CONFIGURATION name="Release" libraryPath="/usr/X11R6/lib/&#10;/usr/lib/openmpi/lib/"
+                       isDebug="0" optimisation="2" targetName="FFTMPI" headerPath="/usr/local/include/boost&#10;/usr/lib/openmpi/include"/>
       </CONFIGURATIONS>
     </LINUX_MAKE>
   </EXPORTFORMATS>
