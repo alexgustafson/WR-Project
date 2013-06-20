@@ -1,12 +1,12 @@
 /*
-  ==============================================================================
-
-    Worker.cpp
-    Created: 4 Jun 2013 3:09:27pm
-    Author:  Alexander Gustafson
-
-  ==============================================================================
-*/
+ ==============================================================================
+ 
+ Worker.cpp
+ Created: 4 Jun 2013 3:09:27pm
+ Author:  Alexander Gustafson
+ 
+ ==============================================================================
+ */
 
 #include "Worker.h"
 #include <boost/mpi.hpp>
@@ -20,51 +20,75 @@
 Worker::Worker()
 {
     
-
-    MPIHandler* mpiHandle = MPIHandler::getInstance();
+    
+    mpiHandle = MPIHandler::getInstance();
     
     int numOfProcessors = mpiHandle->getNumberOfProcesses();
     int *usefft = new int;
+    int *finish = new int;
+    *finish = 0;
+    int reset[1];
+    reset[0] = 0;
+    mpiHandle->shouldReset(reset);
+    MPI_Status status;
+    
+    int *count = new int;
+    mpiHandle->getBufferSize(count);
+    
+    size = *count;
+    float *samples = new float[size];
+    float** dft = new float*[2];
+    float* fftBuffer = new float[size*2];
+    
+    
+    initializeDFTCoeffs();
     
     if(numOfProcessors > 1)
     {
         
-        int *count = new int;
-        
-        mpiHandle->getBufferSize(count);
-        
-        size = *count;
-        float *samples = new float[size];
-        float** dft = new float*[2];
-        float* fftBuffer = new float[size*2];
-        
-        MPI_Status status;
-        initializeDFTCoeffs();
-        
-        while(true)
-        {
+        while (*finish == 0) {
             
-            MPI_Recv(samples, size, MPI_FLOAT, 0, msg_sampledata, mpiHandle->world, &status);
-            performWindowing(samples, size);
-            mpiHandle->getShouldUseFFT(usefft);
+            mpiHandle->shouldFinish(finish);
+            if (*finish > 0) {
+                break;
+            }
             
-            if(*usefft > 0)
+            while(reset[0] == 0)
             {
                 
-                initializeFFTBufferArray(samples, fftBuffer, size);
-                performFFT(fftBuffer, size, -1);
-                deInterlace(fftBuffer, size*2);
-                MPI_Send(&fftBuffer[0],size/2, MPI_FLOAT, 0, msg_result_real, mpiHandle->world);
+                if(reset[0] > 0)
+                {
+                    break;
+                }
                 
                 
-            }else{
+                MPI_Recv(samples, size, MPI_FLOAT, 0, msg_sampledata, mpiHandle->world, &status);
+                performWindowing(samples, size);
+                mpiHandle->getShouldUseFFT(usefft);
                 
-                performDFT(samples, size, dft);
-                MPI_Send(&dft[0][0],size/2, MPI_FLOAT, 0, msg_result_real, mpiHandle->world);
+                if(*usefft > 0)
+                {
+                    
+                    initializeFFTBufferArray(samples, fftBuffer, size);
+                    performFFT(fftBuffer, size, -1);
+                    deInterlace(fftBuffer, size*2);
+                    MPI_Send(&fftBuffer[0],size/2, MPI_FLOAT, 0, msg_result_real, mpiHandle->world);
+                    
+                    
+                }else{
+                    
+                    performDFT(samples, size, dft);
+                    MPI_Send(&dft[0][0],size/2, MPI_FLOAT, 0, msg_result_real, mpiHandle->world);
+                    
+                }
                 
             }
             
+            std::cout << "worker nr:" << mpiHandle->getRank() << " reset" << std::endl;
+            
         }
+        
+        std::cout << "worker nr:" << mpiHandle->getRank() << " finished" << std::endl;
         
         for( int i = 0 ; i < size ; i++ ) {
             delete [] dft[i];
@@ -105,17 +129,19 @@ void Worker::performWindowing(float *samples, int size)
     float theta0 = PI_2 / (float)(size -1);
     float theta1 = PI_4 / (float)(size -1);
     float theta2 = PI_6 / (float)(size -1);
-        
+    
     for(int i = 0;i < size; i++)
     {
         samples[i] = (a0 - a1 * cos(theta0 * i) + a2 * cos(theta1 * i) + a3 * cos(theta2 * i)) * samples[i];
     }
-
+    
 }
 
 void Worker::performDFT(float *samples, int size, float** dft)
 {
     //naive implementation
+    
+    std::cout << "worker nr:" << mpiHandle->getRank() << " calculating DFT" << std::endl;
     
     long bin, k;
     
@@ -136,98 +162,100 @@ void Worker::performDFT(float *samples, int size, float** dft)
         }
         dft[0][bin] = (dft[0][bin]*dft[0][bin]) + (dft[1][bin]*dft[1][bin]);
         dft[0][bin] =  2. * sqrt( dft[0][bin] / size  ) ;
-                
+        
     }
 }
 
 /*float Worker::performFFT(float *data, unsigned long number_of_complex_samples, int isign)
-{
-    
-    //adapted from http://www.codeproject.com/Articles/9388/How-to-implement-the-FFT-algorithm
-    
-    //variables for trigonometric recurrences
-    unsigned long n,mmax,m,j,istep,i;
-    double wtemp,wr,wpr,wpi,wi,theta,tempr,tempi;
-    
-    //the complex array is real+complex so the array
-    //as a size n = 2* number of complex samples
-    // real part is the data[index] and the complex part is the data[index+1]
-    n=number_of_complex_samples * 2;
-    
-    //binary inversion (note that the indexes
-    //start from 0 witch means that the
-    //real part of the complex is on the even-indexes
-    //and the complex part is on the odd-indexes
-    j=0;
-    for (i=0;i<n/2;i+=2) {
-        if (j > i) {
-            //swap the real part
-            float temp = data[j];
-            data[j] = data[i];
-            data[i] = temp;
-            //swap the complex part
-            temp = samples[j+1];
-            data[j+1] = data[i+1];
-            data[i+1] = temp;
-            // checks if the changes occurs in the first half
-            // and use the mirrored effect on the second half
-            if((j/2)<(n/4)){
-                //swap the real part
-                //SWAP(data[(n-(i+2))],data[(n-(j+2))]);
-                temp = data[(n-(i+2))];
-                data[(n-(i+2))] = data[(n-(j+2))];
-                data[(n-(j+2))] = temp;
-                //swap the complex part
-                //SWAP(data[(n-(i+2))+1],data[(n-(j+2))+1]);
-                temp = data[(n-(i+2))+1];
-                data[(n-(i+2))+1] = data[(n-(j+2))+1];
-                data[(n-(j+2))+1] = temp;
-            }
-        }
-        m=n/2;
-        while (m >= 2 && j >= m) {
-            j -= m;
-            m = m/2;
-        }
-        j += m;
-    }
-    
-    //Danielson-Lanzcos routine
-    mmax=2;
-    //external loop
-    while (n > mmax)
-    {
-        istep = mmax<<  1;
-        theta=isign*(2*PI/mmax);
-        wtemp=sin(0.5*theta);
-        wpr = -2.0*wtemp*wtemp;
-        wpi=sin(theta);
-        wr=1.0;
-        wi=0.0;
-        //internal loops
-        for (m=1;m<mmax;m+=2) {
-            for (i= m;i<=n;i+=istep) {
-                j=i+mmax;
-                tempr=wr*data[j-1]-wi*data[j];
-                tempi=wr*data[j]+wi*data[j-1];
-                data[j-1]=data[i-1]-tempr;
-                data[j]=data[i]-tempi;
-                data[i-1] += tempr;
-                data[i] += tempi;
-            }
-            wr=(wtemp=wr)*wpr-wi*wpi+wr;
-            wi=wi*wpr+wtemp*wpi+wi;
-        }
-        mmax=istep;
-    }
+ {
  
-    
-}*/
+ //adapted from http://www.codeproject.com/Articles/9388/How-to-implement-the-FFT-algorithm
+ 
+ //variables for trigonometric recurrences
+ unsigned long n,mmax,m,j,istep,i;
+ double wtemp,wr,wpr,wpi,wi,theta,tempr,tempi;
+ 
+ //the complex array is real+complex so the array
+ //as a size n = 2* number of complex samples
+ // real part is the data[index] and the complex part is the data[index+1]
+ n=number_of_complex_samples * 2;
+ 
+ //binary inversion (note that the indexes
+ //start from 0 witch means that the
+ //real part of the complex is on the even-indexes
+ //and the complex part is on the odd-indexes
+ j=0;
+ for (i=0;i<n/2;i+=2) {
+ if (j > i) {
+ //swap the real part
+ float temp = data[j];
+ data[j] = data[i];
+ data[i] = temp;
+ //swap the complex part
+ temp = samples[j+1];
+ data[j+1] = data[i+1];
+ data[i+1] = temp;
+ // checks if the changes occurs in the first half
+ // and use the mirrored effect on the second half
+ if((j/2)<(n/4)){
+ //swap the real part
+ //SWAP(data[(n-(i+2))],data[(n-(j+2))]);
+ temp = data[(n-(i+2))];
+ data[(n-(i+2))] = data[(n-(j+2))];
+ data[(n-(j+2))] = temp;
+ //swap the complex part
+ //SWAP(data[(n-(i+2))+1],data[(n-(j+2))+1]);
+ temp = data[(n-(i+2))+1];
+ data[(n-(i+2))+1] = data[(n-(j+2))+1];
+ data[(n-(j+2))+1] = temp;
+ }
+ }
+ m=n/2;
+ while (m >= 2 && j >= m) {
+ j -= m;
+ m = m/2;
+ }
+ j += m;
+ }
+ 
+ //Danielson-Lanzcos routine
+ mmax=2;
+ //external loop
+ while (n > mmax)
+ {
+ istep = mmax<<  1;
+ theta=isign*(2*PI/mmax);
+ wtemp=sin(0.5*theta);
+ wpr = -2.0*wtemp*wtemp;
+ wpi=sin(theta);
+ wr=1.0;
+ wi=0.0;
+ //internal loops
+ for (m=1;m<mmax;m+=2) {
+ for (i= m;i<=n;i+=istep) {
+ j=i+mmax;
+ tempr=wr*data[j-1]-wi*data[j];
+ tempi=wr*data[j]+wi*data[j-1];
+ data[j-1]=data[i-1]-tempr;
+ data[j]=data[i]-tempi;
+ data[i-1] += tempr;
+ data[i] += tempi;
+ }
+ wr=(wtemp=wr)*wpr-wi*wpi+wr;
+ wi=wi*wpr+wtemp*wpi+wi;
+ }
+ mmax=istep;
+ }
+ 
+ 
+ }*/
 
 float Worker::performFFT(float *samples, unsigned long number_of_complex_samples, int isign)
 {
-
+    
     //taken from http://www.dspdimension.com/admin/dft-a-pied/
+    std::cout << "worker nr:" << mpiHandle->getRank() << " calculating FFT" << std::endl;
+    
     
     float wr, wi, arg, *p1, *p2, temp;
     float tr, ti, ur, ui, *p1r, *p1i, *p2r, *p2i;
@@ -240,7 +268,7 @@ float Worker::performFFT(float *samples, unsigned long number_of_complex_samples
             j <<= 1;
 		}
 		if (i < j) {
-
+            
 			p1 = samples+i; p2 = samples+j;
 			temp = *p1; *(p1++) = *p2;
 			*(p2++) = temp; temp = *p1;

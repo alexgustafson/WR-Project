@@ -52,6 +52,7 @@ public:
     float xDrawPostion;
     void redrawData();
     void resetImage();
+    void saveBufferToFile(String name);
     //[/UserMethods]
 
     void paint (Graphics& g);

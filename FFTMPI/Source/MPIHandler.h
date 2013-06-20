@@ -16,7 +16,7 @@
 #include <boost/mpi.hpp>
 #include "JuceHeader.h"
 
-enum MESSAGE_TAG {msg_sampledata, msg_resultdata, msg_bufferSize, msg_dataReady, msg_workerBusy, msg_workerReady, msg_broadcastData, msg_finished, msg_result_real, msg_result_img, msg_usefft };
+enum MESSAGE_TAG {msg_sampledata, msg_resultdata, msg_bufferSize, msg_dataReady, msg_workerBusy, msg_workerReady, msg_broadcastData, msg_finished, msg_result_real, msg_result_img, msg_usefft, msg_reset };
 
 
 class MPIHandler
@@ -81,6 +81,8 @@ public:
     void isResultReady(int workerNr, std::string &ready);
     void readyToSendResult();
     void getResultData(void* sampleBuffer, int &count, int fromWorkerNr);
+    void shouldFinish(void *finish);
+    void shouldReset(void *reset);
     
     
     boost::mpi::communicator world;

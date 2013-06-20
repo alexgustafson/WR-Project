@@ -118,6 +118,8 @@ void SpectraViewComponent::setSpectrumSize(int length, int resolution)
 {
     const ScopedLock sl (lock);
     //std::cout << "called setSpectrumSize" << std::endl;
+    buffers.clear();
+    spectraImage.clear(spectraImage.getBounds());
     bufferUntilDraw = 0;
     spectrumLength = length;
     numOfFrequencies = resolution;
@@ -206,6 +208,22 @@ void SpectraViewComponent::resetImage()
 float SpectraViewComponent::toDecibels (float absoluteValue)
 {
     return 20.0 * log10 (absoluteValue);
+}
+
+void SpectraViewComponent::saveBufferToFile(String name)
+{
+    std::cout << "Saving spectrum data to file" << std::endl;
+    
+    File file(File::getSpecialLocation(File::currentApplicationFile).getParentDirectory().getChildFile(name + ".data"));
+    file.deleteFile();
+    FileOutputStream output(file);
+    output.writeInt(buffers.size());
+    output.writeInt(numOfFrequencies);
+    for (int i = 0;i < buffers.size(); i++) {
+        output.write(&buffers[i], sizeof(float)*numOfFrequencies);
+                                         
+    }
+    std::cout << "Finished saving spectrum data to file" << std::endl;
 }
 
 //[/MiscUserCode]

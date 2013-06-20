@@ -35,10 +35,14 @@ private:
     int myRank;
     int numOfSamples;
     int size;
+    int finish;
+    int reset;
     //float *samples;
     
     float** realCoefs;
     float** imgCoefs;
+    
+    MPIHandler* mpiHandle;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Worker)
     

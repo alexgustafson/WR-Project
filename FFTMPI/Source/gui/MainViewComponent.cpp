@@ -70,6 +70,12 @@ MainViewComponent::MainViewComponent (String threadName)
 MainViewComponent::~MainViewComponent()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
+    int numOfProcessors = mpiHandle->getNumberOfProcesses();
+    for (int i = 1; i < numOfProcessors; i++)
+    {
+        mpiHandle->send(i, msg_finished, 1);
+        
+    }
     stopThread(100);
     delete audioBuffer;
     //[/Destructor_pre]
@@ -193,7 +199,8 @@ void MainViewComponent::run()
             for (int i = 1; i < numOfProcessors; i++) {
 
                 audioReader->read(audioBuffer, 0, sliceSize,  currentSamplePosition, true, true);
-
+                mpiHandle->send(i, msg_finished, 0);
+                mpiHandle->send(i, msg_reset, 0);
                 mpiHandle->send(i, msg_bufferSize, sliceSize); //send size of N
                 mpiHandle->send(i, msg_usefft, fftButton->getToggleState()); //should use DFT or FFT ?
                 mpiHandle->sendSampleBuffer(audioBuffer->getSampleData(0), sliceSize, i); //send data slice
@@ -214,6 +221,15 @@ void MainViewComponent::run()
             }
         }
     }
+    
+    for (int i = 1; i < numOfProcessors; i++)
+    {
+        mpiHandle->send(i, msg_reset, 1);
+
+    }
+    
+    
+    spectraViewer->saveBufferToFile(currentFile.getFileName());
 
 }
 

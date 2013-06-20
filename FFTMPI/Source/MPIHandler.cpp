@@ -41,7 +41,16 @@ void MPIHandler::mpi_recFloatArray(void* sampleBuffer, int &count)
     
 }
 
+void MPIHandler::shouldFinish(void *finish)
+{
+    MPI_Recv(finish, 1, MPI_INT, 0, msg_finished, world, NULL);
+}
 
+void MPIHandler::shouldReset(void *reset)
+{
+    MPI_Request request;
+    MPI_Irecv(reset, 1, MPI_INT, 0, msg_reset, world, &request);
+}
 
 
 
