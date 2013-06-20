@@ -63,7 +63,7 @@ MainViewComponent::MainViewComponent (String threadName)
     mpiHandle = MPIHandler::getInstance();
     audioLoaded = false;
     audioBuffer = new AudioSampleBuffer(1, sliceSize);
-
+    useFFT = 1;
     //[/Constructor]
 }
 
@@ -163,6 +163,13 @@ void MainViewComponent::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == fftButton)
     {
         //[UserButtonCode_fftButton] -- add your button handler code here..
+        if(fftButton->getToggleState())
+        {
+            useFFT = 1;
+        }else
+        {
+            useFFT = 0;
+        }
         //[/UserButtonCode_fftButton]
     }
 
@@ -202,7 +209,7 @@ void MainViewComponent::run()
                 mpiHandle->send(i, msg_finished, 0);
                 mpiHandle->send(i, msg_reset, 0);
                 mpiHandle->send(i, msg_bufferSize, sliceSize); //send size of N
-                mpiHandle->send(i, msg_usefft, fftButton->getToggleState()); //should use DFT or FFT ?
+                mpiHandle->send(i, msg_usefft, useFFT); //should use DFT or FFT ?
                 mpiHandle->sendSampleBuffer(audioBuffer->getSampleData(0), sliceSize, i); //send data slice
                 currentSamplePosition += sliceSize / 4;
             }

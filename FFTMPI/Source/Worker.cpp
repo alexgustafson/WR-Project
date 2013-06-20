@@ -25,6 +25,7 @@ Worker::Worker()
     
     int numOfProcessors = mpiHandle->getNumberOfProcesses();
     int *usefft = new int;
+    *usefft = 1;
     int *finish = new int;
     *finish = 0;
     int reset[1];

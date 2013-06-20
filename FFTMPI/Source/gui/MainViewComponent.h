@@ -76,6 +76,7 @@ private:
     ScopedPointer<AudioSampleBuffer> serializeableAudioBuffer;
     File audioFile;
     int sliceSize;
+    int useFFT;
     int64 currentSamplePosition;
     MPIHandler* mpiHandle;
     bool audioLoaded;
